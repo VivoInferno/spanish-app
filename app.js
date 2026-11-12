@@ -1,5 +1,6 @@
 (() => {
   'use strict';
+  const APP_VERSION = 'v3'; // keep in sync with CACHE in sw.js (espanol-v3)
   const KEY = 'spanish-app-state-v1';
   const DAY = SRS.DAY;
   const app = document.getElementById('app');
@@ -346,6 +347,7 @@
     return { words: words.length, patterns: pats.length, mastered, due, newLeft, weak };
   }
   function renderHome(msg) {
+    if (pendingReload) return reloadForUpdate();
     if (!S.placementDone) return renderPlacementIntro();
     const st = stats();
     const q = buildSession();
@@ -355,6 +357,7 @@
       <div class="today"><div><b>${st.due}</b><span>due</span></div><div><b>${nNew}</b><span>new words</span></div><div><b>${st.weak.length}</b><span>weak patterns</span></div></div>
       ${st.weak.length ? `<p class="muted">Focus: ${st.weak.slice(0, 3).map(w => esc(IDX.patterns[w.p].name)).join(' · ')}</p>` : ''}
       </main>
+      <p class="muted small version">${APP_VERSION}</p>
       <footer><button class="btn secondary" id="prog">Progress</button><button class="btn primary" id="go" ${q.length ? '' : 'disabled'}>${q.length ? 'Start session' : 'All caught up'}</button></footer>`;
     document.getElementById('go').onclick = startSession;
     document.getElementById('prog').onclick = renderProgress;
@@ -388,7 +391,7 @@
       <div class="row wrap"><button class="btn secondary" id="exp">Export progress</button><button class="btn secondary" id="copy">Copy to clipboard</button><label class="btn secondary">Import file<input id="imp" type="file" accept="application/json,.json" hidden></label></div>
       <textarea id="paste" placeholder="…or paste a backup here and tap Import pasted" rows="2"></textarea>
       <div class="row wrap"><button class="btn secondary" id="impPaste">Import pasted</button><button class="btn secondary" id="replace">Retake placement</button><button class="btn danger" id="reset">Reset everything</button></div>
-      <p class="muted small">Content v${C.version} · ${IDX.wordOrder.length} words · ${Object.keys(C.patterns).length} patterns · ${st.newLeft} words not started</p>
+      <p class="muted small">App ${APP_VERSION} · Content v${C.version} · ${IDX.wordOrder.length} words · ${Object.keys(C.patterns).length} patterns · ${st.newLeft} words not started</p>
       </main>`;
     bindSpeak();
     document.getElementById('back').onclick = () => renderHome();
@@ -421,8 +424,32 @@
     if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
     renderHome();
   }
-  if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(e => console.warn('SW failed', e)));
+  // ---------- updates (iOS keeps Home Screen apps alive, so check on load and whenever the app comes back) ----------
+  let pendingReload = false;
+  function reloadForUpdate() {
+    pendingReload = false;
+    const last = +sessionStorage.getItem('sw-reload-at') || 0;
+    if (Date.now() - last < 15000) return renderHome(); // loop guard
+    sessionStorage.setItem('sw-reload-at', String(Date.now()));
+    location.reload();
+  }
+  if ('serviceWorker' in navigator) {
+    let hadController = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!hadController) { hadController = true; return; } // first install: page is already current
+      if (run) pendingReload = true; // don't interrupt a session; reload when back on Home
+      else reloadForUpdate();
+    });
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(reg => {
+        const check = () => reg.update().catch(() => {});
+        check();
+        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });
+        window.addEventListener('pageshow', e => { if (e.persisted) check(); });
+      }).catch(e => console.warn('SW failed', e));
+    });
+  }
   // expose a tiny hook for automated tests
-  window.__app = { get state() { return S; }, get ex() { return run && run.ex; }, get entry() { return run && run.queue[run.i]; }, buildSession: () => buildSession(), makeExercise: e => makeExercise(e), get content() { return C; } };
+  window.__app = { version: APP_VERSION, get state() { return S; }, get ex() { return run && run.ex; }, get entry() { return run && run.queue[run.i]; }, buildSession: () => buildSession(), makeExercise: e => makeExercise(e), get content() { return C; } };
   boot();
 })();

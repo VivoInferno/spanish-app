@@ -65,4 +65,10 @@ t('later units recycle earlier words', () => {
     assert.ok(hits.length >= 1, C.units[i].id);
   }
 });
+t('APP_VERSION matches sw.js CACHE', () => {
+  const fs = require('fs'), path = require('path');
+  const v = fs.readFileSync(path.join(__dirname, '../app.js'), 'utf8').match(/APP_VERSION = '(v\d+)'/)[1];
+  const c = fs.readFileSync(path.join(__dirname, '../sw.js'), 'utf8').match(/CACHE = 'espanol-(v\d+)'/)[1];
+  assert.equal(v, c); console.log('   version', v);
+});
 console.log(`\n${n} tests passed`);

@@ -1,11 +1,16 @@
 import asyncio, json, sys
 from playwright.async_api import async_playwright
 URL = sys.argv[1] if len(sys.argv) > 1 else 'http://127.0.0.1:8787/'
+ENGINE = sys.argv[2] if len(sys.argv) > 2 else 'chromium'
 OUT = '/workspace/spanish-app/screens'
 async def main():
     async with async_playwright() as p:
-        b = await p.chromium.launch(args=['--autoplay-policy=no-user-gesture-required'])
-        ctx = await b.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=3, is_mobile=True, has_touch=True)
+        if ENGINE == 'webkit':
+            b = await p.webkit.launch(); dev = dict(p.devices['iPhone 15']); ctx = await b.new_context(**dev)
+        else:
+            b = await p.chromium.launch(args=['--autoplay-policy=no-user-gesture-required'])
+            ctx = await b.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=3, is_mobile=True, has_touch=True)
+        print('engine:', ENGINE, b.version)
         page = await ctx.new_page(); errors = []
         page.on('console', lambda m: errors.append(m.text) if m.type == 'error' else None)
         page.on('pageerror', lambda e: errors.append(str(e)))
@@ -32,15 +37,20 @@ async def main():
                 if right: await page.fill('#ans', ex['answers'][0]); await page.click('#check')
                 else: await page.click('#skip')
             tag = 'ok' if right else 'bad'
+            live = await page.evaluate("document.getAnimations().map(a => a.animationName).filter(Boolean)")
+            if not shots[tag]: print(f'{tag} running animations:', sorted(set(live)))
             if not shots[tag]:
-                await page.wait_for_timeout(120); await page.screenshot(path=f'{OUT}/fx-{tag}.png'); shots[tag] = True
+                await page.wait_for_timeout(120); await page.screenshot(path=f'{OUT}/fx-{ENGINE}-{tag}.png'); shots[tag] = True
                 cls = await page.evaluate("document.querySelector('main.card').className")
                 print(f'{tag} card classes:', cls)
             await page.click('#next')
+            if k == 1:
+                anim = await page.evaluate("(() => { const c = document.querySelector('main.card'); return {reduced: matchMedia('(prefers-reduced-motion: reduce)').matches, noAnimClass: document.documentElement.classList.contains('no-anim'), cardAnimations: c.getAnimations().map(a => a.animationName || a.constructor.name)}; })()")
+                print('animations on next card:', anim)
         done = await page.query_selector('h1:has-text("Done for now")')
         await page.wait_for_timeout(250)
         layer = await page.query_selector('.fx-layer')
-        await page.screenshot(path=f'{OUT}/fx-done-confetti.png')
+        await page.screenshot(path=f'{OUT}/fx-{ENGINE}-done-confetti.png')
         await page.wait_for_timeout(1000)
         gone = not await page.query_selector('.fx-layer')
         print('session finished:', bool(done), '| confetti shown:', bool(layer), '| confetti removed <1s after:', gone)

@@ -1,6 +1,6 @@
 /* Sound (Web Audio, synthesized, offline), haptics and small animations. No assets, no delays. */
 (function (root) {
-  let ctx = null, master = null, getSettings = () => ({});
+  let ctx = null, master = null, unlocked = false, getSettings = () => ({});
   const reduced = () => root.matchMedia && root.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const soundOn = () => getSettings().sound !== false;
   const animOn = () => getSettings().anim !== false && !reduced();
@@ -12,7 +12,10 @@
         const AC = root.AudioContext || root.webkitAudioContext; if (!AC) return;
         ctx = new AC(); master = ctx.createGain(); master.gain.value = 0.22; master.connect(ctx.destination);
       }
-      if (ctx.state === 'suspended') ctx.resume();
+      if (ctx.state !== 'running') ctx.resume().catch(() => {});
+      if (!unlocked) { // iOS: playing a silent buffer inside the gesture fully unlocks output
+        const b = ctx.createBuffer(1, 1, 22050), src = ctx.createBufferSource(); src.buffer = b; src.connect(ctx.destination); src.start(0); unlocked = true;
+      }
     } catch (e) { /* audio unavailable */ }
   }
   // one note: osc -> envelope -> master
@@ -24,7 +27,7 @@
     g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
     o.connect(g); g.connect(master); o.start(t0); o.stop(t0 + dur + 0.02);
   }
-  const ready = () => soundOn() && ctx && ctx.state === 'running';
+  const ready = () => { if (!soundOn() || !ctx) return false; if (ctx.state !== 'running') ctx.resume().catch(() => {}); return ctx.state === 'running'; };
   const sounds = {
     correct() { if (!ready()) return; // bright rising two-note chime (C6 → G6) with a soft octave shimmer
       note(1046.5, 0, 0.16, { type: 'triangle', gain: 0.45 }); note(2093, 0, 0.10, { gain: 0.08 });
@@ -60,7 +63,7 @@
   const FX = {
     init(fn) {
       getSettings = fn;
-      ['pointerdown', 'touchstart', 'keydown'].forEach(ev => root.addEventListener(ev, unlock, { capture: true, passive: true }));
+      ['pointerdown', 'touchstart', 'touchend', 'click', 'keydown'].forEach(ev => root.addEventListener(ev, unlock, { capture: true, passive: true }));
       // subtle tap on plain buttons; answer buttons get the correct/miss sound instead, speaker buttons stay silent
       root.addEventListener('click', e => {
         const b = e.target.closest && e.target.closest('button, label.btn');

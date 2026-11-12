@@ -66,3 +66,4 @@ input.fx-pop{border-color:var(--ok)}
 .fx-layer i{position:absolute;width:8px;height:12px;border-radius:2px;will-change:transform,opacity}
 html.no-anim *,html.no-anim *::before,html.no-anim *::after{animation:none!important;transition:none!important}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+.version{text-align:center;margin-top:28px;opacity:.7}
