@@ -1,0 +1,249 @@
+{
+  "version": 1,
+  "dialect": "es-MX",
+  "patterns": {
+    "clitic_future": {
+      "name": "Double pronouns + future (se lo enviaré)",
+      "explain": "Indirect object first, then direct: me/te/nos + lo/la/los/las. Le and les become se before lo/la/los/las. Both go before a conjugated verb: se los enviaré.",
+      "items": [
+        {"q": "¿Le vas a mandar los documentos al notario? — Sí, ___ mañana.", "o": ["se los enviaré", "le los enviaré", "se lo enviaré", "los se enviaré"], "en": "Are you going to send the documents to the notary? — Yes, I'll send them to him tomorrow.", "n": "le + los → se los. Los = los documentos."},
+        {"q": "¿Quién le va a dar la llave a la señora? — Yo ___ cuando llegue.", "o": ["se la daré", "le la daré", "se lo daré", "la le daré"], "en": "Who's going to give the key to the lady? — I'll give it to her when I get there.", "n": "le + la → se la. La = la llave."},
+        {"q": "¿Me vas a prestar tu coche el sábado? — Sí, ___.", "o": ["te lo prestaré", "te le prestaré", "se lo prestaré", "lo te prestaré"], "en": "Are you going to lend me your car on Saturday? — Yes, I'll lend it to you.", "n": "Indirect (te) always comes before direct (lo)."},
+        {"q": "¿Nos traerán las facturas hoy? — Sí, ___ esta tarde.", "o": ["nos las traerán", "se las traerán", "nos los traerán", "las nos traerán"], "en": "Will they bring us the invoices today? — Yes, they'll bring them to us this afternoon.", "n": "Nos + las (las facturas). Only le/les change to se."},
+        {"q": "¿Les vas a explicar el problema a tus clientes? — Sí, ___ en la junta.", "o": ["se lo explicaré", "les lo explicaré", "se la explicaré", "lo les explicaré"], "en": "Are you going to explain the problem to your clients? — Yes, I'll explain it to them in the meeting.", "n": "les + lo → se lo. Lo = el problema (masculine singular)."},
+        {"q": "¿Me mandarás la ubicación? — Sí, ___ en cuanto salga.", "o": ["te la mandaré", "te lo mandaré", "se la mandaré", "la te mandaré"], "en": "Will you send me the location? — Yes, I'll send it to you as soon as I leave.", "n": "La = la ubicación (feminine)."}
+      ]
+    },
+    "clitic_preterite": {
+      "name": "Double pronouns + preterite (se la pagué)",
+      "explain": "Same order in the past: indirect + direct before the verb. Le/les + lo/la/los/las → se lo/se la/se los/se las.",
+      "items": [
+        {"q": "¿Ya le pagaste la renta al dueño? — Sí, ya ___.", "o": ["se la pagué", "le la pagué", "se lo pagué", "la le pagué"], "en": "Did you already pay the landlord the rent? — Yes, I already paid it to him.", "n": "le + la → se la. La = la renta."},
+        {"q": "¿Quién te dio esas flores? — Mi hermana ___.", "o": ["me las dio", "me los dio", "se las dio", "las me dio"], "en": "Who gave you those flowers? — My sister gave them to me.", "n": "Las = las flores (feminine plural)."},
+        {"q": "¿Le devolviste los libros a la biblioteca? — No, todavía no ___.", "o": ["se los devolví", "le los devolví", "se las devolví", "los le devolví"], "en": "Did you return the books to the library? — No, I haven't returned them yet.", "n": "le + los → se los. Los = los libros."},
+        {"q": "¿Les mandaste las fotos a tus papás? — Sí, ___ anoche.", "o": ["se las mandé", "les las mandé", "se las mandó", "las les mandé"], "en": "Did you send the photos to your parents? — Yes, I sent them to them last night.", "n": "les + las → se las. Mandé = I sent."},
+        {"q": "¿Te explicaron las reglas? — Sí, ___ ayer.", "o": ["me las explicaron", "me los explicaron", "se las explicaron", "las me explicaron"], "en": "Did they explain the rules to you? — Yes, they explained them to me yesterday.", "n": "Me + las (las reglas)."},
+        {"q": "¿Le dijiste la verdad a Carlos? — Sí, ya ___.", "o": ["se la dije", "le la dije", "la le dije", "se le dije"], "en": "Did you tell Carlos the truth? — Yes, I already told him.", "n": "le + la → se la. La = la verdad."}
+      ]
+    },
+    "clitic_imperative": {
+      "name": "Pronouns with commands (dámelo / no se lo digas)",
+      "explain": "Affirmative commands: pronouns attach to the end (dáselas, envíemela) and the verb usually gains a written accent. Negative commands: pronouns go before the verb (no se lo digas).",
+      "items": [
+        {"q": "Necesito el contrato. ___, por favor. (tú)", "o": ["Mándamelo", "Mándalome", "Mándamela", "Mándamele"], "en": "I need the contract. Send it to me, please.", "n": "Affirmative: verb + me + lo, all attached, accent on the stressed syllable."},
+        {"q": "Las llaves son de Ana. ___ hoy. (tú)", "o": ["Dáselas", "Dálelas", "Dáselos", "Se las da"], "en": "The keys are Ana's. Give them to her today.", "n": "Da + le + las → dáselas (le → se)."},
+        {"q": "No ___ a nadie; es un secreto. (tú)", "o": ["se lo digas", "díselo", "se lo dices", "lo se digas"], "en": "Don't tell anyone; it's a secret.", "n": "Negative tú command = no + pronouns + subjunctive (digas)."},
+        {"q": "Señor, si tiene la factura, ___ por correo, por favor. (usted)", "o": ["envíemela", "envíamela", "envíelame", "envíemelo"], "en": "Sir, if you have the invoice, send it to me by email, please.", "n": "Usted command: envíe + me + la. Envíamela is the tú form."},
+        {"q": "Los niños quieren ver las fotos. ___, por favor. (ustedes)", "o": ["Enséñenselas", "Enséñenlesas", "Enséñaselas", "Enséñenselos"], "en": "The kids want to see the photos. Show them to them, please.", "n": "Enseñen + les + las → enséñenselas."},
+        {"q": "Si te pide el dinero, no ___ todavía. (tú)", "o": ["se lo des", "dáselo", "se lo das", "le lo des"], "en": "If he asks you for the money, don't give it to him yet.", "n": "Negative: no + se lo + subjunctive (des)."}
+      ]
+    },
+    "pret_imp": {
+      "name": "Preterite vs. imperfect",
+      "explain": "Preterite: completed, countable events (fui, llamó, fuimos tres veces). Imperfect: background, habits, descriptions, ongoing states (era, jugaba, había, sabía).",
+      "items": [
+        {"q": "Cuando ___ niño, vivía en Monterrey.", "o": ["era", "fui", "estuve", "fue"], "en": "When I was a kid, I lived in Monterrey.", "n": "Age/background description → imperfect (era)."},
+        {"q": "Ayer ___ al banco y abrí una cuenta.", "o": ["fui", "iba", "era", "fue"], "en": "Yesterday I went to the bank and opened an account.", "n": "A completed event in sequence → preterite."},
+        {"q": "Estaba manejando cuando me ___ mi jefe.", "o": ["llamó", "llamaba", "llama", "llamaría"], "en": "I was driving when my boss called me.", "n": "Ongoing background (estaba manejando) interrupted by a completed event (llamó)."},
+        {"q": "De niño, ___ al fútbol todos los sábados.", "o": ["jugaba", "jugué", "jugara", "jugaré"], "en": "As a kid, I played soccer every Saturday.", "n": "Habit in the past → imperfect."},
+        {"q": "No ___ que tenías hermanos.", "o": ["sabía", "supe", "sé", "sabré"], "en": "I didn't know you had siblings.", "n": "State of knowledge → imperfect. (Supe = I found out.)"},
+        {"q": "El año pasado ___ tres veces a Oaxaca.", "o": ["fuimos", "íbamos", "vamos", "iríamos"], "en": "Last year we went to Oaxaca three times.", "n": "A counted number of times → preterite."},
+        {"q": "Eran las diez y ___ mucho tráfico cuando salimos.", "o": ["había", "hubo", "hay", "habrá"], "en": "It was ten o'clock and there was a lot of traffic when we left.", "n": "Scene-setting description → imperfect (había)."}
+      ]
+    },
+    "subj": {
+      "name": "Subjunctive triggers",
+      "explain": "Wishes, requests, importance, doubt, purpose (para que) and future time clauses (cuando, en cuanto) take the subjunctive. Belief (creo que) takes the indicative.",
+      "items": [
+        {"q": "Quiero que ___ el presupuesto antes del viernes.", "o": ["me mandes", "me mandas", "me mandarás", "mandarme"], "en": "I want you to send me the budget before Friday.", "n": "Querer que + different subject → subjunctive."},
+        {"q": "Es importante que todos ___ a tiempo a la junta.", "o": ["lleguen", "llegan", "llegarán", "llegaron"], "en": "It's important that everyone arrive at the meeting on time.", "n": "Es importante que → subjunctive."},
+        {"q": "Ojalá que no ___ mañana; vamos a la playa.", "o": ["llueva", "llueve", "lloverá", "llovió"], "en": "I hope it doesn't rain tomorrow; we're going to the beach.", "n": "Ojalá (que) → subjunctive."},
+        {"q": "Te llamo cuando ___ al aeropuerto.", "o": ["llegue", "llego", "llegaré", "llegaba"], "en": "I'll call you when I get to the airport.", "n": "Cuando + a future event → subjunctive."},
+        {"q": "Dudo que el plomero ___ hoy.", "o": ["venga", "viene", "vino", "venir"], "en": "I doubt the plumber will come today.", "n": "Dudar que → subjunctive."},
+        {"q": "Creo que el banco ___ a las nueve.", "o": ["abre", "abra", "abriera", "abrir"], "en": "I think the bank opens at nine.", "n": "Creo que (belief) → indicative. No creo que → subjunctive."},
+        {"q": "Te lo explico para que lo ___.", "o": ["entiendas", "entiendes", "entenderás", "entender"], "en": "I'll explain it to you so that you understand it.", "n": "Para que → always subjunctive."},
+        {"q": "Busco un departamento que ___ cerca del metro.", "o": ["esté", "está", "estará", "es"], "en": "I'm looking for an apartment that's close to the metro.", "n": "Describing something not yet known to exist → subjunctive."}
+      ]
+    },
+    "por_para": {
+      "name": "Por vs. para",
+      "explain": "Para: destination, recipient, deadline, purpose, comparison (para ser...). Por: exchange/price, cause, through/around, means (por teléfono), thanks (gracias por).",
+      "items": [
+        {"q": "Salgo ___ Guadalajara mañana temprano.", "o": ["para", "por"], "en": "I'm leaving for Guadalajara early tomorrow.", "n": "Destination → para."},
+        {"q": "Pagué 500 pesos ___ la consulta.", "o": ["por", "para"], "en": "I paid 500 pesos for the consultation.", "n": "Exchange / price → por."},
+        {"q": "Este regalo es ___ mi mamá.", "o": ["para", "por"], "en": "This gift is for my mom.", "n": "Recipient → para."},
+        {"q": "Caminamos ___ el centro toda la tarde.", "o": ["por", "para"], "en": "We walked around downtown all afternoon.", "n": "Through / around a place → por."},
+        {"q": "Necesito el reporte ___ el lunes.", "o": ["para", "por"], "en": "I need the report by Monday.", "n": "Deadline → para."},
+        {"q": "Gracias ___ tu ayuda.", "o": ["por", "para"], "en": "Thanks for your help.", "n": "Gracias por — reason / cause."},
+        {"q": "Te llamo ___ teléfono más tarde.", "o": ["por", "para"], "en": "I'll call you on the phone later.", "n": "Means of communication → por."},
+        {"q": "___ ser extranjero, hablas muy bien.", "o": ["Para", "Por"], "en": "For a foreigner, you speak very well.", "n": "Comparison against expectation → para."}
+      ]
+    },
+    "ser_estar": {
+      "name": "Ser vs. estar",
+      "explain": "Ser: identity, profession, time, possession, where an event takes place. Estar: location of things/people, states, results (cerrado), how something tastes or seems right now.",
+      "items": [
+        {"q": "La junta ___ en la oficina de Laura.", "o": ["es", "está"], "en": "The meeting is in Laura's office.", "n": "Where an event takes place → ser."},
+        {"q": "El café ___ frío; pide otro.", "o": ["está", "es"], "en": "The coffee is cold; order another one.", "n": "Current state → estar."},
+        {"q": "Mi hermano ___ ingeniero.", "o": ["es", "está"], "en": "My brother is an engineer.", "n": "Profession → ser."},
+        {"q": "¿Dónde ___ las llaves?", "o": ["están", "son"], "en": "Where are the keys?", "n": "Location of things → estar."},
+        {"q": "Ya ___ las ocho; vámonos.", "o": ["son", "están"], "en": "It's already eight; let's go.", "n": "Time → ser."},
+        {"q": "Esta casa ___ de mi abuelo.", "o": ["es", "está"], "en": "This house is my grandfather's.", "n": "Possession → ser."},
+        {"q": "La tienda ___ cerrada los domingos.", "o": ["está", "es"], "en": "The store is closed on Sundays.", "n": "Resulting state → estar."},
+        {"q": "El pescado ___ muy rico hoy.", "o": ["está", "es"], "en": "The fish is really tasty today.", "n": "How food tastes right now → estar."}
+      ]
+    },
+    "se_constructions": {
+      "name": "Se constructions (se me olvidó, se vende)",
+      "explain": "Accidental se: se + me/te/le/nos/les + verb, and the verb agrees with the thing (se me olvidaron las llaves). Impersonal/passive se: se habla, se venden casas.",
+      "items": [
+        {"q": "Ay, ___ las llaves en el coche.", "o": ["se me olvidaron", "me olvidaron", "se me olvidó", "me se olvidaron"], "en": "Oh, I forgot the keys in the car.", "n": "Verb agrees with las llaves (plural) → olvidaron. Order: se + me."},
+        {"q": "A Pedro ___ el celular y se rompió la pantalla.", "o": ["se le cayó", "se lo cayó", "le se cayó", "se le cayeron"], "en": "Pedro dropped his phone and the screen broke.", "n": "Accidental se: se + le (to Pedro) + cayó (el celular)."},
+        {"q": "Aquí ___ inglés.", "o": ["se habla", "se hablan", "habla se", "es hablado"], "en": "English is spoken here.", "n": "Impersonal se + singular noun."},
+        {"q": "___ casas en esta colonia.", "o": ["Se venden", "Se vende", "Venden se", "Se vendan"], "en": "Houses are for sale in this neighborhood.", "n": "Passive se agrees with the noun: casas → venden."},
+        {"q": "¿Cómo ___ “receipt” en español?", "o": ["se dice", "se dicen", "dice se", "se diga"], "en": "How do you say “receipt” in Spanish?", "n": "Impersonal se: se dice."},
+        {"q": "___ la gasolina en la carretera.", "o": ["Se nos acabó", "Nos se acabó", "Se nos acabaron", "Nos acabamos"], "en": "We ran out of gas on the highway.", "n": "Se + nos + acabó (la gasolina, singular)."},
+        {"q": "En México ___ mucho maíz.", "o": ["se come", "se comen", "come se", "es comido"], "en": "In Mexico people eat a lot of corn.", "n": "Impersonal se + singular noun."},
+        {"q": "___ los papeles en el taxi.", "o": ["Se les perdieron", "Se les perdió", "Les se perdieron", "Se los perdieron"], "en": "They lost the papers in the taxi.", "n": "Se + les + perdieron (los papeles, plural)."}
+      ]
+    },
+    "conditional": {
+      "name": "Conditional and si-clauses",
+      "explain": "Polite requests (¿podría...?, me gustaría). Hypotheticals: si + imperfect subjunctive → conditional (si tuviera, iría). Past hypothetical: si hubiera + participle → habría + participle.",
+      "items": [
+        {"q": "Si tuviera más tiempo, ___ más seguido al gimnasio.", "o": ["iría", "iré", "voy", "fuera"], "en": "If I had more time, I'd go to the gym more often.", "n": "Si + imperfect subjunctive → conditional."},
+        {"q": "¿___ ayudarme con esta maleta? (usted)", "o": ["Podría", "Podré", "Pude", "Poder"], "en": "Could you help me with this suitcase?", "n": "Polite request → conditional."},
+        {"q": "Si ganara la lotería, ___ una casa en la playa.", "o": ["compraría", "compraré", "compro", "comprara"], "en": "If I won the lottery, I'd buy a house at the beach.", "n": "Si + ganara → compraría."},
+        {"q": "Me ___ reservar una mesa para cuatro.", "o": ["gustaría", "gustará", "gusto", "gustaba"], "en": "I'd like to reserve a table for four.", "n": "Me gustaría = I would like."},
+        {"q": "Si ___ tú, hablaría con el dueño.", "o": ["fuera", "sería", "era", "seré"], "en": "If I were you, I'd talk to the owner.", "n": "Si + imperfect subjunctive (fuera)."},
+        {"q": "Dijo que ___ a las cinco, pero no llegó.", "o": ["vendría", "vendrá", "viene", "venga"], "en": "He said he would come at five, but he didn't show up.", "n": "Future in the past → conditional."},
+        {"q": "Si hubiera sabido, te ___ avisado.", "o": ["habría", "había", "habrá", "haya"], "en": "If I had known, I would have told you.", "n": "Si hubiera + participle → habría + participle (hubiera avisado is also common)."}
+      ]
+    },
+    "commands": {
+      "name": "Commands (tú / usted / ustedes)",
+      "explain": "Affirmative tú: like the él present (cierra), with irregulars (haz, ven, ten, pon). Usted/ustedes and all negatives use the subjunctive (siéntese, no llegues, no toquen).",
+      "items": [
+        {"q": "___ aquí, por favor. (usted, sit down)", "o": ["Siéntese", "Siéntate", "Se sienta", "Siéntase"], "en": "Sit here, please.", "n": "Usted command of sentarse: siente + se → siéntese."},
+        {"q": "No ___ tarde mañana. (tú)", "o": ["llegues", "llegas", "llega", "llegue"], "en": "Don't be late tomorrow.", "n": "Negative tú → subjunctive (llegues)."},
+        {"q": "___ la puerta cuando salgas. (tú)", "o": ["Cierra", "Cierre", "Cierras", "Cerra"], "en": "Close the door when you leave.", "n": "Affirmative tú = él form of the present (cierra). Cierre is usted."},
+        {"q": "___ paciencia, señora; ya casi está. (usted)", "o": ["Tenga", "Ten", "Tiene", "Tenía"], "en": "Be patient, ma'am; it's almost ready.", "n": "Usted command → subjunctive (tenga). Ten is tú."},
+        {"q": "___ la tarea antes de salir. (tú)", "o": ["Haz", "Hace", "Haga", "Hagas"], "en": "Do your homework before going out.", "n": "Irregular tú command: hacer → haz."},
+        {"q": "No ___ eso, por favor. (ustedes)", "o": ["toquen", "tocan", "toquéis", "toque"], "en": "Don't touch that, please.", "n": "Ustedes command → subjunctive (toquen). Toquéis is Spain's vosotros."},
+        {"q": "___ a la derecha en el semáforo. (usted)", "o": ["Dé vuelta", "Da vuelta", "Dar vuelta", "Dio vuelta"], "en": "Turn right at the traffic light.", "n": "Usted command of dar → dé. Dar vuelta = to turn (Mexico)."},
+        {"q": "___ conmigo, te quiero enseñar algo. (tú)", "o": ["Ven", "Venga", "Vienes", "Veni"], "en": "Come with me, I want to show you something.", "n": "Irregular tú command: venir → ven."}
+      ]
+    }
+  },
+  "units": [
+    {
+      "id": "u1", "title": "Trámites y mandados", "titleEn": "Paperwork and errands", "level": "B1",
+      "focus": ["clitic_future", "clitic_preterite", "clitic_imperative"],
+      "words": [
+        {"id": "tramite", "es": "el trámite", "en": "procedure / paperwork", "accept": ["procedure", "paperwork", "formality", "process", "red tape", "errand", "bureaucratic procedure"]},
+        {"id": "comprobante", "es": "el comprobante de domicilio", "en": "proof of address", "accept": ["proof of address", "proof of residence"], "note": "Usually a recent utility bill (recibo de luz, agua o teléfono)."},
+        {"id": "cita", "es": "la cita", "en": "appointment", "accept": ["appointment", "date"]},
+        {"id": "entregar", "es": "entregar", "en": "to hand in / deliver", "accept": ["to deliver", "to hand in", "to hand over", "to submit", "to turn in", "to give"]},
+        {"id": "recibo", "es": "el recibo", "en": "receipt / bill", "accept": ["receipt", "bill"], "note": "In Mexico, el recibo de luz = the electric bill."}
+      ],
+      "sentences": [
+        {"es": "Tengo una cita en el banco a las diez.", "en": "I have an appointment at the bank at ten.", "k": "cita", "f": "cita"},
+        {"es": "Para abrir la cuenta, me pidieron un comprobante de domicilio.", "en": "To open the account, they asked me for proof of address.", "k": "comprobante", "f": "comprobante de domicilio"},
+        {"es": "Si necesitas el recibo, te lo mando por correo.", "en": "If you need the receipt, I'll send it to you by email.", "k": "recibo", "f": "recibo"},
+        {"es": "Tengo que entregar los documentos antes del viernes.", "en": "I have to hand in the documents before Friday.", "k": "entregar", "f": "entregar"},
+        {"es": "Este trámite tarda casi un mes.", "en": "This procedure takes almost a month.", "k": "tramite", "f": "trámite"},
+        {"es": "¿El comprobante de domicilio? Se lo entregué a la licenciada ayer.", "en": "The proof of address? I gave it to the lawyer yesterday.", "k": "entregar", "f": "entregué", "h": "entregar, preterite yo"},
+        {"es": "Cuando tengas el recibo, dámelo y yo hago el trámite.", "en": "When you have the receipt, give it to me and I'll do the paperwork.", "k": "tramite", "f": "trámite"}
+      ]
+    },
+    {
+      "id": "u2", "title": "La casa y las reparaciones", "titleEn": "Home and repairs", "level": "B1",
+      "focus": ["pret_imp", "se_constructions"],
+      "words": [
+        {"id": "plomero", "es": "el plomero", "en": "plumber", "accept": ["plumber"]},
+        {"id": "fuga", "es": "la fuga", "en": "leak", "accept": ["leak", "leakage"]},
+        {"id": "descompuesto", "es": "descompuesto", "esAlt": ["descompuesta"], "en": "broken / out of order", "accept": ["broken", "out of order", "not working", "broken down"], "note": "Mexico: for machines and appliances (el refri está descompuesto)."},
+        {"id": "arreglar", "es": "arreglar", "en": "to fix / repair", "accept": ["to fix", "to repair", "to arrange", "to sort out"]},
+        {"id": "llave", "es": "la llave", "en": "faucet / tap (MX)", "accept": ["faucet", "tap", "key"], "note": "In Mexico la llave is both the key and the faucet."}
+      ],
+      "sentences": [
+        {"es": "La llave del baño tenía una fuga y llamé al plomero.", "en": "The bathroom faucet had a leak and I called the plumber.", "k": "fuga", "f": "fuga"},
+        {"es": "Cuando llegué, el refri estaba descompuesto.", "en": "When I got there, the fridge was broken.", "k": "descompuesto", "f": "descompuesto"},
+        {"es": "El plomero vino ayer, pero no pudo arreglar la fuga.", "en": "The plumber came yesterday, but he couldn't fix the leak.", "k": "arreglar", "f": "arreglar"},
+        {"es": "Se me olvidó entregarle el recibo al plomero.", "en": "I forgot to give the plumber the receipt.", "k": "plomero", "f": "plomero"},
+        {"es": "Mientras arreglaba la llave, se le cayó una pieza.", "en": "While he was fixing the faucet, he dropped a part.", "k": "llave", "f": "llave"},
+        {"es": "Hice una cita con el plomero para el lunes.", "en": "I made an appointment with the plumber for Monday.", "k": "plomero", "f": "plomero"},
+        {"es": "El elevador estuvo descompuesto toda la semana.", "en": "The elevator was out of order all week.", "k": "descompuesto", "f": "descompuesto"},
+        {"es": "¿Ya te arreglaron la llave?", "en": "Did they fix your faucet yet?", "k": "arreglar", "f": "arreglaron", "h": "arreglar, preterite ellos"}
+      ]
+    },
+    {
+      "id": "u3", "title": "El trabajo", "titleEn": "Work", "level": "B1+",
+      "focus": ["subj"],
+      "words": [
+        {"id": "junta", "es": "la junta", "en": "meeting (MX)", "accept": ["meeting", "board", "board meeting"], "note": "Mexico uses la junta for a work meeting; la reunión also works."},
+        {"id": "presupuesto", "es": "el presupuesto", "en": "budget / estimate", "accept": ["budget", "estimate", "quote", "quotation"]},
+        {"id": "plazo", "es": "el plazo", "en": "deadline / time frame", "accept": ["deadline", "term", "time limit", "period", "time frame", "timeframe", "installment"]},
+        {"id": "propuesta", "es": "la propuesta", "en": "proposal", "accept": ["proposal", "offer", "proposition"]},
+        {"id": "aprobar", "es": "aprobar", "en": "to approve", "accept": ["to approve", "to pass"]}
+      ],
+      "sentences": [
+        {"es": "La junta es a las nueve en la sala grande.", "en": "The meeting is at nine in the big room.", "k": "junta", "f": "junta"},
+        {"es": "Necesito que me mandes el presupuesto antes de la junta.", "en": "I need you to send me the budget before the meeting.", "k": "presupuesto", "f": "presupuesto"},
+        {"es": "Ojalá que aprueben la propuesta esta semana.", "en": "I hope they approve the proposal this week.", "k": "aprobar", "f": "aprueben", "h": "aprobar, subjunctive ellos"},
+        {"es": "El plazo para entregar la propuesta es el viernes.", "en": "The deadline to hand in the proposal is Friday.", "k": "plazo", "f": "plazo"},
+        {"es": "Le pedí al plomero un presupuesto para arreglar la fuga.", "en": "I asked the plumber for an estimate to fix the leak.", "k": "presupuesto", "f": "presupuesto"},
+        {"es": "Es importante que el cliente apruebe el presupuesto pronto.", "en": "It's important that the client approve the budget soon.", "k": "aprobar", "f": "apruebe", "h": "aprobar, subjunctive él"},
+        {"es": "Mi jefe está en una junta; te llama cuando termine.", "en": "My boss is in a meeting; he'll call you when he's done.", "k": "junta", "f": "junta"},
+        {"es": "Mandé la propuesta, pero todavía no me contestan.", "en": "I sent the proposal, but they still haven't answered me.", "k": "propuesta", "f": "propuesta"}
+      ]
+    },
+    {
+      "id": "u4", "title": "De viaje", "titleEn": "Travel", "level": "B1+",
+      "focus": ["por_para", "conditional"],
+      "words": [
+        {"id": "caseta", "es": "la caseta", "en": "toll booth", "accept": ["toll booth", "tollbooth", "toll", "toll plaza", "booth"], "note": "Mexico: la caseta (de cobro) on the cuota highways."},
+        {"id": "retraso", "es": "el retraso", "en": "delay", "accept": ["delay"]},
+        {"id": "escala", "es": "la escala", "en": "layover / stopover", "accept": ["layover", "stopover", "stop", "scale", "connection"]},
+        {"id": "boleto", "es": "el boleto", "en": "ticket (MX)", "accept": ["ticket"], "note": "Mexico: el boleto. Spain: el billete."},
+        {"id": "rentar", "es": "rentar", "en": "to rent (MX)", "accept": ["to rent", "to lease", "to hire"], "note": "Mexico: rentar. Spain: alquilar."}
+      ],
+      "sentences": [
+        {"es": "Pagamos 150 pesos por la caseta.", "en": "We paid 150 pesos for the toll.", "k": "caseta", "f": "caseta"},
+        {"es": "El vuelo tiene una escala en Monterrey.", "en": "The flight has a layover in Monterrey.", "k": "escala", "f": "escala"},
+        {"es": "Por el retraso, perdimos la conexión.", "en": "Because of the delay, we missed our connection.", "k": "retraso", "f": "retraso"},
+        {"es": "Compré los boletos para Oaxaca por internet.", "en": "I bought the tickets to Oaxaca online.", "k": "boleto", "f": "boletos", "h": "plural"},
+        {"es": "Si rentáramos un coche, podríamos ir a la playa.", "en": "If we rented a car, we could go to the beach.", "k": "rentar", "f": "rentáramos", "h": "rentar, imperfect subjunctive nosotros"},
+        {"es": "¿Me podría dar el recibo del boleto, por favor?", "en": "Could you give me the receipt for the ticket, please?", "k": "boleto", "f": "boleto"},
+        {"es": "Si no hubiera retraso, llegaríamos a tiempo a la junta.", "en": "If there were no delay, we'd get to the meeting on time.", "k": "retraso", "f": "retraso"},
+        {"es": "Antes de la caseta hay una gasolinera.", "en": "There's a gas station before the toll booth.", "k": "caseta", "f": "caseta"},
+        {"es": "Quiero rentar un departamento por seis meses.", "en": "I want to rent an apartment for six months.", "k": "rentar", "f": "rentar"}
+      ]
+    },
+    {
+      "id": "u5", "title": "La salud", "titleEn": "Health", "level": "B1+",
+      "focus": ["commands", "ser_estar"],
+      "words": [
+        {"id": "receta", "es": "la receta", "en": "prescription", "accept": ["prescription", "recipe"], "note": "Also means recipe."},
+        {"id": "pastilla", "es": "la pastilla", "en": "pill", "accept": ["pill", "tablet"]},
+        {"id": "consultorio", "es": "el consultorio", "en": "doctor's office", "accept": ["doctor's office", "doctors office", "doctor office", "clinic", "office", "practice", "medical office"]},
+        {"id": "mareado", "es": "mareado", "esAlt": ["mareada"], "en": "dizzy", "accept": ["dizzy", "lightheaded", "light-headed", "nauseous", "seasick", "carsick"]},
+        {"id": "recetar", "es": "recetar", "en": "to prescribe", "accept": ["to prescribe"]}
+      ],
+      "sentences": [
+        {"es": "El doctor me recetó unas pastillas para la presión.", "en": "The doctor prescribed me some pills for my blood pressure.", "k": "recetar", "f": "recetó", "h": "recetar, preterite él"},
+        {"es": "Tómese una pastilla cada ocho horas.", "en": "Take one pill every eight hours.", "k": "pastilla", "f": "pastilla"},
+        {"es": "Estoy un poco mareado desde la mañana.", "en": "I've been a little dizzy since this morning.", "k": "mareado", "f": "mareado"},
+        {"es": "El consultorio está en el segundo piso.", "en": "The doctor's office is on the second floor.", "k": "consultorio", "f": "consultorio"},
+        {"es": "No se le olvide traer la receta a la cita.", "en": "Don't forget to bring the prescription to the appointment.", "k": "receta", "f": "receta"},
+        {"es": "Si sigues mareado, ve al doctor; no esperes.", "en": "If you're still dizzy, go to the doctor; don't wait.", "k": "mareado", "f": "mareado"},
+        {"es": "La farmacia no me quiso vender la medicina sin receta.", "en": "The pharmacy wouldn't sell me the medicine without a prescription.", "k": "receta", "f": "receta"},
+        {"es": "Llegué al consultorio y el doctor iba con una hora de retraso.", "en": "I got to the doctor's office and the doctor was running an hour late.", "k": "consultorio", "f": "consultorio"}
+      ]
+    }
+  ],
+  "placement": {
+    "patternItemsEach": 2,
+    "words": ["tramite", "fuga", "descompuesto", "presupuesto", "plazo", "escala", "receta", "mareado"]
+  }
+}
