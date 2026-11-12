@@ -44,3 +44,25 @@ ul{padding-left:20px}.list{list-style:none;padding:0;margin:0;background:var(--c
 .list li{display:flex;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:15px}.list li:last-child{border:0}
 .set{display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:16px}
 select{font-size:16px;padding:4px 8px}
+/* ---- motion & feedback (v2) ---- */
+main.card{animation:fx-in .2s cubic-bezier(.2,.8,.3,1)}
+@keyframes fx-in{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+.feedback{animation:fx-up .18s ease-out}
+@keyframes fx-up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.bar span{transition:width .35s cubic-bezier(.2,.8,.3,1)}
+.fx-pop{animation:fx-pop .32s cubic-bezier(.3,1.6,.5,1)}
+@keyframes fx-pop{0%{transform:scale(1)}40%{transform:scale(1.06)}100%{transform:scale(1)}}
+.fx-shake{animation:fx-shake .34s ease-in-out}
+@keyframes fx-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(2px)}}
+main.card.fx-flash-ok{animation:fx-flash-ok .45s ease-out}
+main.card.fx-flash-bad{animation:fx-flash-bad .45s ease-out}
+@keyframes fx-flash-ok{0%{box-shadow:inset 0 0 0 999px rgba(34,197,94,.14)}100%{box-shadow:inset 0 0 0 999px rgba(34,197,94,0)}}
+@keyframes fx-flash-bad{0%{box-shadow:inset 0 0 0 999px rgba(239,68,68,.12)}100%{box-shadow:inset 0 0 0 999px rgba(239,68,68,0)}}
+input.fx-shake{border-color:var(--bad)}
+input.fx-pop{border-color:var(--ok)}
+.btn:active,.opt:active{transform:scale(.97)}
+.btn,.opt{transition:transform .08s ease,background-color .15s,border-color .15s}
+.fx-layer{position:fixed;inset:0;pointer-events:none;z-index:50;overflow:hidden}
+.fx-layer i{position:absolute;width:8px;height:12px;border-radius:2px;will-change:transform,opacity}
+html.no-anim *,html.no-anim *::before,html.no-anim *::after{animation:none!important;transition:none!important}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}

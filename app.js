@@ -7,7 +7,7 @@
 
   // ---------- state ----------
   const defaults = () => ({ v: 1, placementDone: false, created: Date.now(), items: {}, pstats: {}, recent: {},
-    settings: { newPerSession: 5, rate: 0.9, autoAdvance: false }, sessions: 0 });
+    settings: { newPerSession: 5, rate: 0.9, autoAdvance: false, sound: true, anim: true }, sessions: 0 });
   function load() {
     try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v) { const d = defaults(); return Object.assign(d, s, { settings: Object.assign(d.settings, s.settings) }); } } catch (e) { /* fresh */ }
     return defaults();
@@ -122,7 +122,11 @@
     run.ex = makeExercise(entry); run.answered = false;
     renderExercise(entry, run.ex);
   }
-  function progressBar() { const pct = Math.round(100 * run.i / run.queue.length); return `<div class="topbar"><button class="icon" id="quit" aria-label="Close">✕</button><div class="bar"><span style="width:${pct}%"></span></div><span class="count">${run.i + 1}/${run.queue.length}</span></div>`; }
+  function progressBar() { const pct = run.barPct || 0; return `<div class="topbar"><button class="icon" id="quit" aria-label="Close">✕</button><div class="bar"><span style="width:${pct}%"></span></div><span class="count">${run.i + 1}/${run.queue.length}</span></div>`; }
+  function setBar(frac) {
+    const pct = Math.max(0, Math.min(100, 100 * frac)); run.barPct = pct;
+    const el = app.querySelector('.bar span'); if (!el) return; void el.offsetWidth; el.style.width = pct + '%';
+  }
   function bindQuit() { document.getElementById('quit').onclick = () => { if (run.mode === 'placement' && !confirm('Leave placement? Progress on it will be lost.')) return; speechSynthesis && speechSynthesis.cancel(); run = null; renderHome(); }; }
 
   function renderIntro(entry) {
@@ -139,7 +143,7 @@
       body = `<div class="label">New grammar pattern</div><div class="title">${esc(p.name)}</div><p>${esc(p.explain)}</p>`;
     }
     app.innerHTML = progressBar() + `<main class="card">${body}</main><footer><button class="btn primary" id="go">Continue</button></footer>`;
-    bindQuit(); bindSpeak();
+    bindQuit(); bindSpeak(); setBar(run.i / run.queue.length);
     if (entry.id.startsWith('w:')) speak(IDX.words[entry.id.slice(2)].es);
     const known = document.getElementById('known');
     if (known) known.onclick = () => {
@@ -160,7 +164,7 @@
       : `<form id="f" autocomplete="off"><input id="ans" type="text" lang="${ex.opts.lang}" placeholder="${esc(ex.placeholder)}" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done"></form>`;
     app.innerHTML = progressBar() + `<main class="card"><div class="label">${esc(ex.label)}</div>${prompt}${input}<div id="fb"></div></main>
       <footer>${ex.kind === 'mc' ? '' : '<button class="btn secondary" id="skip">I don\'t know</button><button class="btn primary" id="check">Check</button>'}</footer>`;
-    bindQuit(); bindSpeak();
+    bindQuit(); bindSpeak(); setBar(run.i / run.queue.length);
     if (ex.listen) {
       document.getElementById('play').onclick = () => speak(ex.listen);
       document.getElementById('slow').onclick = () => speak(ex.listen, true);
@@ -212,6 +216,10 @@
     fb.innerHTML = `<div class="feedback ${ok ? 'good' : 'miss'}">${head}${more}</div>`;
     bindSpeak();
     const inp = document.getElementById('ans'); if (inp) inp.readOnly = true;
+    setBar((run.i + 1) / run.queue.length);
+    const chosen = ex.kind === 'mc' ? app.querySelector(ok ? '.opt.right' : '.opt.wrong') : inp;
+    const fbBox = fb.querySelector('.feedback');
+    if (ok) FX.correct([chosen, fbBox]); else FX.miss([chosen]);
     const footer = app.querySelector('footer');
     const extra = [];
     if (!ok && ex.kind === 'type' && given && run.mode === 'session') extra.push('<button class="btn secondary" id="override">I was right</button>');
@@ -312,6 +320,7 @@
   function startSession() { persist(); const q = buildSession(); if (!q.length) return renderHome('Nothing due right now. Come back later.'); startRun(q, 'session'); }
   function finishSession() {
     S.sessions = (S.sessions || 0) + 1; S.lastSession = Date.now(); save();
+    setTimeout(() => FX.complete(), 0);
     const tomorrow = endOfToday() + DAY;
     const dueTomorrow = Object.values(S.items).filter(c => c.due <= tomorrow).length;
     run = null;
@@ -371,6 +380,8 @@
       <h3>Settings</h3>
       <label class="set">New words per session <select id="npw">${[3, 4, 5, 6, 8].map(n => `<option ${n === S.settings.newPerSession ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
       <label class="set">Speech speed <input id="rate" type="range" min="0.6" max="1.2" step="0.05" value="${S.settings.rate}"></label>
+      <label class="set">Sound effects <input id="snd" type="checkbox" ${S.settings.sound !== false ? 'checked' : ''}></label>
+      <label class="set">Animations <input id="anim" type="checkbox" ${S.settings.anim !== false ? 'checked' : ''}></label>
       <label class="set">Auto-continue on correct <input id="auto" type="checkbox" ${S.settings.autoAdvance ? 'checked' : ''}></label>
       <p class="muted">Voice: ${voice ? esc(voice.name + ' (' + voice.lang + ')') : 'default Spanish'} <button class="icon speak" data-say="¿Me lo puedes mandar mañana?">🔊</button></p>
       <h3>Backup</h3>
@@ -383,6 +394,8 @@
     document.getElementById('back').onclick = () => renderHome();
     document.getElementById('npw').onchange = e => { S.settings.newPerSession = +e.target.value; save(); };
     document.getElementById('rate').onchange = e => { S.settings.rate = +e.target.value; save(); speak('Así suena ahora.'); };
+    document.getElementById('snd').onchange = e => { S.settings.sound = e.target.checked; save(); if (e.target.checked) FX.sounds.correct(); };
+    document.getElementById('anim').onchange = e => { S.settings.anim = e.target.checked; save(); FX.applyClasses(); };
     document.getElementById('auto').onchange = e => { S.settings.autoAdvance = e.target.checked; save(); };
     const json = () => JSON.stringify(Object.assign({ exportedAt: new Date().toISOString(), app: 'spanish-app' }, S), null, 1);
     document.getElementById('exp').onclick = () => {
@@ -390,7 +403,7 @@
       a.href = URL.createObjectURL(blob); a.download = 'spanish-progress-' + new Date().toISOString().slice(0, 10) + '.json'; document.body.appendChild(a); a.click(); a.remove();
     };
     document.getElementById('copy').onclick = async () => { try { await navigator.clipboard.writeText(json()); alert('Backup copied. Paste it into Notes or email it to yourself.'); } catch (e) { document.getElementById('paste').value = json(); alert('Copy blocked — the backup is in the box below; select all and copy.'); } };
-    const doImport = txt => { try { const d = JSON.parse(txt); if (!d || !d.v || !d.items) throw new Error('not a backup'); if (!confirm('Replace current progress with this backup?')) return; delete d.exportedAt; delete d.app; S = Object.assign(defaults(), d); save(); renderProgress(); alert('Imported.'); } catch (e) { alert('Could not import: ' + e.message); } };
+    const doImport = txt => { try { const d = JSON.parse(txt); if (!d || !d.v || !d.items) throw new Error('not a backup'); if (!confirm('Replace current progress with this backup?')) return; delete d.exportedAt; delete d.app; S = Object.assign(defaults(), d, { settings: Object.assign(defaults().settings, d.settings) }); save(); FX.applyClasses(); renderProgress(); alert('Imported.'); } catch (e) { alert('Could not import: ' + e.message); } };
     document.getElementById('imp').onchange = e => { const f = e.target.files[0]; if (f) f.text().then(doImport); };
     document.getElementById('impPaste').onclick = () => doImport(document.getElementById('paste').value);
     document.getElementById('replace').onclick = () => { if (confirm('Retake placement? Your learned words are kept; grammar patterns get re-rated.')) { S.placementDone = false; save(); renderHome(); } };
@@ -401,6 +414,7 @@
   // ---------- boot ----------
   async function boot() {
     S = load();
+    FX.init(() => S.settings);
     try { C = await (await fetch('content.json')).json(); }
     catch (e) { app.innerHTML = '<main class="card"><p>Could not load lessons. Open once with internet to install them.</p></main>'; return; }
     buildIndex();
