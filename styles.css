@@ -118,3 +118,22 @@ html.no-anim *,html.no-anim *::before,html.no-anim *::after{animation:none!impor
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);background:#1c1c1e;color:#fff;padding:10px 16px;border-radius:999px;font-size:15px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:70;white-space:nowrap}
 .toast.show{opacity:.95;transform:translateX(-50%) translateY(0)}
 main.card.story.no-enter{animation:none}
+/* ---- v5: daily minutes bar + streak ---- */
+.home-head{position:sticky;top:0;z-index:20;background:var(--bg);margin-top:calc(-1 * env(safe-area-inset-top));padding-top:env(safe-area-inset-top);border-bottom:1px solid var(--line)}
+.home-head .topbar{padding-bottom:4px}
+.daybar{display:flex;align-items:center;gap:12px;padding:4px 16px 12px}
+.streak{display:flex;align-items:center;gap:4px;font-size:17px;min-width:64px}
+.streak .flame{font-size:20px;filter:grayscale(1);opacity:.55;transition:filter .3s,opacity .3s}
+.streak.lit .flame{filter:none;opacity:1}
+.streak b{font-variant-numeric:tabular-nums;color:var(--muted)}.streak.lit b{color:#ea580c}
+.mbar{flex:1;height:12px;background:var(--line);border-radius:6px;overflow:hidden}
+.mbar span{display:block;height:100%;background:var(--accent);border-radius:6px;transition:width .5s cubic-bezier(.2,.8,.3,1)}
+.mins{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;min-width:78px;text-align:right}
+.daybar.goal-done .mbar span{background:linear-gradient(90deg,#16a34a,#22c55e)}
+.daybar.goal-done .mins{color:var(--ok);font-weight:600}
+.daybar.fx-goal .mbar{animation:goal-glow 1s ease-out}
+.daybar.fx-goal .mins{animation:fx-pop .45s cubic-bezier(.3,1.6,.5,1)}
+@keyframes goal-glow{0%{box-shadow:0 0 0 0 rgba(34,197,94,.55)}100%{box-shadow:0 0 0 10px rgba(34,197,94,0)}}
+.row-inline{display:flex;gap:8px;align-items:center}
+input[type=number]{width:96px;font-size:16px;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);color:var(--fg);font-family:inherit}
+.no-anim .mbar span,.no-anim .streak .flame{transition:none}

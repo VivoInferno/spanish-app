@@ -37,6 +37,9 @@
       note(246.9, 0.09, 0.28, { type: 'sine', gain: 0.28, attack: 0.02, glideTo: 220 }); },
     tap() { if (!ready() || speaking()) return; note(880, 0, 0.035, { type: 'sine', gain: 0.12, attack: 0.002, glideTo: 660 }); },
     stone() { if (!ready()) return; [783.99, 1046.5, 1318.5].forEach((f, i) => note(f, i * 0.06, 0.35, { type: 'triangle', gain: 0.28 })); },
+    goal() { if (!ready()) return; // daily goal reached: soft rising E–G#–B–E, a little brighter than "complete"
+      [659.25, 830.61, 987.77, 1318.5].forEach((f, i) => note(f, i * 0.09, 0.5, { type: 'triangle', gain: 0.24, attack: 0.012 }));
+      note(2637, 0.3, 0.25, { gain: 0.05 }); },
     complete() { if (!ready()) return; // gentle C-major chord, lightly arpeggiated
       [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => note(f, i * 0.05, 0.9 - i * 0.05, { type: 'triangle', gain: 0.22, attack: 0.02 })); }
   };
@@ -94,6 +97,12 @@
       if (!el || !animOn()) return;
       retrigger(el, 'fx-stone');
       const r = el.getBoundingClientRect(); sparkle(r.left + r.width / 2, r.top + r.height / 2);
+    },
+    goal(el) { // daily minutes goal hit: chime, bar glow + pop, sparkles from the bar
+      sounds.goal(); vibrate([12, 40, 12]);
+      if (!el || !animOn()) return;
+      retrigger(el, 'fx-goal');
+      const bar = el.querySelector('.mbar') || el, r = bar.getBoundingClientRect(); sparkle(r.left + r.width / 2, r.top + r.height / 2);
     },
     sounds
   };

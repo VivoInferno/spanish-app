@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const APP_VERSION = 'v4'; // keep in sync with CACHE in sw.js (espanol-v4)
+  const APP_VERSION = 'v5'; // keep in sync with CACHE in sw.js (espanol-v5)
   const KEY = 'spanish-app-state-v1'; // unchanged since v1 — never rename
   const DAY = SRS.DAY;
   const STONES = [
@@ -14,15 +14,15 @@
   let C, S, IDX;
 
   // ---------- state + migration ----------
-  const defaults = () => ({ v: 1, schema: 2, placementDone: false, created: Date.now(), items: {}, pstats: {}, recent: {},
-    settings: { newPerSession: 5, rate: 0.9, autoAdvance: false, sound: true, anim: true }, sessions: 0,
-    path: { done: {}, tests: {}, testedOut: {} }, parked: {} });
+  const defaults = () => ({ v: 1, schema: 3, placementDone: false, created: Date.now(), items: {}, pstats: {}, recent: {},
+    settings: { newPerSession: 5, rate: 0.9, autoAdvance: false, sound: true, anim: true, goalMin: Daily.GOAL_MIN }, sessions: 0,
+    path: { done: {}, tests: {}, testedOut: {} }, parked: {}, daily: {}, streak: Daily.seed() });
   function load() {
     let raw = null;
     try { raw = JSON.parse(localStorage.getItem(KEY)); } catch (e) { /* fresh */ }
     return raw && raw.v ? normalize(raw) : defaults();
   }
-  // merge any older shape (v1–v3 had no path/parked/schema) into the current one without touching SRS item states
+  // merge any older shape (v1–v3 had no path/parked/schema; v4 had no daily/streak) into the current one without touching SRS item states
   function normalize(raw) {
     const d = defaults();
     const s = Object.assign(d, raw, { settings: Object.assign(d.settings, raw.settings || {}) });
@@ -31,7 +31,11 @@
     const hadPath = raw.path && raw.path.done;
     s.path = Object.assign({ done: {}, tests: {}, testedOut: {} }, raw.path || {});
     s.needsPathMigration = !hadPath;
-    s.schema = 2;
+    // v5 (schema 3): per-day practice history + streak. The 1090-day seed is applied only when no streak exists yet.
+    s.daily = raw.daily && typeof raw.daily === 'object' ? raw.daily : {};
+    s.streak = raw.streak && typeof raw.streak === 'object' && 'count' in raw.streak ? raw.streak : Daily.seed();
+    if (!(s.settings.goalMin > 0)) s.settings.goalMin = Daily.GOAL_MIN;
+    s.schema = 3;
     return s;
   }
   function migratePath() { // runs once content is loaded; derives path progress from existing SRS items
@@ -91,6 +95,59 @@
     }).join('');
   }
   const wordSpan = (id, text) => `<span class="w" data-w="${id}">${esc(text)}</span>`;
+
+  // ---------- daily minutes (active practice time only) + streak ----------
+  const todayKey = () => Daily.dayKey(Date.now());
+  const goalMin = () => S.settings.goalMin || Daily.GOAL_MIN;
+  const T = { lastTick: Date.now(), lastInput: 0, lastSave: 0, shownDay: null };
+  const inSession = () => !!(run || story);
+  function tick() { // credit time since the last tick when a lesson is open, the app is visible and there was input in the last 60 s
+    const t = Date.now();
+    if (S && inSession() && document.visibilityState !== 'hidden') {
+      const added = Daily.accrue(S.daily, T.lastTick, t, T.lastInput);
+      if (added) { checkGoal(); if (t - T.lastSave > 15000) { T.lastSave = t; save(); } }
+    }
+    T.lastTick = t;
+    if (T.shownDay && T.shownDay !== todayKey()) updateDayBar(); // home left open across midnight
+  }
+  function noteInput() { tick(); T.lastInput = Date.now(); }
+  function sessionStart() { tick(); T.lastInput = T.lastTick = Date.now(); }
+  function sessionDone() { // a lesson, story, practice, test, review or placement was completed
+    tick();
+    const k = todayKey(), e = S.daily[k] = S.daily[k] || { ms: 0, sessions: 0 };
+    e.sessions = (e.sessions || 0) + 1;
+    S.streak = Daily.complete(S.streak, k);
+  }
+  function checkGoal() {
+    const k = todayKey(), e = S.daily[k];
+    if (e && !e.goal && Daily.minutesOn(S.daily, k) >= goalMin()) { e.goal = true; e.goalAt = Date.now(); }
+  }
+  function dayBarHtml() {
+    const k = todayKey(), m = Daily.minutesOn(S.daily, k), g = goalMin(), done = m >= g;
+    const sk = Daily.current(S.streak, k);
+    return `<div class="daybar ${done ? 'goal-done' : ''}" id="daybar">
+      <div class="streak ${sk.doneToday ? 'lit' : ''}" id="streak" title="Day streak"><span class="flame" aria-hidden="true">🔥</span><b id="streak-n">${sk.count.toLocaleString('en-US')}</b></div>
+      <div class="mbar" role="progressbar" aria-valuemin="0" aria-valuemax="${g}" aria-valuenow="${Math.min(m, g)}"><span style="width:${Math.min(100, 100 * m / g)}%"></span></div>
+      <div class="mins" id="mins">${done ? '✓ ' : ''}${m} / ${g} min</div></div>`;
+  }
+  function updateDayBar() {
+    const el = document.getElementById('daybar'); if (!el) { T.shownDay = null; return; }
+    el.outerHTML = dayBarHtml(); T.shownDay = todayKey();
+  }
+  function celebrateGoal() { // once per day, the first time home is shown after reaching the goal
+    const e = S.daily[todayKey()];
+    if (!e || !e.goal || e.celebrated) return;
+    e.celebrated = true; save();
+    const el = document.getElementById('daybar');
+    setTimeout(() => FX.goal(el), 250);
+  }
+  ['pointerdown', 'keydown', 'touchstart', 'wheel', 'input'].forEach(ev => document.addEventListener(ev, noteInput, { capture: true, passive: true }));
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') { tick(); if (S) save(); }
+    else { T.lastTick = T.lastInput = Date.now(); if (!inSession()) updateDayBar(); }
+  });
+  window.addEventListener('pagehide', () => { tick(); if (S) save(); });
+  setInterval(tick, 1000);
 
   // ---------- speech ----------
   let voice = null;
@@ -191,7 +248,7 @@
 
   // ---------- runner (placement, review, and the intro/practice/test stones share this) ----------
   let run = null;
-  function startRun(queue, mode, meta) { run = Object.assign({ queue, i: 0, mode, results: [], firstDone: {}, score: 0, total: 0, misses: [] }, meta || {}); nextCard(); }
+  function startRun(queue, mode, meta) { sessionStart(); run = Object.assign({ queue, i: 0, mode, results: [], firstDone: {}, score: 0, total: 0, misses: [] }, meta || {}); nextCard(); }
   function nextCard() {
     while (run.i < run.queue.length && run.queue[run.i].id && run.queue[run.i].id.startsWith('w:') && isParked(run.queue[run.i].id) && run.mode !== 'placement') run.i++;
     if (run.i >= run.queue.length) return finishRun();
@@ -202,6 +259,7 @@
     renderExercise(entry, run.ex);
   }
   function finishRun() {
+    sessionDone();
     if (run.mode === 'placement') return finishPlacement();
     if (run.mode === 'review') return finishReview();
     if (run.mode === 'test') return finishTest();
@@ -213,7 +271,7 @@
     const pct = Math.max(0, Math.min(100, 100 * frac)); if (run) run.barPct = pct;
     const el = app.querySelector('.bar span'); if (!el) return; void el.offsetWidth; el.style.width = pct + '%';
   }
-  function bindQuit(onQuit) { document.getElementById('quit').onclick = () => { if (run && run.mode === 'placement' && !confirm('Leave placement? Progress on it will be lost.')) return; if ('speechSynthesis' in window) speechSynthesis.cancel(); run = null; story = null; (onQuit || renderHome)(); }; }
+  function bindQuit(onQuit) { document.getElementById('quit').onclick = () => { if (run && run.mode === 'placement' && !confirm('Leave placement? Progress on it will be lost.')) return; if ('speechSynthesis' in window) speechSynthesis.cancel(); tick(); save(); run = null; story = null; (onQuit || renderHome)(); }; }
 
   function renderTheme(entry) {
     const u = C.units[IDX.unitIdx[run.uid]];
@@ -434,7 +492,7 @@
 
   // ---------- story stone ----------
   let story = null;
-  function startStory(u) { story = { u, shown: 1, answered: {}, showEn: false }; renderStory(true); }
+  function startStory(u) { sessionStart(); story = { u, shown: 1, answered: {}, showEn: false }; renderStory(true); }
   function renderStory(speakLast) {
     const { u } = story, st = u.story, lines = st.lines.slice(0, story.shown);
     const pendingQ = st.qs.find(q => q.after === story.shown - 1 && !story.answered[st.qs.indexOf(q)]);
@@ -472,7 +530,7 @@
     const st = story.u.story;
     const pendingQ = st.qs.find(q => q.after === story.shown - 1 && story.answered[st.qs.indexOf(q)] == null);
     if (pendingQ) return renderStory(false);
-    if (story.shown >= st.lines.length) { const uid = story.u.id; setStone(uid, 1, true); save(); story = null; return renderHome({ justDone: { uid, stone: 1 } }); }
+    if (story.shown >= st.lines.length) { sessionDone(); const uid = story.u.id; setStone(uid, 1, true); save(); story = null; return renderHome({ justDone: { uid, stone: 1 } }); }
     story.shown++; renderStory(true);
   }
 
@@ -567,7 +625,7 @@
               return `<div class="stone-wrap" style="--off:${offs[i]}"><button class="stone ${state}${jd ? ' just-done' : ''}" data-u="${uid}" data-s="${i}" aria-label="${esc(stn.label)}">${state === 'done' ? '✓' : state === 'locked' ? '🔒' : stn.icon}</button><span class="stone-label">${esc(stn.label)}${i === 3 && S.path.tests[uid] ? ` · ${S.path.tests[uid].best}/${S.path.tests[uid].total || 15}` : ''}</span></div>`; }).join('')}</div></div>`;
         }).join('')}`;
     };
-    app.innerHTML = `<div class="topbar home-top"><div class="title">Español <span class="muted small">${APP_VERSION}</span></div><button class="btn secondary slim" id="prog">Progress</button></div>
+    app.innerHTML = `<div class="home-head"><div class="topbar home-top"><div class="title">Español <span class="muted small">${APP_VERSION}</span></div><button class="btn secondary slim" id="prog">Progress</button></div>${dayBarHtml()}</div>
       <main class="card path">
       <button class="btn ${st.due ? 'primary' : 'secondary'} review-btn" id="review" ${st.due ? '' : 'disabled'}>${st.due ? `Review · ${st.due} due` : 'No reviews due'}</button>
       ${st.weak.length ? `<p class="muted small center">Weak: ${st.weak.slice(0, 3).map(w => esc(C.patterns[w.p].name.replace(/\s*\(.*\)\s*$/, ''))).join(' · ')}</p>` : ''}
@@ -584,6 +642,7 @@
     const focus = opts.justDone ? app.querySelector('.stone.just-done') : app.querySelector('.stone.current');
     if (focus) focus.scrollIntoView({ block: 'center' });
     if (opts.justDone) { const el = app.querySelector('.stone.just-done'); FX.stone(el); }
+    T.shownDay = todayKey(); celebrateGoal();
   }
   function toast(msg) { const t = document.getElementById('toast'); if (!t) return; t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 1800); }
 
@@ -614,6 +673,8 @@
       <label class="set">Sound effects <input id="snd" type="checkbox" ${S.settings.sound !== false ? 'checked' : ''}></label>
       <label class="set">Animations <input id="anim" type="checkbox" ${S.settings.anim !== false ? 'checked' : ''}></label>
       <label class="set">Auto-continue on correct <input id="auto" type="checkbox" ${S.settings.autoAdvance ? 'checked' : ''}></label>
+      <div class="set">Edit streak <span class="row-inline"><input id="streakIn" type="number" inputmode="numeric" min="0" step="1" value="${Daily.current(S.streak, todayKey()).count}"><button class="btn secondary slim" id="streakSave">Save</button></span></div>
+      <p class="muted small">Use this only to correct the number. Today counts once you finish a lesson.</p>
       <p class="muted">Voice: ${voice ? esc(voice.name + ' (' + voice.lang + ')') : 'default Spanish'} <button class="icon speak" data-say="¿Me lo puedes mandar mañana?">🔊</button></p>
       <h3>Backup</h3>
       <div class="row wrap"><button class="btn secondary" id="exp">Export progress</button><button class="btn secondary" id="copy">Copy to clipboard</button><label class="btn secondary">Import file<input id="imp" type="file" accept="application/json,.json" hidden></label></div>
@@ -628,6 +689,10 @@
     document.getElementById('snd').onchange = e => { S.settings.sound = e.target.checked; save(); if (e.target.checked) FX.sounds.correct(); };
     document.getElementById('anim').onchange = e => { S.settings.anim = e.target.checked; save(); FX.applyClasses(); };
     document.getElementById('auto').onchange = e => { S.settings.autoAdvance = e.target.checked; save(); };
+    document.getElementById('streakSave').onclick = () => {
+      const n = parseInt(document.getElementById('streakIn').value, 10); if (!(n >= 0)) return toast('Enter a whole number');
+      const k = todayKey(); S.streak = Daily.edit(S.streak, n, k, !!(S.daily[k] && S.daily[k].sessions)); save(); toast(`Streak set to ${n.toLocaleString('en-US')}`);
+    };
     const json = () => JSON.stringify(Object.assign({ exportedAt: new Date().toISOString(), app: 'spanish-app', appVersion: APP_VERSION }, S), null, 1);
     document.getElementById('exp').onclick = () => {
       const blob = new Blob([json()], { type: 'application/json' }); const a = document.createElement('a');
@@ -739,6 +804,7 @@
     renderHome();
   }
   window.__app = { version: APP_VERSION, get state() { return S; }, get ex() { return run && run.ex; }, get entry() { return run && run.queue[run.i]; }, get run() { return run; }, get story() { return story; },
-    makeExercise: e => makeExercise(e), get content() { return C; }, importBackup: (t) => importBackup(t, true), openStone: (u, i) => openStone(u, i), testQueue: u => testQueue(C.units[IDX.unitIdx[u]]), practiceQueue: u => practiceQueue(C.units[IDX.unitIdx[u]]), dueIds: () => dueIds(Date.now()), currentPos: () => currentPos() };
+    makeExercise: e => makeExercise(e), get content() { return C; }, importBackup: (t) => importBackup(t, true), openStone: (u, i) => openStone(u, i), testQueue: u => testQueue(C.units[IDX.unitIdx[u]]), practiceQueue: u => practiceQueue(C.units[IDX.unitIdx[u]]), dueIds: () => dueIds(Date.now()), currentPos: () => currentPos(),
+    tick: () => tick(), todayMinutes: () => Daily.minutesOn(S.daily, todayKey()), streakNow: () => Daily.current(S.streak, todayKey()) };
   boot();
 })();

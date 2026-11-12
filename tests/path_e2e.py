@@ -1,4 +1,4 @@
-"""v4 end-to-end: placement -> path -> all 4 stones of unit 1 -> unit 2 unlocked; long-press parking; v3 migration."""
+"""v4+ end-to-end: placement -> path -> all 4 stones of unit 1 -> unit 2 unlocked; long-press parking; v3 migration."""
 import asyncio, json, sys, os
 from playwright.async_api import async_playwright
 URL = sys.argv[1] if len(sys.argv) > 1 else 'http://127.0.0.1:8787/'
@@ -44,31 +44,31 @@ async def main():
         page.on('console', lambda m: errors.append(m.text) if m.type == 'error' else None)
         page.on('pageerror', lambda e: errors.append(str(e)))
         await page.goto(URL); await page.wait_for_selector('#go')
-        check(await page.evaluate("__app.version") == 'v4', 'app version is v4')
+        check(await page.evaluate("__app.version") == 'v5', 'app version is v5')
         # --- placement
         await page.click('#go'); k = 0
         while not await page.query_selector('h1:has-text("Placement results")'):
             await answer(page, right=(k % 3 != 0)); k += 1
         print('placement items:', k)
         await page.click('#go'); await page.wait_for_selector('.stone.current')
-        await page.wait_for_timeout(400); await page.evaluate('window.scrollTo(0,0)'); await page.wait_for_timeout(100); await page.screenshot(path=f'{OUT}/v4-{ENGINE}-path.png')
+        await page.wait_for_timeout(400); await page.evaluate('window.scrollTo(0,0)'); await page.wait_for_timeout(100); await page.screenshot(path=f'{OUT}/v5-{ENGINE}-path.png')
         check(await page.evaluate("__app.currentPos().uid") == 'u1', 'path starts at unit 1 (B1)')
         check(len(await page.query_selector_all('.section-card')) == 6, 'six CEFR section cards (A1..C2)')
         # --- stone 1: intro
         await page.click('.stone.current')
-        await page.wait_for_selector('.badge.new'); await page.wait_for_timeout(350); await page.screenshot(path=f'{OUT}/v4-{ENGINE}-intro-theme.png')
+        await page.wait_for_selector('.badge.new'); await page.wait_for_timeout(350); await page.screenshot(path=f'{OUT}/v5-{ENGINE}-intro-theme.png')
         check(await page.evaluate("getComputedStyle(document.querySelector('.w')).webkitUserSelect || getComputedStyle(document.querySelector('.w')).userSelect") == 'none', 'word spans suppress text selection')
         while await answer(page): pass
         await page.wait_for_selector('.stone.just-done')
         check(await page.evaluate("__app.state.path.done.u1[0]") is True, 'stone 1 (intro) completed')
-        await page.wait_for_timeout(250); await page.screenshot(path=f'{OUT}/v4-{ENGINE}-stone-done.png')
+        await page.wait_for_timeout(250); await page.screenshot(path=f'{OUT}/v5-{ENGINE}-stone-done.png')
         # --- stone 2: story
         await page.click('.stone.current'); await page.wait_for_selector('.story')
         shot = False; steps = 0
         while await page.evaluate("!!__app.story") and steps < 60:
             steps += 1
             if await page.query_selector('.squestion .opt:not(.right):not(.wrong)') and not await page.query_selector('.squestion .opt.right'):
-                if not shot: await page.click('#en'); await page.wait_for_timeout(350); await page.screenshot(path=f'{OUT}/v4-{ENGINE}-story.png'); shot = True
+                if not shot: await page.click('#en'); await page.wait_for_timeout(350); await page.screenshot(path=f'{OUT}/v5-{ENGINE}-story.png'); shot = True
                 correct = await page.evaluate("(() => { const st = __app.story; const q = st.u.story.qs.find(q => q.after === st.shown - 1 && st.answered[st.u.story.qs.indexOf(q)] == null); return q.o[0]; })()")
                 await page.click(f'.squestion .opt[data-o="{correct}"]')
             await page.click('#next')
@@ -84,15 +84,15 @@ async def main():
         n = 0
         while await page.evaluate("!!__app.run"):
             if await page.evaluate("__app.ex && __app.ex.kind === 'build'") and n < 1:
-                await page.wait_for_timeout(350); await page.screenshot(path=f'{OUT}/v4-{ENGINE}-test-build.png'); n += 1
+                await page.wait_for_timeout(350); await page.screenshot(path=f'{OUT}/v5-{ENGINE}-test-build.png'); n += 1
             await answer(page, right=await page.evaluate("__app.run.i % 3 !== 0"))
         txt = await page.inner_text('main'); check('need' in txt, 'failing test shows retry (score below 80%)')
-        await page.screenshot(path=f'{OUT}/v4-{ENGINE}-test-fail.png')
+        await page.screenshot(path=f'{OUT}/v5-{ENGINE}-test-fail.png')
         await page.click('#retry')
         i = 0
         while await page.evaluate("!!__app.run"):
             await answer(page, right=(i != 4)); i += 1
-        await page.wait_for_timeout(350); await page.screenshot(path=f'{OUT}/v4-{ENGINE}-test-pass.png')
+        await page.wait_for_timeout(350); await page.screenshot(path=f'{OUT}/v5-{ENGINE}-test-pass.png')
         check('Passed' in await page.inner_text('main'), 'retry passes with 14/15')
         await page.click('#home'); await page.wait_for_selector('.stone.current')
         check(await page.evaluate("__app.currentPos().uid") == 'u2', 'unit 2 unlocked after passing')
@@ -103,7 +103,7 @@ async def main():
         await page.mouse.move(box['x'] + 5, box['y'] + 5); await page.mouse.down(); await page.wait_for_timeout(650)
         menu = await page.query_selector('.wmenu'); await page.mouse.up()
         check(menu is not None, f'long-press opens word menu ({wid})')
-        await page.screenshot(path=f'{OUT}/v4-{ENGINE}-longpress-menu.png')
+        await page.screenshot(path=f'{OUT}/v5-{ENGINE}-longpress-menu.png')
         await page.click('#wm-act')
         st = await page.evaluate(f"({{parked: !!__app.state.parked['{wid}'], inQueue: __app.run.queue.some(e => e.id === 'w:{wid}'), inTest: __app.testQueue('u2').some(e => e.id === 'w:{wid}'), inPractice: __app.practiceQueue('u2').some(e => e.id === 'w:{wid}'), testLen: __app.testQueue('u2').filter(e => e.ex !== 'build').length}})")
         check(st['parked'] and not st['inQueue'] and not st['inTest'] and not st['inPractice'] and st['testLen'] == 12, f'parked word removed from intro/test/practice, test refilled to 12 vocab: {st}')
@@ -114,7 +114,7 @@ async def main():
         exp = await page.evaluate("JSON.parse(JSON.stringify(__app.state))")
         check(wid in exp['parked'], 'parked words included in export data')
         check(await page.query_selector(f'.unpark[data-id="{wid}"]') is not None, 'Progress page lists the parked word')
-        await page.screenshot(path=f'{OUT}/v4-{ENGINE}-progress-parked.png', full_page=True)
+        await page.screenshot(path=f'{OUT}/v5-{ENGINE}-progress-parked.png', full_page=True)
         await page.click(f'.unpark[data-id="{wid}"]')
         check(not await page.evaluate(f"!!__app.state.parked['{wid}']"), 'Unpark works')
         # import round-trip of parked
@@ -135,7 +135,7 @@ async def main():
             s2 = await pg.evaluate("__app.state")
             same = all(s2['items'].get(k) == v for k, v in V3['items'].items()) and len(s2['items']) == len(V3['items'])
             check(same, f'migration ({mode}): all {len(V3["items"])} SRS item states preserved exactly')
-            check(s2['settings'].get('sound') is not None and s2['schema'] == 2 and 'path' in s2 and 'parked' in s2, f'migration ({mode}): new fields added, schema 2')
+            check(s2['settings'].get('sound') is not None and s2['schema'] == 3 and 'path' in s2 and 'parked' in s2, f'migration ({mode}): new fields added, schema 3')
             u1 = s2['path']['done'].get('u1')
             print(f'   derived path ({mode}): u1={u1}, current={await pg.evaluate("__app.currentPos()")}, testedOut={list(s2["path"]["testedOut"].keys())}')
             stored = await pg.evaluate("JSON.parse(localStorage.getItem('spanish-app-state-v1'))")
