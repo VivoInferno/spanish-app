@@ -18,6 +18,16 @@ async def new_ctx(b, p):
     dev = dict(p.devices['iPhone 15']) if ENGINE == 'webkit' else dict(viewport={'width': 390, 'height': 844}, device_scale_factor=3, is_mobile=True, has_touch=True)
     return await b.new_context(**dev, timezone_id='America/Mexico_City')
 
+async def solve_story_tile(page):
+    """v7: a story may pause on a "rebuild the line" word bank; place the tiles in order and check."""
+    if not (await page.query_selector('#stile') and await page.query_selector('#check')): return False
+    ex = await page.evaluate("({tiles: __app.story.tile.ex.tiles, answers: __app.story.tile.ex.answers})")
+    used = []
+    for wt in re.sub(r'[¿?¡!.,;:“”"]', '', ex['answers'][0]).split():
+        for k, t in enumerate(ex['tiles']):
+            if k not in used and t == wt: used.append(k); await page.click(f'#tiles .tile[data-k="{k}"]'); break
+    await page.click('#check'); return True
+
 async def play_story(page, uid, shot=None):
     await page.evaluate(f"__app.openStone('{uid}', 1)"); await page.wait_for_selector('.story')
     asked = 0; steps = 0
@@ -29,6 +39,7 @@ async def play_story(page, uid, shot=None):
                 await page.wait_for_timeout(400); await page.screenshot(path=shot)
             await page.click(f'.squestion .opt[data-o="{correct}"]'); asked += 1
             check(await page.query_selector('.squestion .opt.right') is not None, f'{uid}: question {asked} marked right')
+        await solve_story_tile(page)
         await page.click('#next')
     return asked
 
@@ -45,7 +56,7 @@ async def main():
                 await pg.goto(URL); await pg.wait_for_selector('.stone')
             else:
                 await pg.goto(URL); await pg.wait_for_selector('#go'); await pg.evaluate("s => __app.importBackup(s)", json.dumps(V5)); await pg.reload(); await pg.wait_for_selector('.stone')
-            check(await pg.evaluate("__app.version") == 'v6', f'[{mode}] app version is v6')
+            check(await pg.evaluate("__app.version") == 'v7', f'[{mode}] app version is v7')
             s = await pg.evaluate("__app.state"); stored = await pg.evaluate(f"JSON.parse(localStorage.getItem('{KEY}'))")
             keep = ['items', 'pstats', 'recent', 'parked', 'daily', 'streak', 'placementDone', 'placementSummary', 'sessions', 'created']
             check(all(s.get(k) == raw.get(k) for k in keep), f'[{mode}] SRS items ({len(raw["items"])}), stats, parked, daily history, streak unchanged')

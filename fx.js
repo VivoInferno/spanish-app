@@ -40,6 +40,8 @@
     goal() { if (!ready()) return; // daily goal reached: soft rising E–G#–B–E, a little brighter than "complete"
       [659.25, 830.61, 987.77, 1318.5].forEach((f, i) => note(f, i * 0.09, 0.5, { type: 'triangle', gain: 0.24, attack: 0.012 }));
       note(2637, 0.3, 0.25, { gain: 0.05 }); },
+    pause() { if (!ready()) return; // "can't listen now": two soft falling notes, quieter than a miss
+      note(698.46, 0, 0.12, { type: 'sine', gain: 0.16, attack: 0.004 }); note(523.25, 0.07, 0.2, { type: 'sine', gain: 0.14, attack: 0.006 }); },
     complete() { if (!ready()) return; // gentle C-major chord, lightly arpeggiated
       [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => note(f, i * 0.05, 0.9 - i * 0.05, { type: 'triangle', gain: 0.22, attack: 0.02 })); }
   };
@@ -82,7 +84,7 @@
       // subtle tap on plain buttons; answer buttons get the correct/miss sound instead, speaker buttons stay silent
       root.addEventListener('click', e => {
         const b = e.target.closest && e.target.closest('button, label.btn');
-        if (!b || b.disabled || b.matches('.opt, #check, #skip, .speak, #play, #slow')) return;
+        if (!b || b.disabled || b.matches('.opt, #check, #skip, .speak, #play, #slow, #cantListen')) return;
         sounds.tap();
       }, true);
       applyClasses();
@@ -104,6 +106,7 @@
       retrigger(el, 'fx-goal');
       const bar = el.querySelector('.mbar') || el, r = bar.getBoundingClientRect(); sparkle(r.left + r.width / 2, r.top + r.height / 2);
     },
+    pause(el) { sounds.pause(); vibrate(8); retrigger(el, 'fx-pop'); retrigger(document.querySelector('main.card'), 'fx-dim'); },
     sounds
   };
   root.FX = FX;

@@ -1,3 +1,4 @@
+import re
 """v4+ end-to-end: placement -> path -> all 4 stones of unit 1 -> unit 2 unlocked; long-press parking; v3 migration."""
 import asyncio, json, sys, os
 from playwright.async_api import async_playwright
@@ -36,6 +37,16 @@ async def answer(page, right=True):
         else: await page.click('#skip')
     await page.click('#next'); return True
 
+async def solve_story_tile(page):
+    """v7: a story may pause on a "rebuild the line" word bank; place the tiles in order and check."""
+    if not (await page.query_selector('#stile') and await page.query_selector('#check')): return False
+    ex = await page.evaluate("({tiles: __app.story.tile.ex.tiles, answers: __app.story.tile.ex.answers})")
+    used = []
+    for wt in re.sub(r'[¿?¡!.,;:“”"]', '', ex['answers'][0]).split():
+        for k, t in enumerate(ex['tiles']):
+            if k not in used and t == wt: used.append(k); await page.click(f'#tiles .tile[data-k="{k}"]'); break
+    await page.click('#check'); return True
+
 async def main():
     async with async_playwright() as p:
         if ENGINE == 'webkit': b = await p.webkit.launch(); ctx = await b.new_context(**dict(p.devices['iPhone 15']))
@@ -44,7 +55,7 @@ async def main():
         page.on('console', lambda m: errors.append(m.text) if m.type == 'error' else None)
         page.on('pageerror', lambda e: errors.append(str(e)))
         await page.goto(URL); await page.wait_for_selector('#go')
-        check(await page.evaluate("__app.version") == 'v6', 'app version is v6')
+        check(await page.evaluate("__app.version") == 'v7', 'app version is v7')
         # --- placement
         await page.click('#go'); k = 0
         while not await page.query_selector('h1:has-text("Placement results")'):
@@ -71,6 +82,7 @@ async def main():
                 if not shot: await page.click('#en'); await page.wait_for_timeout(350); await page.screenshot(path=f'{OUT}/v5-{ENGINE}-story.png'); shot = True
                 correct = await page.evaluate("(() => { const st = __app.story; const q = st.u.story.qs.find(q => q.after === st.shown - 1 && st.answered[st.u.story.qs.indexOf(q)] == null); return q.o[0]; })()")
                 await page.click(f'.squestion .opt[data-o="{correct}"]')
+            await solve_story_tile(page)
             await page.click('#next')
         check(await page.evaluate("__app.state.path.done.u1[1]") is True, 'stone 2 (story) completed')
         # --- stone 3: practice
@@ -140,7 +152,7 @@ async def main():
             print(f'   derived path ({mode}): u1={u1}, current={await pg.evaluate("__app.currentPos()")}, testedOut={list(s2["path"]["testedOut"].keys())}')
             stored = await pg.evaluate("JSON.parse(localStorage.getItem('spanish-app-state-v1'))")
             check(stored and stored['items'] == s2['items'], f'migration ({mode}): saved under the same storage key')
-            check(not errs2, f'migration ({mode}): no page errors')
+            check(not errs2, f'migration ({mode}): no page errors {errs2}')
             await ctx2.close()
         check(not errors, f'no console errors ({errors[:3]})')
         await b.close()

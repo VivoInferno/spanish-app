@@ -1,3 +1,4 @@
+import re
 import asyncio, json, sys
 from playwright.async_api import async_playwright
 URL = sys.argv[1] if len(sys.argv) > 1 else 'http://127.0.0.1:8787/'
@@ -35,6 +36,14 @@ async def main():
             if ex['kind'] == 'mc':
                 opts = await page.query_selector_all('.opt'); texts = [await o.inner_text() for o in opts]
                 await opts[texts.index(ex['answer']) if right else next(j for j, t in enumerate(texts) if t != ex['answer'])].click()
+            elif ex['kind'] == 'build':  # v7: tile drills now show up in review too
+                if right:
+                    tl = await page.evaluate("__app.ex.tiles"); used = []
+                    for wt in re.sub(r'[¿?¡!.,;:“”"]', '', ex['answers'][0]).split():
+                        for j, t in enumerate(tl):
+                            if j not in used and t == wt: used.append(j); await page.click(f'#tiles .tile[data-k="{j}"]'); break
+                    await page.click('#check')
+                else: await page.click('#skip')
             else:
                 if right: await page.fill('#ans', ex['answers'][0]); await page.click('#check')
                 else: await page.click('#skip')

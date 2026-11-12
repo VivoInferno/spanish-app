@@ -210,4 +210,46 @@ t('startParked list holds word ids', () => {
   const ids = new Set(C.units.flatMap(u => u.words.map(w => w.id)));
   C.startParked.forEach(id => assert.ok(/^[a-z]+$/.test(id), id));
 });
+
+// ---- v7: "Can't listen now"
+const Listen = require('../listen.js');
+t('only listen / listenS are audio-only types', () => {
+  assert.deepEqual(['es2en', 'en2es', 'cloze', 'listen', 'listenS', 'build'].filter(Listen.isAudio), ['listen', 'listenS']);
+});
+t('audio types get a read-only equivalent', () => {
+  assert.equal(Listen.substitute('listen', true), 'es2en'); assert.equal(Listen.substitute('listenS', true), 'cloze'); assert.equal(Listen.substitute('listenS', false), 'es2en');
+  Listen.AUDIO.forEach(a => assert.ok(!Listen.isAudio(Listen.substitute(a, true)) && !Listen.isAudio(Listen.substitute(a, false))));
+});
+t('pause lasts 10 minutes and counts down', () => {
+  const t0 = Date.UTC(2026, 10, 12, 16), until = Listen.start(t0);
+  assert.equal(until - t0, 600000);
+  assert.ok(Listen.paused(until, t0) && Listen.paused(until, t0 + 599999) && !Listen.paused(until, t0 + 600000));
+  assert.equal(Listen.minutesLeft(until, t0), 10); assert.equal(Listen.minutesLeft(until, t0 + 30000), 10); assert.equal(Listen.minutesLeft(until, t0 + 541000), 1); assert.equal(Listen.minutesLeft(until, t0 + 600000), 0);
+  assert.ok(!Listen.paused(0, t0) && !Listen.paused(undefined, t0));
+});
+
+// ---- v7: one-letter typo tolerance per word
+Check.setKnown(Check.knownFromContent(C));
+const R = (typed, ans, o) => Check.check(typed, [].concat(ans), o).result;
+t('one substitution passes: cotizacion → cotizaciom', () => assert.equal(R('cotizaciom', 'la cotización'), 'typo'));
+t('one deletion passes: mojonera → mojnera', () => assert.equal(R('mojnera', 'mojonera'), 'typo'));
+t('one insertion and one adjacent swap pass', () => { assert.equal(R('mercaddo', 'mercado'), 'typo'); assert.equal(R('trámtie', 'el trámite'), 'typo'); assert.equal(R('cotizacoin', 'cotización'), 'typo'); });
+t('two typos in one word fail', () => { assert.equal(R('mojnra', 'mojonera'), 'wrong'); assert.equal(R('cotisaciom', 'cotización'), 'wrong'); });
+t('3-letter words must be exact', () => { assert.equal(R('lso', 'los'), 'wrong'); assert.equal(R('al', 'el'), 'wrong'); assert.equal(R('mra', 'mar'), 'wrong'); });
+t('clitic swaps fail: se los → se las, se lo → se la', () => { assert.equal(R('se las', 'se los'), 'wrong'); assert.equal(R('se la enviaré', 'se lo enviaré'), 'wrong'); });
+t('verb-ending changes fail: envió → envíe, aprueben → aprueban, hablan → habla', () => { assert.equal(R('envíe', 'envió'), 'wrong'); assert.equal(R('envie', 'envió'), 'wrong'); assert.equal(R('aprueban', 'aprueben'), 'wrong'); assert.equal(R('habla', 'hablan'), 'wrong'); });
+t('gender / number changes fail: interesado → interesada, vendido → vendidos', () => { assert.equal(R('interesada', 'interesado'), 'wrong'); assert.equal(R('vendidos', 'vendido'), 'wrong'); });
+t('a typo that makes another real course word fails (quedan → queden is a different form)', () => { assert.equal(R('esta', 'eso'), 'wrong'); assert.equal(R('quedan', 'queden'), 'wrong'); });
+t('each word in a multi-word answer gets its own allowance', () => {
+  assert.equal(R('el comprobnte de domicillio', 'el comprobante de domicilio'), 'typo');
+  assert.equal(R('el vuelo tiene una escla en monterey', 'El vuelo tiene una escala en Monterrey.', { sentence: true }), 'typo');
+  assert.equal(R('el comprbnte de domicilio', 'el comprobante de domicilio'), 'wrong', 'two edits in one word');
+  assert.equal(R('comprobante domicilio', 'el comprobante de domicilio'), 'wrong', 'missing word');
+});
+t('accent-only slips keep the old "watch the accents" result', () => assert.equal(R('hablo', 'habló'), 'accent'));
+t('English: one-letter typo passes, plural / past -s/-d endings do not', () => { assert.equal(R('prescripton', 'prescription', { lang: 'en' }), 'typo'); assert.equal(R('tires', 'tire', { lang: 'en' }), 'wrong'); });
+t('typo feedback highlights the fixed letter in the correct answer', () => {
+  const r = Check.check('cotizaciom', ['la cotización']); assert.equal(Check.markFixes('la cotización', r), 'la cotizació<mark>n</mark>');
+  const r2 = Check.check('mojnera', ['mojonera']); assert.equal(Check.markFixes('mojonera', r2), 'moj<mark>o</mark>nera');
+});
 console.log(`\n${n} tests passed`);
