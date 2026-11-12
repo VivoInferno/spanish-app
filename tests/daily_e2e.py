@@ -59,13 +59,16 @@ async def main():
         page.on('console', lambda m: errors.append(m.text) if m.type == 'error' else None)
         await page.clock.install(time=at(2026, 11, 11, 9)); await page.clock.pause_at(at(2026, 11, 11, 9))
         await page.goto(URL); await page.wait_for_selector('#daybar')
-        check(await page.evaluate("__app.version") == 'v5', 'app version is v5')
+        check(await page.evaluate("__app.version") == 'v6', 'app version is v6')
         # --- migration from v4 progress
         s = await page.evaluate("__app.state"); stored = await page.evaluate(f"JSON.parse(localStorage.getItem('{KEY}'))")
-        same = all(s.get(k) == v for k, v in raw.items() if k != 'schema' and k != 'settings')
+        diff = [k for k, v in raw.items() if k not in ('schema', 'settings', 'path') and s.get(k) != v]
+        path_same = all(s['path']['done'].get(u) == v for u, v in raw['path']['done'].items()) and s['path']['tests'] == raw['path']['tests'] and s['path']['testedOut'] == raw['path']['testedOut']
+        same = not diff and path_same  # path.done may gain empty entries for units added later (v6), nothing existing changes
+        if not same: print('   differs:', diff, 'path same:', path_same)
         check(same, 'v4 migration: items, pstats, recent, path, tests, parked, placement, sessions all identical')
         check(all(s['settings'].get(k) == v for k, v in raw['settings'].items()) and s['settings']['goalMin'] == 15, 'v4 migration: settings kept, 15-min goal added')
-        check(s['schema'] == 3 and s['streak']['count'] == 1090 and s['streak']['lastDay'] == '2026-11-11' and s['daily'] == {}, f"v4 migration: schema 3, streak seeded 1090 (lastDay {s['streak']['lastDay']})")
+        check(s['schema'] == 4 and s['streak']['count'] == 1090 and s['streak']['lastDay'] == '2026-11-11' and s['daily'] == {}, f"v4 migration: schema 4, streak seeded 1090 (lastDay {s['streak']['lastDay']})")
         check(stored is not None and stored['items'] == raw['items'], 'v4 migration: saved under the same storage key')
         m, n, lit = await bar(page)
         check(m == '0 / 15 min' and n == '1,090' and lit, f'home shows seed: "{m}", streak {n}, flame lit={lit}')

@@ -1,5 +1,5 @@
 {
- "version": 2,
+ "version": 3,
  "dialect": "es-MX",
  "patterns": {
   "clitic_future": {
@@ -1068,6 +1068,476 @@
      ],
      "en": "I'm looking for someone who knows how to fix the gate.",
      "n": "Que after alguien (no preposition). Sepa is subjunctive: the person isn't known yet."
+    }
+   ]
+  },
+  "clitic_usted": {
+   "name": "Double pronouns with usted (¿le comparto…? → se la comparto)",
+   "explain": "With usted, le means “to you”: ¿Le comparto la información? When lo/la/los/las follows, le (or les) becomes se: se la comparto. The “to whom” pronoun always goes first, and both attach to an infinitive or a command: puedo mandársela, mándemela.",
+   "items": [
+    {
+     "q": "¿La cotización? Con gusto ___ comparto hoy.",
+     "o": [
+      "se la",
+      "le la",
+      "la se",
+      "se lo"
+     ],
+     "en": "The quote? I’ll gladly share it with you today.",
+     "n": "le + la (la cotización) → se la."
+    },
+    {
+     "q": "¿Le mando las fotos del terreno? Sí, ___, por favor.",
+     "o": [
+      "mándemelas",
+      "mándemelos",
+      "mándeme las",
+      "me las mande"
+     ],
+     "en": "Shall I send you the photos of the land? Yes, send them to me, please.",
+     "n": "Usted command: mande + me + las in one word, with an accent. Las = las fotos."
+    },
+    {
+     "q": "No tengo el contrato aquí, pero mañana ___ llevo a su oficina.",
+     "o": [
+      "se lo",
+      "le lo",
+      "lo le",
+      "se la"
+     ],
+     "en": "I don’t have the contract here, but tomorrow I’ll bring it to your office.",
+     "n": "el contrato → lo; le + lo → se lo."
+    },
+    {
+     "q": "¿Ya le mandaron los recibos? No, todavía no ___ mandan.",
+     "o": [
+      "me los",
+      "me les",
+      "los me",
+      "se los"
+     ],
+     "en": "Have they sent you the receipts yet? No, they still haven’t sent them to me.",
+     "n": "me + los (los recibos). Only le/les change to se."
+    },
+    {
+     "q": "Si quiere la información, puedo ___ ahorita.",
+     "o": [
+      "mandársela",
+      "mandarle la",
+      "mandarsela",
+      "se mandarla"
+     ],
+     "en": "If you want the information, I can send it to you right now.",
+     "n": "Attach both to the infinitive: mandar + se + la → mandársela (the accent keeps the stress)."
+    },
+    {
+     "q": "Señores, ¿las cotizaciones? Ya ___ envié a los dos.",
+     "o": [
+      "se las",
+      "les las",
+      "las les",
+      "se los"
+     ],
+     "en": "Gentlemen, the quotes? I already sent them to both of you.",
+     "n": "les (ustedes) + las → se las."
+    },
+    {
+     "q": "___ comparto mi ubicación para que llegue sin problema.",
+     "o": [
+      "Le",
+      "Lo",
+      "Se",
+      "La"
+     ],
+     "en": "I’ll share my location with you so you can get here without any trouble.",
+     "n": "Only one pronoun (“to you”) → le. It becomes se only before lo/la/los/las."
+    },
+    {
+     "q": "¿Le explico cómo llegar? Sí, ___, por favor.",
+     "o": [
+      "explíquemelo",
+      "explíqueme lo",
+      "me lo explique",
+      "explíquemela"
+     ],
+     "en": "Shall I explain how to get there? Yes, explain it to me, please.",
+     "n": "Usted command + me + lo, one word with an accent. Lo stands for the whole idea (cómo llegar)."
+    }
+   ]
+  },
+  "quedar_distancia": {
+   "name": "Quedar and distances (queda a 15 minutos de…)",
+   "explain": "Quedar says where a place is: ¿Dónde queda? Queda cerca del aeropuerto. Distance takes a: queda a 15 minutos del aeropuerto, a 100 metros del mar. De + el → del. Quedar also means to suit or to agree: ¿Le queda bien el sábado? Quedamos a las diez.",
+   "items": [
+    {
+     "q": "El terreno queda ___ quince minutos del aeropuerto.",
+     "o": [
+      "a",
+      "en",
+      "de",
+      "por"
+     ],
+     "en": "The land is fifteen minutes from the airport.",
+     "n": "Distance or time away → a: queda a 15 minutos de…"
+    },
+    {
+     "q": "La playa queda a cinco minutos ___ fraccionamiento.",
+     "o": [
+      "del",
+      "de el",
+      "al",
+      "en el"
+     ],
+     "en": "The beach is five minutes from the development.",
+     "n": "de + el always contracts → del."
+    },
+    {
+     "q": "¿Dónde ___ la oficina de ventas?",
+     "o": [
+      "queda",
+      "quede",
+      "quedan",
+      "es"
+     ],
+     "en": "Where is the sales office?",
+     "n": "Where a place is → queda (or está), not es."
+    },
+    {
+     "q": "El centro no queda ___; son como dieciocho minutos.",
+     "o": [
+      "lejos",
+      "lejos de",
+      "a lejos",
+      "cerca de"
+     ],
+     "en": "Downtown isn’t far; it’s about eighteen minutes.",
+     "n": "Lejos / cerca alone when no place follows; lejos de / cerca de + place."
+    },
+    {
+     "q": "El aeropuerto queda cerca ___ Bajos de Chila.",
+     "o": [
+      "de",
+      "a",
+      "en",
+      "por"
+     ],
+     "en": "The airport is close to Bajos de Chila.",
+     "n": "cerca de + place."
+    },
+    {
+     "q": "¿Le ___ bien el sábado a las diez?",
+     "o": [
+      "queda",
+      "quede",
+      "quedan",
+      "quedo"
+     ],
+     "en": "Does Saturday at ten work for you?",
+     "n": "Quedar bien = to suit. The subject is el sábado → queda."
+    },
+    {
+     "q": "Entonces ___ el sábado en la entrada del fraccionamiento.",
+     "o": [
+      "quedamos",
+      "quedemos",
+      "quedan",
+      "queda"
+     ],
+     "en": "So we’ll meet on Saturday at the entrance to the development.",
+     "n": "Quedar = to agree on a plan: quedamos el sábado."
+    },
+    {
+     "q": "Los lotes de la segunda fila quedan ___ cien metros del mar.",
+     "o": [
+      "a",
+      "en",
+      "por",
+      "de"
+     ],
+     "en": "The second-row lots are a hundred meters from the sea.",
+     "n": "Distance → a: a 100 metros de…"
+    }
+   ]
+  },
+  "estar_participio": {
+   "name": "Estar + participle and quedan (está apartado, quedan dos)",
+   "explain": "Estar + participle describes the state something is in, and the participle agrees like an adjective: el lote está apartado, las casas están vendidas. Quedar counts what is left: queda un lote, quedan tres lotes.",
+   "items": [
+    {
+     "q": "Los lotes de la primera fila ya están ___.",
+     "o": [
+      "vendidos",
+      "vendidas",
+      "vendido",
+      "vendiendo"
+     ],
+     "en": "The front-row lots are already sold.",
+     "n": "Agrees with los lotes → vendidos."
+    },
+    {
+     "q": "La oficina ___ cerrada los domingos.",
+     "o": [
+      "está",
+      "es",
+      "tiene",
+      "hay"
+     ],
+     "en": "The office is closed on Sundays.",
+     "n": "A resulting state → estar + participle; cerrada agrees with la oficina."
+    },
+    {
+     "q": "Solo ___ un lote en esa calle.",
+     "o": [
+      "queda",
+      "quedan",
+      "está",
+      "son"
+     ],
+     "en": "There’s only one lot left on that street.",
+     "n": "One thing left → queda (singular)."
+    },
+    {
+     "q": "Todavía ___ cinco lotes con vista al mar.",
+     "o": [
+      "quedan",
+      "queda",
+      "están",
+      "es"
+     ],
+     "en": "There are still five lots with an ocean view left.",
+     "n": "Plural → quedan."
+    },
+    {
+     "q": "La cotización ya está ___; ahorita se la mando.",
+     "o": [
+      "hecha",
+      "hecho",
+      "haciendo",
+      "hace"
+     ],
+     "en": "The quote is done; I’ll send it to you right now.",
+     "n": "Hacer → hecho (irregular); agrees with la cotización → hecha."
+    },
+    {
+     "q": "El contrato ya está ___ por los dos.",
+     "o": [
+      "firmado",
+      "firmada",
+      "firmando",
+      "firmó"
+     ],
+     "en": "The contract is already signed by both of them.",
+     "n": "El contrato → firmado."
+    },
+    {
+     "q": "Las dos casas de la esquina están ___ hasta el viernes.",
+     "o": [
+      "apartadas",
+      "apartados",
+      "apartada",
+      "apartando"
+     ],
+     "en": "The two corner houses are on hold until Friday.",
+     "n": "Las casas → apartadas (feminine plural)."
+    },
+    {
+     "q": "¿Cuántos lotes ___ disponibles?",
+     "o": [
+      "quedan",
+      "queda",
+      "quedamos",
+      "son"
+     ],
+     "en": "How many lots are still available?",
+     "n": "Quedan + adjective = how many are left in that state."
+    }
+   ]
+  },
+  "habitual": {
+   "name": "Habits: imperfect, soler and impersonal se (solía, se acostumbra)",
+   "explain": "Past habits use the imperfect: comíamos a las tres. Soler + infinitive = usually: suelo, suelen (present); solía, solíamos (used to). For general customs use impersonal se: aquí se come tarde, se acostumbra brindar. With a plural noun the verb is plural: se quitan los zapatos.",
+   "items": [
+    {
+     "q": "Cuando vivía en Texas, ___ cenar a las seis.",
+     "o": [
+      "solía",
+      "suelo",
+      "suele",
+      "soleré"
+     ],
+     "en": "When I lived in Texas, I used to have dinner at six.",
+     "n": "Past habit → imperfect: solía + infinitive."
+    },
+    {
+     "q": "En México se ___ comer entre las dos y las cuatro.",
+     "o": [
+      "acostumbra",
+      "acostumbran",
+      "acostumbro",
+      "acostumbre"
+     ],
+     "en": "In Mexico it’s customary to eat between two and four.",
+     "n": "Impersonal se + infinitive → singular verb."
+    },
+    {
+     "q": "Los domingos mis suegros ___ hacer una comida grande.",
+     "o": [
+      "suelen",
+      "suele",
+      "solemos",
+      "sueles"
+     ],
+     "en": "On Sundays my in-laws usually make a big meal.",
+     "n": "Soler changes o → ue: ellos suelen."
+    },
+    {
+     "q": "De niño, todos los veranos ___ a la playa con mis papás.",
+     "o": [
+      "iba",
+      "fui",
+      "voy",
+      "iré"
+     ],
+     "en": "As a kid, I went to the beach with my parents every summer.",
+     "n": "Repeated past action (todos los veranos) → imperfect."
+    },
+    {
+     "q": "Aquí no se ___ llegar puntual a una fiesta.",
+     "o": [
+      "acostumbra",
+      "acostumbras",
+      "acostumbrado",
+      "acostumbran"
+     ],
+     "en": "Here it isn’t customary to arrive on time to a party.",
+     "n": "Impersonal se + infinitive → acostumbra."
+    },
+    {
+     "q": "Cuando éramos niños, mi abuela nos ___ chocolate en las tardes.",
+     "o": [
+      "preparaba",
+      "preparó",
+      "prepara",
+      "preparará"
+     ],
+     "en": "When we were kids, my grandmother used to make us hot chocolate in the afternoons.",
+     "n": "A habit in the past (cuando éramos niños) → imperfect."
+    },
+    {
+     "q": "¿A qué hora ___ comer ustedes?",
+     "o": [
+      "suelen",
+      "suelan",
+      "solen",
+      "soléis"
+     ],
+     "en": "What time do you all usually eat?",
+     "n": "Ustedes → suelen (o → ue). Soléis is Spain’s vosotros form."
+    },
+    {
+     "q": "En esta casa se ___ los zapatos en la entrada.",
+     "o": [
+      "quitan",
+      "quita",
+      "quitamos",
+      "quiten"
+     ],
+     "en": "In this house you take your shoes off at the door.",
+     "n": "Se + plural noun (los zapatos) → plural verb: se quitan."
+    }
+   ]
+  },
+  "comparatives": {
+   "name": "Comparatives and measurements (más grande que, mide 20 de frente)",
+   "explain": "más / menos + adjective + que: más grande que el otro. Irregular: mejor, peor, mayor, menor. Before a number use de: más de 400 metros; before a clause use de lo que: más grande de lo que pensaba. Equal: tan grande como, tantos lotes como. Measurements: mide 20 de frente por 30 de fondo.",
+   "items": [
+    {
+     "q": "Este lote es más grande ___ el de al lado.",
+     "o": [
+      "que",
+      "de",
+      "como",
+      "a"
+     ],
+     "en": "This lot is bigger than the one next to it.",
+     "n": "Comparing two things → más … que."
+    },
+    {
+     "q": "El terreno tiene más ___ cuatrocientos metros cuadrados.",
+     "o": [
+      "de",
+      "que",
+      "como",
+      "a"
+     ],
+     "en": "The land has more than four hundred square meters.",
+     "n": "Before a number → más de."
+    },
+    {
+     "q": "La vista desde el fondo es ___ que desde la calle.",
+     "o": [
+      "mejor",
+      "más buena",
+      "más mejor",
+      "bueno"
+     ],
+     "en": "The view from the back is better than from the street.",
+     "n": "Bueno → mejor. Never más mejor."
+    },
+    {
+     "q": "El L-689 es tan bonito ___ el L-702.",
+     "o": [
+      "como",
+      "que",
+      "de",
+      "tan"
+     ],
+     "en": "L-689 is as nice as L-702.",
+     "n": "tan + adjective + como."
+    },
+    {
+     "q": "Mide quince metros ___ frente por treinta de fondo.",
+     "o": [
+      "de",
+      "en",
+      "a",
+      "por"
+     ],
+     "en": "It’s fifteen meters wide by thirty deep.",
+     "n": "Medir X de frente por Y de fondo."
+    },
+    {
+     "q": "Este lote tiene ___ pendiente que el otro, así que es más fácil construir.",
+     "o": [
+      "menos",
+      "más poco",
+      "tan poca",
+      "poco"
+     ],
+     "en": "This lot has less slope than the other one, so it’s easier to build on.",
+     "n": "Less → menos … que."
+    },
+    {
+     "q": "La casa salió más cara ___ lo que pensábamos.",
+     "o": [
+      "de",
+      "que",
+      "como",
+      "a"
+     ],
+     "en": "The house turned out more expensive than we thought.",
+     "n": "Before a clause → de lo que."
+    },
+    {
+     "q": "Ya no hay tantos lotes ___ antes.",
+     "o": [
+      "como",
+      "que",
+      "de",
+      "tan"
+     ],
+     "en": "There aren’t as many lots as before.",
+     "n": "tantos + noun + como."
     }
    ]
   }
@@ -3014,6 +3484,1505 @@
      }
     ]
    }
+  },
+  {
+   "id": "ta1",
+   "ta": true,
+   "title": "Primer mensaje por WhatsApp",
+   "titleEn": "First WhatsApp reply to a lead",
+   "level": "B1",
+   "note": "Tres Aguas work unit. Prices, lot counts and lot statuses here are practice examples, not current figures.",
+   "focus": [
+    "clitic_usted",
+    "clitic_future"
+   ],
+   "words": [
+    {
+     "id": "prospecto",
+     "es": "el prospecto",
+     "en": "lead / prospective buyer",
+     "accept": [
+      "lead",
+      "prospect",
+      "prospective buyer",
+      "prospective client",
+      "potential client",
+      "potential buyer",
+      "sales lead"
+     ],
+     "note": "In Mexican real estate, un prospecto is a lead."
+    },
+    {
+     "id": "interesado",
+     "es": "interesado",
+     "en": "interested",
+     "accept": [
+      "interested",
+      "interested party",
+      "interested person"
+     ],
+     "esAlt": [
+      "interesada"
+     ]
+    },
+    {
+     "id": "cotizacion",
+     "es": "la cotización",
+     "en": "quote",
+     "accept": [
+      "quote",
+      "price quote",
+      "quotation",
+      "estimate"
+     ],
+     "note": "Cotizar = to quote a price. ¿Me manda una cotización?"
+    },
+    {
+     "id": "compartir",
+     "es": "compartir",
+     "en": "to share",
+     "accept": [
+      "to share",
+      "to send"
+     ],
+     "note": "¿Le comparto la información? is the polite WhatsApp way to offer to send something."
+    },
+    {
+     "id": "congusto",
+     "es": "con gusto",
+     "en": "gladly / my pleasure",
+     "accept": [
+      "gladly",
+      "my pleasure",
+      "with pleasure",
+      "happy to",
+      "glad to",
+      "happy to help",
+      "with gladness"
+     ],
+     "note": "Con gusto is the standard friendly yes: Con gusto le ayudo."
+    }
+   ],
+   "sentences": [
+    {
+     "es": "Ayer me escribió un prospecto de Oaxaca por WhatsApp.",
+     "en": "Yesterday a lead from Oaxaca wrote to me on WhatsApp.",
+     "k": "prospecto",
+     "f": "prospecto"
+    },
+    {
+     "es": "Cada prospecto nuevo quiere saber el precio primero.",
+     "en": "Every new lead wants to know the price first.",
+     "k": "prospecto",
+     "f": "prospecto"
+    },
+    {
+     "es": "La señora está muy interesada en conocer el terreno.",
+     "en": "The woman is very interested in seeing the land.",
+     "k": "interesado",
+     "f": "interesada",
+     "h": "feminine"
+    },
+    {
+     "es": "Si sigue interesado, agendamos una cita para que conozca el terreno.",
+     "en": "If you’re still interested, we’ll set up an appointment so you can see the land.",
+     "k": "interesado",
+     "f": "interesado"
+    },
+    {
+     "es": "Le envié la cotización y todavía no me contesta.",
+     "en": "I sent him the quote and he still hasn’t answered me.",
+     "k": "cotizacion",
+     "f": "cotización"
+    },
+    {
+     "es": "¿Me puede mandar la cotización por correo también?",
+     "en": "Can you send me the quote by email too?",
+     "k": "cotizacion",
+     "f": "cotización"
+    },
+    {
+     "es": "¿Le comparto la información por aquí?",
+     "en": "Shall I share the information with you here?",
+     "k": "compartir",
+     "f": "comparto",
+     "h": "compartir, yo"
+    },
+    {
+     "es": "Si le interesa la información, se la comparto ahora mismo.",
+     "en": "If you’re interested in the information, I’ll share it with you right now.",
+     "k": "compartir",
+     "f": "comparto",
+     "h": "compartir, yo"
+    },
+    {
+     "es": "Con gusto se la mando hoy en la tarde.",
+     "en": "I’ll gladly send it to you this afternoon.",
+     "k": "congusto",
+     "f": "Con gusto"
+    },
+    {
+     "es": "Con gusto le entrego el recibo en la oficina.",
+     "en": "I’ll gladly give you the receipt at the office.",
+     "k": "congusto",
+     "f": "Con gusto"
+    }
+   ],
+   "story": {
+    "title": "Un mensaje a las nueve de la noche",
+    "lines": [
+     {
+      "s": null,
+      "es": "Son las nueve de la noche. A Mariana le llega un mensaje de un prospecto nuevo.",
+      "en": "It’s nine at night. Mariana gets a message from a new lead."
+     },
+     {
+      "s": "Sr. Ortega",
+      "es": "Buenas noches. Vi su anuncio de Tres Aguas. ¿Todavía tienen lotes?",
+      "en": "Good evening. I saw your Tres Aguas ad. Do you still have lots?"
+     },
+     {
+      "s": "Mariana",
+      "es": "¡Buenas noches! Soy Mariana, asesora de Tres Aguas. Con gusto le ayudo.",
+      "en": "Good evening! I’m Mariana, an advisor at Tres Aguas. I’m happy to help you."
+     },
+     {
+      "s": "Mariana",
+      "es": "Sí, todavía tenemos lotes. ¿Le comparto la información del proyecto?",
+      "en": "Yes, we still have lots. Shall I share the project information with you?"
+     },
+     {
+      "s": "Sr. Ortega",
+      "es": "Sí, por favor. Me interesa, pero primero quiero saber precios.",
+      "en": "Yes, please. I’m interested, but first I want to know prices."
+     },
+     {
+      "s": "Mariana",
+      "es": "Claro. Para mandarle una cotización, ¿más o menos cuánto quiere invertir?",
+      "en": "Sure. So I can send you a quote, roughly how much do you want to invest?"
+     },
+     {
+      "s": "Sr. Ortega",
+      "es": "Unos ochocientos mil pesos. Y me gustaría ir a verlo en diciembre.",
+      "en": "About eight hundred thousand pesos. And I’d like to go see it in December."
+     },
+     {
+      "s": "Mariana",
+      "es": "Perfecto. Ahorita se la preparo y se la mando con el plano.",
+      "en": "Perfect. I’ll put it together for you right now and send it to you with the map."
+     },
+     {
+      "s": null,
+      "es": "Diez minutos después, Mariana le comparte la cotización y unas fotos del terreno.",
+      "en": "Ten minutes later, Mariana shares the quote and some photos of the land with him."
+     },
+     {
+      "s": "Sr. Ortega",
+      "es": "Muchas gracias. ¿Ya puedo agendar la cita de diciembre?",
+      "en": "Thank you very much. Can I already schedule the December appointment?"
+     },
+     {
+      "s": "Mariana",
+      "es": "Claro que sí. Dígame qué día le queda bien y se la confirmo.",
+      "en": "Of course. Tell me which day works for you and I’ll confirm it for you."
+     },
+     {
+      "s": "Sr. Ortega",
+      "es": "El sábado 5. Gracias por contestar tan rápido.",
+      "en": "Saturday the 5th. Thanks for answering so quickly."
+     }
+    ],
+    "qs": [
+     {
+      "after": 1,
+      "q": "What does the lead want to know?",
+      "o": [
+       "If there are still lots",
+       "How to get to the beach",
+       "If he can pay in dollars"
+      ],
+      "k": "prospecto"
+     },
+     {
+      "after": 5,
+      "q": "What does Mariana ask him?",
+      "o": [
+       "Roughly how much he wants to invest",
+       "Where he lives",
+       "When he can sign"
+      ],
+      "k": "cotizacion"
+     },
+     {
+      "after": 7,
+      "q": "Complete: “Ahorita se ___ preparo y se la mando.”",
+      "o": [
+       "la",
+       "le",
+       "les"
+      ],
+      "p": "clitic_usted"
+     },
+     {
+      "after": 10,
+      "q": "Why does Mariana need him to pick a day?",
+      "o": [
+       "To confirm the appointment",
+       "To send the quote",
+       "To reserve a hotel"
+      ],
+      "k": "cita"
+     }
+    ]
+   }
+  },
+  {
+   "id": "ta2",
+   "ta": true,
+   "title": "El proyecto en 30 segundos",
+   "titleEn": "Pitching the project",
+   "level": "B1",
+   "note": "Tres Aguas work unit. Prices, lot counts and lot statuses here are practice examples, not current figures.",
+   "focus": [
+    "ser_estar",
+    "relative"
+   ],
+   "words": [
+    {
+     "id": "fraccionamiento",
+     "es": "el fraccionamiento",
+     "en": "development / subdivision",
+     "accept": [
+      "development",
+      "subdivision",
+      "housing development",
+      "residential development",
+      "gated community",
+      "planned community"
+     ],
+     "note": "A fraccionamiento is a planned subdivision of lots, often gated."
+    },
+    {
+     "id": "frentealmar",
+     "es": "frente al mar",
+     "en": "oceanfront",
+     "accept": [
+      "oceanfront",
+      "beachfront",
+      "seafront",
+      "ocean front",
+      "facing the sea",
+      "facing the ocean",
+      "on the ocean",
+      "in front of the sea",
+      "in front of the ocean"
+     ]
+    },
+    {
+     "id": "lotificacion",
+     "es": "la lotificación",
+     "en": "lot layout",
+     "accept": [
+      "lot layout",
+      "subdivision into lots",
+      "lot plan",
+      "plot layout",
+      "lot division",
+      "lotting",
+      "subdivision"
+     ],
+     "note": "La lotificación = how the land is divided into lots."
+    },
+    {
+     "id": "planmaestro",
+     "es": "el plan maestro",
+     "en": "master plan",
+     "accept": [
+      "master plan",
+      "masterplan"
+     ]
+    },
+    {
+     "id": "etapa",
+     "es": "la etapa",
+     "en": "phase / stage",
+     "accept": [
+      "phase",
+      "stage"
+     ],
+     "note": "Projects sell por etapas (in phases), like the Gold Plus phase."
+    }
+   ],
+   "sentences": [
+    {
+     "es": "Tres Aguas es un fraccionamiento cerca de Puerto Escondido.",
+     "en": "Tres Aguas is a development near Puerto Escondido.",
+     "k": "fraccionamiento",
+     "f": "fraccionamiento"
+    },
+    {
+     "es": "La playa que está frente al fraccionamiento se llama Agua Dulce.",
+     "en": "The beach in front of the development is called Agua Dulce.",
+     "k": "fraccionamiento",
+     "f": "fraccionamiento"
+    },
+    {
+     "es": "Los lotes de la primera fila están frente al mar.",
+     "en": "The front-row lots are oceanfront.",
+     "k": "frentealmar",
+     "f": "frente al mar"
+    },
+    {
+     "es": "El cliente que vino ayer quiere un lote frente al mar.",
+     "en": "The client who came yesterday wants an oceanfront lot.",
+     "k": "frentealmar",
+     "f": "frente al mar"
+    },
+    {
+     "es": "El plano de la lotificación está en la oficina.",
+     "en": "The lot layout map is at the office.",
+     "k": "lotificacion",
+     "f": "lotificación"
+    },
+    {
+     "es": "En la lotificación, cada lote tiene acceso a una calle interna.",
+     "en": "In the lot layout, every lot has access to an internal street.",
+     "k": "lotificacion",
+     "f": "lotificación"
+    },
+    {
+     "es": "En el plan maestro se ven las calles, los lotes y las áreas comunes.",
+     "en": "The master plan shows the streets, the lots and the common areas.",
+     "k": "planmaestro",
+     "f": "plan maestro"
+    },
+    {
+     "es": "Le comparto el plan maestro para que vea dónde queda cada lote.",
+     "en": "I’ll share the master plan with you so you can see where each lot is.",
+     "k": "planmaestro",
+     "f": "plan maestro"
+    },
+    {
+     "es": "Ahorita estamos vendiendo la etapa Gold Plus.",
+     "en": "Right now we’re selling the Gold Plus phase.",
+     "k": "etapa",
+     "f": "etapa"
+    },
+    {
+     "es": "La segunda etapa todavía no tiene fecha de entrega.",
+     "en": "The second phase doesn’t have a delivery date yet.",
+     "k": "etapa",
+     "f": "etapa"
+    }
+   ],
+   "story": {
+    "title": "Treinta segundos",
+    "lines": [
+     {
+      "s": null,
+      "es": "Laura y Javier están de vacaciones en Puerto Escondido y entran a la oficina de ventas.",
+      "en": "Laura and Javier are on vacation in Puerto Escondido and walk into the sales office."
+     },
+     {
+      "s": "Javier",
+      "es": "Hola. Tenemos poco tiempo. ¿Nos explica rápido qué es Tres Aguas?",
+      "en": "Hi. We don’t have much time. Can you quickly explain what Tres Aguas is?"
+     },
+     {
+      "s": "Mariana",
+      "es": "Con gusto. Es un fraccionamiento frente al mar, en la playa Agua Dulce.",
+      "en": "Gladly. It’s an oceanfront development on Agua Dulce beach."
+     },
+     {
+      "s": "Mariana",
+      "es": "Está a quince minutos del aeropuerto y a unos dieciocho del centro.",
+      "en": "It’s fifteen minutes from the airport and about eighteen from downtown."
+     },
+     {
+      "s": "Laura",
+      "es": "¿Y es un proyecto nuevo? ¿Ya están vendiendo todo?",
+      "en": "And is it a new project? Are you already selling all of it?"
+     },
+     {
+      "s": "Mariana",
+      "es": "El proyecto va por etapas. Ahorita estamos vendiendo la etapa Gold Plus.",
+      "en": "The project goes in phases. Right now we’re selling the Gold Plus phase."
+     },
+     {
+      "s": "Mariana",
+      "es": "Aquí está el plan maestro: estas son las calles y aquí están las áreas comunes.",
+      "en": "Here’s the master plan: these are the streets and here are the common areas."
+     },
+     {
+      "s": "Javier",
+      "es": "¿Y todos los lotes son iguales?",
+      "en": "And are all the lots the same?"
+     },
+     {
+      "s": "Mariana",
+      "es": "No. La lotificación tiene lotes de varios tamaños, y los de la primera fila están frente al mar.",
+      "en": "No. The lot layout has lots of several sizes, and the front-row ones are oceanfront."
+     },
+     {
+      "s": "Laura",
+      "es": "Me encanta. ¿Nos puede mandar el plano por WhatsApp?",
+      "en": "I love it. Can you send us the map on WhatsApp?"
+     },
+     {
+      "s": "Mariana",
+      "es": "Claro, ahorita se lo mando. Y si quieren, mañana les enseño el terreno.",
+      "en": "Sure, I’ll send it to you right now. And if you like, tomorrow I’ll show you the land."
+     },
+     {
+      "s": null,
+      "es": "Fueron treinta segundos, pero Laura y Javier salieron muy interesados.",
+      "en": "It took thirty seconds, but Laura and Javier left very interested."
+     }
+    ],
+    "qs": [
+     {
+      "after": 2,
+      "q": "What is Tres Aguas?",
+      "o": [
+       "An oceanfront development",
+       "A hotel on the beach",
+       "A restaurant by the airport"
+      ],
+      "k": "fraccionamiento"
+     },
+     {
+      "after": 5,
+      "q": "What is being sold right now?",
+      "o": [
+       "The Gold Plus phase",
+       "Houses that are already built",
+       "Only the common areas"
+      ],
+      "k": "etapa"
+     },
+     {
+      "after": 6,
+      "q": "Complete: “Aquí ___ el plan maestro.”",
+      "o": [
+       "está",
+       "es",
+       "son"
+      ],
+      "p": "ser_estar"
+     },
+     {
+      "after": 8,
+      "q": "Which lots are oceanfront?",
+      "o": [
+       "The front-row ones",
+       "All of them",
+       "The smallest ones"
+      ],
+      "k": "frentealmar"
+     }
+    ]
+   }
+  },
+  {
+   "id": "ta3",
+   "ta": true,
+   "title": "¿Dónde queda Tres Aguas?",
+   "titleEn": "Location and distances",
+   "level": "B1",
+   "note": "Tres Aguas work unit. Prices, lot counts and lot statuses here are practice examples, not current figures.",
+   "focus": [
+    "quedar_distancia",
+    "por_para"
+   ],
+   "words": [
+    {
+     "id": "carreteracostera",
+     "es": "la carretera costera",
+     "en": "coastal highway",
+     "accept": [
+      "coastal highway",
+      "coast highway",
+      "coastal road",
+      "coast road"
+     ]
+    },
+    {
+     "id": "laguna",
+     "es": "la laguna",
+     "en": "lagoon",
+     "accept": [
+      "lagoon",
+      "lake"
+     ]
+    },
+    {
+     "id": "quedarcerca",
+     "es": "quedar cerca",
+     "en": "to be close by",
+     "accept": [
+      "to be close",
+      "to be near",
+      "to be nearby",
+      "to be close by",
+      "be close",
+      "be near"
+     ],
+     "note": "Quedar = to be located. ¿Dónde queda? Queda cerca del aeropuerto."
+    },
+    {
+     "id": "desviacion",
+     "es": "la desviación",
+     "en": "turnoff",
+     "accept": [
+      "turnoff",
+      "turn-off",
+      "exit",
+      "turn",
+      "detour",
+      "side road"
+     ],
+     "note": "In Mexico, la desviación is where you turn off a highway onto a smaller road."
+    },
+    {
+     "id": "entronque",
+     "es": "el entronque",
+     "en": "junction",
+     "accept": [
+      "junction",
+      "intersection",
+      "crossroads",
+      "interchange"
+     ]
+    }
+   ],
+   "sentences": [
+    {
+     "es": "Tres Aguas queda por la carretera costera, rumbo a Acapulco.",
+     "en": "Tres Aguas is off the coastal highway, heading toward Acapulco.",
+     "k": "carreteracostera",
+     "f": "carretera costera"
+    },
+    {
+     "es": "La carretera costera es muy bonita, pero de noche hay que manejar con cuidado.",
+     "en": "The coastal highway is very pretty, but at night you have to drive carefully.",
+     "k": "carreteracostera",
+     "f": "carretera costera"
+    },
+    {
+     "es": "La laguna de Manialtepec queda muy cerca del fraccionamiento.",
+     "en": "Manialtepec Lagoon is very close to the development.",
+     "k": "laguna",
+     "f": "laguna"
+    },
+    {
+     "es": "Pasamos por la laguna para llegar a la playa.",
+     "en": "We go past the lagoon to get to the beach.",
+     "k": "laguna",
+     "f": "laguna"
+    },
+    {
+     "es": "El aeropuerto queda cerca, a quince minutos en coche.",
+     "en": "The airport is close, fifteen minutes by car.",
+     "k": "quedarcerca",
+     "f": "queda cerca"
+    },
+    {
+     "es": "¿El centro queda cerca? Sí, a unos dieciocho minutos.",
+     "en": "Is downtown close? Yes, about eighteen minutes.",
+     "k": "quedarcerca",
+     "f": "queda cerca"
+    },
+    {
+     "es": "Después de Bajos de Chila, busque la desviación a la playa Agua Dulce.",
+     "en": "After Bajos de Chila, look for the turnoff to Agua Dulce beach.",
+     "k": "desviacion",
+     "f": "desviación"
+    },
+    {
+     "es": "La desviación está a la derecha, justo después del puente.",
+     "en": "The turnoff is on the right, just after the bridge.",
+     "k": "desviacion",
+     "f": "desviación"
+    },
+    {
+     "es": "En el entronque hay una tienda; ahí dé vuelta a la izquierda.",
+     "en": "There’s a store at the junction; turn left there.",
+     "k": "entronque",
+     "f": "entronque"
+    },
+    {
+     "es": "Le comparto la ubicación del entronque por WhatsApp.",
+     "en": "I’ll share the location of the junction with you on WhatsApp.",
+     "k": "entronque",
+     "f": "entronque"
+    }
+   ],
+   "story": {
+    "title": "Me pasé la desviación",
+    "lines": [
+     {
+      "s": null,
+      "es": "Es sábado. El señor Ortega maneja desde el aeropuerto para su cita en Tres Aguas.",
+      "en": "It’s Saturday. Mr. Ortega is driving from the airport to his appointment at Tres Aguas."
+     },
+     {
+      "s": "Sr. Ortega",
+      "es": "Mariana, buenos días. Ya salí del aeropuerto. ¿Para dónde voy?",
+      "en": "Mariana, good morning. I just left the airport. Which way do I go?"
+     },
+     {
+      "s": "Mariana",
+      "es": "Buenos días. Tome la carretera costera hacia Acapulco. Queda muy cerca.",
+      "en": "Good morning. Take the coastal highway toward Acapulco. It’s very close."
+     },
+     {
+      "s": "Sr. Ortega",
+      "es": "¿Más o menos cuánto hago?",
+      "en": "Roughly how long will it take me?"
+     },
+     {
+      "s": "Mariana",
+      "es": "Unos quince minutos. Va a pasar por Bajos de Chila.",
+      "en": "About fifteen minutes. You’ll go through Bajos de Chila."
+     },
+     {
+      "s": "Mariana",
+      "es": "Después del entronque, busque la desviación a la playa Agua Dulce.",
+      "en": "After the junction, look for the turnoff to Agua Dulce beach."
+     },
+     {
+      "s": null,
+      "es": "Diez minutos después, el señor Ortega vuelve a llamar.",
+      "en": "Ten minutes later, Mr. Ortega calls again."
+     },
+     {
+      "s": "Sr. Ortega",
+      "es": "Creo que me pasé la desviación. Veo una laguna a la derecha.",
+      "en": "I think I missed the turnoff. I can see a lagoon on the right."
+     },
+     {
+      "s": "Mariana",
+      "es": "No se preocupe, es la laguna de Manialtepec. Regrésese un kilómetro.",
+      "en": "Don’t worry, that’s Manialtepec Lagoon. Go back one kilometer."
+     },
+     {
+      "s": "Mariana",
+      "es": "Ahora la desviación le queda a la derecha. Ahorita le comparto mi ubicación.",
+      "en": "Now the turnoff will be on your right. I’ll share my location with you right now."
+     },
+     {
+      "s": "Sr. Ortega",
+      "es": "Ya la vi. ¡Qué bonito camino para llegar al mar!",
+      "en": "I see it now. What a beautiful road down to the sea!"
+     },
+     {
+      "s": "Mariana",
+      "es": "Aquí lo espero, en la entrada. Bienvenido a Tres Aguas.",
+      "en": "I’m waiting for you here at the entrance. Welcome to Tres Aguas."
+     }
+    ],
+    "qs": [
+     {
+      "after": 2,
+      "q": "Which road does Mariana tell him to take?",
+      "o": [
+       "The coastal highway toward Acapulco",
+       "The road to Oaxaca City",
+       "The road to downtown"
+      ],
+      "k": "carreteracostera"
+     },
+     {
+      "after": 4,
+      "q": "Complete: “Va a pasar ___ Bajos de Chila.”",
+      "o": [
+       "por",
+       "para",
+       "a"
+      ],
+      "p": "por_para"
+     },
+     {
+      "after": 5,
+      "q": "What should he look for after the junction?",
+      "o": [
+       "The turnoff to Agua Dulce beach",
+       "A gas station",
+       "The airport sign"
+      ],
+      "k": "desviacion"
+     },
+     {
+      "after": 7,
+      "q": "What does he see on the right?",
+      "o": [
+       "A lagoon",
+       "The sea",
+       "A store"
+      ],
+      "k": "laguna"
+     }
+    ]
+   }
+  },
+  {
+   "id": "ta4",
+   "ta": true,
+   "title": "Lotes disponibles",
+   "titleEn": "Lot availability",
+   "level": "B1",
+   "note": "Tres Aguas work unit. Prices, lot counts and lot statuses here are practice examples, not current figures.",
+   "focus": [
+    "estar_participio",
+    "clitic_usted"
+   ],
+   "words": [
+    {
+     "id": "disponible",
+     "es": "disponible",
+     "en": "available",
+     "accept": [
+      "available",
+      "free",
+      "open"
+     ],
+     "esAlt": [
+      "disponibles"
+     ]
+    },
+    {
+     "id": "apartado",
+     "es": "apartado",
+     "en": "on hold / reserved",
+     "accept": [
+      "on hold",
+      "reserved",
+      "held",
+      "set aside",
+      "booked"
+     ],
+     "esAlt": [
+      "apartada",
+      "apartados",
+      "apartadas"
+     ],
+     "note": "Un lote apartado has a deposit on it but isn’t paid off. Apartar = to put on hold."
+    },
+    {
+     "id": "vendido",
+     "es": "vendido",
+     "en": "sold",
+     "accept": [
+      "sold",
+      "sold out"
+     ],
+     "esAlt": [
+      "vendida",
+      "vendidos",
+      "vendidas"
+     ]
+    },
+    {
+     "id": "clavedellote",
+     "es": "la clave del lote",
+     "en": "lot ID",
+     "accept": [
+      "lot id",
+      "lot code",
+      "lot number",
+      "lot key",
+      "lot identifier",
+      "lot reference"
+     ],
+     "note": "Lot IDs at Tres Aguas look like L-689."
+    },
+    {
+     "id": "quedan",
+     "es": "quedan",
+     "en": "there are … left",
+     "accept": [
+      "there are left",
+      "are left",
+      "remain",
+      "there remain",
+      "left",
+      "they remain",
+      "remaining"
+     ],
+     "note": "Quedan cinco lotes = there are five lots left. One left → queda uno."
+    }
+   ],
+   "sentences": [
+    {
+     "es": "Ese lote todavía está disponible.",
+     "en": "That lot is still available.",
+     "k": "disponible",
+     "f": "disponible"
+    },
+    {
+     "es": "Hay doce lotes disponibles en esta etapa.",
+     "en": "There are twelve lots available in this phase.",
+     "k": "disponible",
+     "f": "disponibles",
+     "h": "plural"
+    },
+    {
+     "es": "El lote de la esquina está apartado desde el lunes.",
+     "en": "The corner lot has been on hold since Monday.",
+     "k": "apartado",
+     "f": "apartado"
+    },
+    {
+     "es": "Se lo apartamos hoy si nos manda el comprobante de pago.",
+     "en": "We’ll hold it for you today if you send us the proof of payment.",
+     "k": "apartado",
+     "f": "apartamos",
+     "h": "apartar, nosotros"
+    },
+    {
+     "es": "Lo siento, ese lote ya está vendido.",
+     "en": "Sorry, that lot is already sold.",
+     "k": "vendido",
+     "f": "vendido"
+    },
+    {
+     "es": "Los tres lotes de esa fila ya están vendidos.",
+     "en": "The three lots in that row are already sold.",
+     "k": "vendido",
+     "f": "vendidos",
+     "h": "plural"
+    },
+    {
+     "es": "¿Me da la clave del lote para buscarlo en el plano?",
+     "en": "Can you give me the lot ID so I can find it on the map?",
+     "k": "clavedellote",
+     "f": "clave del lote"
+    },
+    {
+     "es": "La clave del lote que le interesa es L-689.",
+     "en": "The ID of the lot you’re interested in is L-689.",
+     "k": "clavedellote",
+     "f": "clave del lote"
+    },
+    {
+     "es": "Solo quedan dos lotes con vista al mar.",
+     "en": "There are only two lots with an ocean view left.",
+     "k": "quedan",
+     "f": "quedan"
+    },
+    {
+     "es": "¿Cuántos lotes quedan en la etapa Gold Plus?",
+     "en": "How many lots are left in the Gold Plus phase?",
+     "k": "quedan",
+     "f": "quedan"
+    }
+   ],
+   "story": {
+    "title": "¿Sigue disponible?",
+    "lines": [
+     {
+      "s": null,
+      "es": "Sofía vio el mapa de Tres Aguas en internet y le escribe a Mariana.",
+      "en": "Sofía saw the Tres Aguas map online and messages Mariana."
+     },
+     {
+      "s": "Sofía",
+      "es": "Hola, Mariana. ¿El lote L-689 sigue disponible?",
+      "en": "Hi, Mariana. Is lot L-689 still available?"
+     },
+     {
+      "s": "Mariana",
+      "es": "Hola, Sofía. Déjeme ver… Ese lote está apartado desde ayer.",
+      "en": "Hi, Sofía. Let me see… That lot has been on hold since yesterday."
+     },
+     {
+      "s": "Sofía",
+      "es": "¡Qué lástima! ¿Y el de al lado?",
+      "en": "What a shame! And the one next to it?"
+     },
+     {
+      "s": "Mariana",
+      "es": "El de al lado ya está vendido, igual que los otros de esa fila.",
+      "en": "The one next to it is already sold, like the others in that row."
+     },
+     {
+      "s": "Sofía",
+      "es": "¿Cuántos lotes quedan en la etapa Gold Plus?",
+      "en": "How many lots are left in the Gold Plus phase?"
+     },
+     {
+      "s": "Mariana",
+      "es": "Hoy quedan diecisiete disponibles, pero eso cambia cada semana.",
+      "en": "Today there are seventeen available, but that changes every week."
+     },
+     {
+      "s": "Sofía",
+      "es": "¿Me puede mandar las claves de los lotes disponibles?",
+      "en": "Can you send me the IDs of the available lots?"
+     },
+     {
+      "s": "Mariana",
+      "es": "Claro, ahorita se las mando con la cotización de cada uno.",
+      "en": "Sure, I’ll send them to you right now with the quote for each one."
+     },
+     {
+      "s": null,
+      "es": "Sofía lee la lista y escoge el lote L-702, que está en una esquina.",
+      "en": "Sofía reads the list and picks lot L-702, which is on a corner."
+     },
+     {
+      "s": "Sofía",
+      "es": "Me gusta el L-702. ¿Me lo puede apartar?",
+      "en": "I like L-702. Can you put it on hold for me?"
+     },
+     {
+      "s": "Mariana",
+      "es": "Con gusto. En cuanto reciba su pago, se lo aparto y le mando el recibo.",
+      "en": "Gladly. As soon as I receive your payment, I’ll put it on hold for you and send you the receipt."
+     }
+    ],
+    "qs": [
+     {
+      "after": 1,
+      "q": "Which lot is Sofía asking about?",
+      "o": [
+       "L-689",
+       "L-702",
+       "L-869"
+      ],
+      "k": "disponible"
+     },
+     {
+      "after": 2,
+      "q": "Complete: “Ese lote está ___ desde ayer.”",
+      "o": [
+       "apartado",
+       "apartada",
+       "apartados"
+      ],
+      "p": "estar_participio"
+     },
+     {
+      "after": 6,
+      "q": "How many lots are left in Gold Plus today?",
+      "o": [
+       "Seventeen",
+       "Forty-nine",
+       "Seven"
+      ],
+      "k": "quedan"
+     },
+     {
+      "after": 11,
+      "q": "What will Mariana do when the payment arrives?",
+      "o": [
+       "Put the lot on hold and send a receipt",
+       "Sell the lot to someone else",
+       "Change the lot ID"
+      ],
+      "k": "recibo"
+     }
+    ]
+   }
+  },
+  {
+   "id": "u10",
+   "title": "Costumbres en la mesa",
+   "titleEn": "Table customs",
+   "level": "B1",
+   "focus": [
+    "habitual",
+    "se_constructions"
+   ],
+   "words": [
+    {
+     "id": "sobremesa",
+     "es": "la sobremesa",
+     "en": "chatting at the table after a meal",
+     "accept": [
+      "after-dinner conversation",
+      "after-meal conversation",
+      "after-dinner chat",
+      "after-lunch chat",
+      "chatting at the table after a meal",
+      "chatting after a meal",
+      "table talk",
+      "lingering at the table"
+     ],
+     "note": "La sobremesa: staying at the table to talk after eating. It can last for hours."
+    },
+    {
+     "id": "soler",
+     "es": "soler",
+     "en": "to usually (do)",
+     "accept": [
+      "to usually",
+      "usually",
+      "to tend to",
+      "tend to",
+      "to be in the habit of",
+      "to be used to"
+     ],
+     "note": "Suelo comer a las tres = I usually eat at three. Solía = I used to."
+    },
+    {
+     "id": "acostumbrarse",
+     "es": "acostumbrarse",
+     "en": "to get used to",
+     "accept": [
+      "to get used to",
+      "get used to",
+      "to become accustomed",
+      "to become accustomed to",
+      "to get accustomed to"
+     ]
+    },
+    {
+     "id": "brindar",
+     "es": "brindar",
+     "en": "to toast",
+     "accept": [
+      "to toast",
+      "to make a toast",
+      "to raise a glass",
+      "to drink a toast"
+     ]
+    },
+    {
+     "id": "anfitrion",
+     "es": "el anfitrión",
+     "en": "host",
+     "accept": [
+      "host",
+      "hostess"
+     ],
+     "esAlt": [
+      "la anfitriona"
+     ]
+    }
+   ],
+   "sentences": [
+    {
+     "es": "En México la sobremesa puede durar horas.",
+     "en": "In Mexico, chatting at the table after a meal can last for hours.",
+     "k": "sobremesa",
+     "f": "sobremesa"
+    },
+    {
+     "es": "Después de la junta, nos quedamos de sobremesa hasta las seis.",
+     "en": "After the meeting, we stayed at the table talking until six.",
+     "k": "sobremesa",
+     "f": "sobremesa"
+    },
+    {
+     "es": "Los domingos solemos comer en casa de mis suegros.",
+     "en": "On Sundays we usually eat at my in-laws’ house.",
+     "k": "soler",
+     "f": "solemos",
+     "h": "soler, nosotros"
+    },
+    {
+     "es": "Cuando vivía en Texas, solía cenar a las seis.",
+     "en": "When I lived in Texas, I used to have dinner at six.",
+     "k": "soler",
+     "f": "solía",
+     "h": "soler, yo, past habit"
+    },
+    {
+     "es": "Todavía no me acostumbro a comer tan tarde.",
+     "en": "I still haven’t gotten used to eating so late.",
+     "k": "acostumbrarse",
+     "f": "acostumbro",
+     "h": "acostumbrarse, yo"
+    },
+    {
+     "es": "Al principio me costó acostumbrarme a la comida picante.",
+     "en": "At first it was hard for me to get used to spicy food.",
+     "k": "acostumbrarse",
+     "f": "acostumbrarme"
+    },
+    {
+     "es": "Aquí se acostumbra brindar antes de comer.",
+     "en": "Here it’s customary to make a toast before eating.",
+     "k": "brindar",
+     "f": "brindar"
+    },
+    {
+     "es": "Brindamos por los novios y por toda la familia.",
+     "en": "We toasted the bride and groom and the whole family.",
+     "k": "brindar",
+     "f": "Brindamos",
+     "h": "brindar, nosotros"
+    },
+    {
+     "es": "La anfitriona nos recibió con un mole delicioso.",
+     "en": "The hostess welcomed us with a delicious mole.",
+     "k": "anfitrion",
+     "f": "anfitriona",
+     "h": "feminine"
+    },
+    {
+     "es": "Se me olvidó el regalo para el anfitrión.",
+     "en": "I forgot the gift for the host.",
+     "k": "anfitrion",
+     "f": "anfitrión"
+    }
+   ],
+   "story": {
+    "title": "La comida del domingo",
+    "lines": [
+     {
+      "s": null,
+      "es": "Mark lleva un año en Puerto Escondido. Su vecino, don Rafa, lo invita a comer el domingo.",
+      "en": "Mark has been in Puerto Escondido for a year. His neighbor, Don Rafa, invites him to Sunday lunch."
+     },
+     {
+      "s": "Mark",
+      "es": "¿A qué hora llego? ¿A la una?",
+      "en": "What time should I come? At one?"
+     },
+     {
+      "s": "Don Rafa",
+      "es": "Mejor a las tres. Aquí solemos comer tarde.",
+      "en": "Better at three. We usually eat late here."
+     },
+     {
+      "s": null,
+      "es": "Mark llega a las tres con un pastel. La anfitriona, doña Chela, lo recibe en el portón.",
+      "en": "Mark arrives at three with a cake. The hostess, Doña Chela, greets him at the gate."
+     },
+     {
+      "s": "Doña Chela",
+      "es": "¡Pásale, pásale! No tenías que traer nada.",
+      "en": "Come in, come in! You didn’t have to bring anything."
+     },
+     {
+      "s": null,
+      "es": "Antes de comer, don Rafa levanta su copa.",
+      "en": "Before eating, Don Rafa raises his glass."
+     },
+     {
+      "s": "Don Rafa",
+      "es": "Vamos a brindar por nuestro nuevo vecino. ¡Salud!",
+      "en": "Let’s toast our new neighbor. Cheers!"
+     },
+     {
+      "s": "Mark",
+      "es": "En mi casa no solíamos brindar, pero me gusta la costumbre.",
+      "en": "At home we didn’t usually make toasts, but I like the custom."
+     },
+     {
+      "s": null,
+      "es": "Después de comer, nadie se levanta. Se quedan platicando dos horas más.",
+      "en": "After eating, nobody gets up. They stay chatting for two more hours."
+     },
+     {
+      "s": "Mark",
+      "es": "¿Siempre se quedan tanto tiempo en la mesa?",
+      "en": "Do you always stay at the table this long?"
+     },
+     {
+      "s": "Doña Chela",
+      "es": "Claro, es la sobremesa. Ya te vas a acostumbrar.",
+      "en": "Of course, it’s the sobremesa. You’ll get used to it."
+     },
+     {
+      "s": "Mark",
+      "es": "Creo que ya me acostumbré. ¡Se me pasó la tarde volando!",
+      "en": "I think I’m already used to it. The afternoon flew by!"
+     }
+    ],
+    "qs": [
+     {
+      "after": 2,
+      "q": "Why does Don Rafa say to come at three?",
+      "o": [
+       "They usually eat late",
+       "He works until two",
+       "The food won’t be ready"
+      ],
+      "k": "soler"
+     },
+     {
+      "after": 3,
+      "q": "Who is Doña Chela?",
+      "o": [
+       "The hostess",
+       "Mark’s boss",
+       "A waitress"
+      ],
+      "k": "anfitrion"
+     },
+     {
+      "after": 7,
+      "q": "Complete: “En mi casa no ___ brindar.”",
+      "o": [
+       "solíamos",
+       "solemos",
+       "suelo"
+      ],
+      "p": "habitual"
+     },
+     {
+      "after": 10,
+      "q": "What is the sobremesa?",
+      "o": [
+       "Staying at the table to talk after eating",
+       "The dessert",
+       "The first course"
+      ],
+      "k": "sobremesa"
+     }
+    ]
+   }
+  },
+  {
+   "id": "ta5",
+   "ta": true,
+   "title": "Cómo es el lote",
+   "titleEn": "Lot features",
+   "level": "B1",
+   "note": "Tres Aguas work unit. Prices, lot counts and lot statuses here are practice examples, not current figures.",
+   "focus": [
+    "comparatives",
+    "clitic_usted"
+   ],
+   "words": [
+    {
+     "id": "superficie",
+     "es": "la superficie",
+     "en": "area (of land)",
+     "accept": [
+      "area",
+      "surface area",
+      "surface",
+      "total area",
+      "size",
+      "land area"
+     ],
+     "note": "La superficie is given in metros cuadrados (m²)."
+    },
+    {
+     "id": "frente",
+     "es": "el frente",
+     "en": "frontage / width",
+     "accept": [
+      "frontage",
+      "front",
+      "width",
+      "front width"
+     ],
+     "note": "El frente = how wide the lot is along the street (or the beach)."
+    },
+    {
+     "id": "fondo",
+     "es": "el fondo",
+     "en": "depth / back",
+     "accept": [
+      "depth",
+      "back",
+      "the back",
+      "lot depth",
+      "rear"
+     ],
+     "note": "El fondo = how deep the lot is, from front to back. Al fondo = at the back."
+    },
+    {
+     "id": "colindancias",
+     "es": "las colindancias",
+     "en": "boundaries / adjoining lots",
+     "accept": [
+      "boundaries",
+      "adjoining lots",
+      "adjoining properties",
+      "adjacent lots",
+      "neighboring lots",
+      "property lines",
+      "abutting properties"
+     ],
+     "note": "Las colindancias say what borders each side of a lot: al norte, al sur…"
+    },
+    {
+     "id": "pendiente",
+     "es": "la pendiente",
+     "en": "slope",
+     "accept": [
+      "slope",
+      "incline",
+      "grade",
+      "gradient"
+     ]
+    }
+   ],
+   "sentences": [
+    {
+     "es": "El lote tiene una superficie de cuatrocientos metros cuadrados.",
+     "en": "The lot has an area of four hundred square meters.",
+     "k": "superficie",
+     "f": "superficie"
+    },
+    {
+     "es": "¿Me confirma la superficie exacta? Necesito que me la mande por escrito.",
+     "en": "Can you confirm the exact area? I need you to send it to me in writing.",
+     "k": "superficie",
+     "f": "superficie"
+    },
+    {
+     "es": "Mide veinte metros de frente.",
+     "en": "It’s twenty meters wide.",
+     "k": "frente",
+     "f": "frente"
+    },
+    {
+     "es": "El L-702 es más grande que el L-689, pero tiene menos frente.",
+     "en": "L-702 is bigger than L-689, but it has less frontage.",
+     "k": "frente",
+     "f": "frente"
+    },
+    {
+     "es": "Tiene veinte de frente por treinta de fondo.",
+     "en": "It’s twenty wide by thirty deep.",
+     "k": "fondo",
+     "f": "fondo"
+    },
+    {
+     "es": "Al fondo del terreno hay unas palmeras.",
+     "en": "At the back of the land there are some palm trees.",
+     "k": "fondo",
+     "f": "fondo"
+    },
+    {
+     "es": "En el plano vienen todas las colindancias del lote.",
+     "en": "The map shows all of the lot’s boundaries.",
+     "k": "colindancias",
+     "f": "colindancias"
+    },
+    {
+     "es": "Las colindancias del lote son una calle y dos lotes vendidos.",
+     "en": "The lot borders a street and two sold lots.",
+     "k": "colindancias",
+     "f": "colindancias"
+    },
+    {
+     "es": "Este lote tiene menos pendiente que el de al lado.",
+     "en": "This lot has less slope than the one next to it.",
+     "k": "pendiente",
+     "f": "pendiente"
+    },
+    {
+     "es": "Con esa pendiente, la vista al mar es mejor.",
+     "en": "With that slope, the ocean view is better.",
+     "k": "pendiente",
+     "f": "pendiente"
+    }
+   ],
+   "story": {
+    "title": "El lote de la esquina",
+    "lines": [
+     {
+      "s": null,
+      "es": "Sofía llega a Tres Aguas para conocer el lote L-702, que está apartado a su nombre.",
+      "en": "Sofía arrives at Tres Aguas to see lot L-702, which is on hold in her name."
+     },
+     {
+      "s": "Mariana",
+      "es": "Bienvenida, Sofía. Este es el L-702. Tiene una superficie de cuatrocientos ochenta metros cuadrados.",
+      "en": "Welcome, Sofía. This is L-702. It has an area of four hundred eighty square meters."
+     },
+     {
+      "s": "Sofía",
+      "es": "Se ve más grande de lo que pensaba.",
+      "en": "It looks bigger than I thought."
+     },
+     {
+      "s": "Mariana",
+      "es": "Mide veinte metros de frente por veinticuatro de fondo.",
+      "en": "It’s twenty meters wide by twenty-four deep."
+     },
+     {
+      "s": "Sofía",
+      "es": "¿Y qué hay a los lados? ¿Cuáles son las colindancias?",
+      "en": "And what’s on the sides? What are the boundaries?"
+     },
+     {
+      "s": "Mariana",
+      "es": "Al norte, la calle principal; al este, otra calle, porque es esquina; y al sur, el lote L-703.",
+      "en": "To the north, the main street; to the east, another street, because it’s a corner; and to the south, lot L-703."
+     },
+     {
+      "s": "Sofía",
+      "es": "Veo que el terreno sube un poco hacia el fondo.",
+      "en": "I see the land rises a little toward the back."
+     },
+     {
+      "s": "Mariana",
+      "es": "Sí, tiene una pendiente suave. Por eso la vista es mejor desde el fondo que desde la calle.",
+      "en": "Yes, it has a gentle slope. That’s why the view is better from the back than from the street."
+     },
+     {
+      "s": "Sofía",
+      "es": "¿La pendiente hace más cara la construcción?",
+      "en": "Does the slope make building more expensive?"
+     },
+     {
+      "s": "Mariana",
+      "es": "Un poco, depende del proyecto. Le recomiendo que un arquitecto lo revise antes.",
+      "en": "A little; it depends on the project. I’d recommend having an architect look at it first."
+     },
+     {
+      "s": "Sofía",
+      "es": "Perfecto. ¿Me manda las medidas y las colindancias por WhatsApp?",
+      "en": "Perfect. Can you send me the measurements and the boundaries on WhatsApp?"
+     },
+     {
+      "s": "Mariana",
+      "es": "Claro, se las mando hoy con el plano del lote.",
+      "en": "Sure, I’ll send them to you today with the lot map."
+     }
+    ],
+    "qs": [
+     {
+      "after": 2,
+      "q": "Complete: “Se ve más grande ___ lo que pensaba.”",
+      "o": [
+       "de",
+       "que",
+       "como"
+      ],
+      "p": "comparatives"
+     },
+     {
+      "after": 3,
+      "q": "How deep is the lot?",
+      "o": [
+       "Twenty-four meters",
+       "Twenty meters",
+       "Forty-eight meters"
+      ],
+      "k": "fondo"
+     },
+     {
+      "after": 5,
+      "q": "Why does the lot border two streets?",
+      "o": [
+       "It’s a corner lot",
+       "It’s oceanfront",
+       "It’s next to the lagoon"
+      ],
+      "k": "colindancias"
+     },
+     {
+      "after": 7,
+      "q": "Where is the view better?",
+      "o": [
+       "From the back of the lot",
+       "From the street",
+       "From lot L-703"
+      ],
+      "k": "pendiente"
+     }
+    ]
+   }
   }
  ],
  "placement": {
@@ -3046,17 +5015,23 @@
    "id": "b1",
    "cefr": "B1",
    "title": "La vida práctica en México",
-   "desc": "Errands, home, work, travel, health, money and neighbors — roughly where Duolingo's Sections 5–6 sit.",
+   "desc": "Errands, home, work, travel, health, money and neighbors, with a Tres Aguas work unit every third stop. Roughly where Duolingo’s Sections 5–6 sit.",
    "units": [
     "u1",
     "u2",
+    "ta1",
     "u3",
     "u4",
+    "ta2",
     "u5",
     "u6",
+    "ta3",
     "u7",
     "u8",
-    "u9"
+    "ta4",
+    "u9",
+    "u10",
+    "ta5"
    ]
   },
   {
@@ -3077,5 +5052,20 @@
    "title": "Maestría",
    "placeholder": "after"
   }
+ ],
+ "startParked": [
+  "poesia",
+  "poema",
+  "poeta",
+  "verso",
+  "rima",
+  "fantasma",
+  "monstruo",
+  "asesino",
+  "pesadilla",
+  "vampiro",
+  "disfraz",
+  "autobiografia",
+  "cienciaficcion"
  ]
 }

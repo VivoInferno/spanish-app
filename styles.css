@@ -137,3 +137,6 @@ main.card.story.no-enter{animation:none}
 .row-inline{display:flex;gap:8px;align-items:center}
 input[type=number]{width:96px;font-size:16px;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);color:var(--fg);font-family:inherit}
 .no-anim .mbar span,.no-anim .streak .flame{transition:none}
+/* ---- v6: Tres Aguas work units ---- */
+.badge.ta{background:#e0f2fe;color:#075985;text-transform:none;letter-spacing:0}
+@media (prefers-color-scheme:dark){.badge.ta{background:#0c4a6e;color:#e0f2fe}}

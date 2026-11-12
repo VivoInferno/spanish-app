@@ -1,4 +1,4 @@
-"""Simulates a deploy while the app is open: v5 running -> server gets v6 -> app returns to foreground -> auto reload into v6, progress intact."""
+"""Simulates a deploy while the app is open: v6 running -> server gets v7 -> app returns to foreground -> auto reload into v7, progress intact."""
 import asyncio, shutil, subprocess, sys, time, re, os
 from playwright.async_api import async_playwright
 SRC = '/workspace/spanish-app'; TMP = '/tmp/spanish-upd'; PORT = 8788
@@ -21,7 +21,7 @@ async def run(engine):
             await page.evaluate("(() => { const s = __app.state; s.placementDone = true; s.items['w:fuga'] = {s: 50, d: 3, reps: 4, lapses: 0, last: Date.now(), due: Date.now() + 40*864e5}; localStorage.setItem('spanish-app-state-v1', JSON.stringify(s)); })()")
             await page.reload(); await page.wait_for_selector('.stone')
             v_before = await page.evaluate("__app.version"); label = await page.inner_text('.version')
-            setv(6)  # "deploy" (v5 -> v6)
+            setv(7)  # "deploy" (v6 -> v7)
             async with page.expect_navigation(timeout=15000):
                 await page.evaluate("Object.defineProperty(document, 'visibilityState', {configurable: true, get: () => 'visible'}); document.dispatchEvent(new Event('visibilitychange'));")
             await page.wait_for_selector('.stone')

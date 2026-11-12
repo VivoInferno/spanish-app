@@ -44,7 +44,7 @@ async def main():
         page.on('console', lambda m: errors.append(m.text) if m.type == 'error' else None)
         page.on('pageerror', lambda e: errors.append(str(e)))
         await page.goto(URL); await page.wait_for_selector('#go')
-        check(await page.evaluate("__app.version") == 'v5', 'app version is v5')
+        check(await page.evaluate("__app.version") == 'v6', 'app version is v6')
         # --- placement
         await page.click('#go'); k = 0
         while not await page.query_selector('h1:has-text("Placement results")'):
@@ -135,7 +135,7 @@ async def main():
             s2 = await pg.evaluate("__app.state")
             same = all(s2['items'].get(k) == v for k, v in V3['items'].items()) and len(s2['items']) == len(V3['items'])
             check(same, f'migration ({mode}): all {len(V3["items"])} SRS item states preserved exactly')
-            check(s2['settings'].get('sound') is not None and s2['schema'] == 3 and 'path' in s2 and 'parked' in s2, f'migration ({mode}): new fields added, schema 3')
+            check(s2['settings'].get('sound') is not None and s2['schema'] == 4 and 'path' in s2 and 'parked' in s2, f'migration ({mode}): new fields added, schema 4')
             u1 = s2['path']['done'].get('u1')
             print(f'   derived path ({mode}): u1={u1}, current={await pg.evaluate("__app.currentPos()")}, testedOut={list(s2["path"]["testedOut"].keys())}')
             stored = await pg.evaluate("JSON.parse(localStorage.getItem('spanish-app-state-v1'))")

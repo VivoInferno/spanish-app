@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const APP_VERSION = 'v5'; // keep in sync with CACHE in sw.js (espanol-v5)
+  const APP_VERSION = 'v6'; // keep in sync with CACHE in sw.js (espanol-v6)
   const KEY = 'spanish-app-state-v1'; // unchanged since v1 — never rename
   const DAY = SRS.DAY;
   const STONES = [
@@ -14,9 +14,9 @@
   let C, S, IDX;
 
   // ---------- state + migration ----------
-  const defaults = () => ({ v: 1, schema: 3, placementDone: false, created: Date.now(), items: {}, pstats: {}, recent: {},
+  const defaults = () => ({ v: 1, schema: 4, placementDone: false, created: Date.now(), items: {}, pstats: {}, recent: {},
     settings: { newPerSession: 5, rate: 0.9, autoAdvance: false, sound: true, anim: true, goalMin: Daily.GOAL_MIN }, sessions: 0,
-    path: { done: {}, tests: {}, testedOut: {} }, parked: {}, daily: {}, streak: Daily.seed() });
+    path: { done: {}, tests: {}, testedOut: {} }, parked: {}, daily: {}, streak: Daily.seed(), parkedDefaults: {} });
   function load() {
     let raw = null;
     try { raw = JSON.parse(localStorage.getItem(KEY)); } catch (e) { /* fresh */ }
@@ -35,8 +35,20 @@
     s.daily = raw.daily && typeof raw.daily === 'object' ? raw.daily : {};
     s.streak = raw.streak && typeof raw.streak === 'object' && 'count' in raw.streak ? raw.streak : Daily.seed();
     if (!(s.settings.goalMin > 0)) s.settings.goalMin = Daily.GOAL_MIN;
-    s.schema = 3;
+    // v6 (schema 4): path order now comes from content.json (units keep their ids, so path.done / items need no rewrite);
+    // parkedDefaults remembers which syllabus "start parked" words were already parked once, so an Unpark sticks.
+    s.parkedDefaults = raw.parkedDefaults && typeof raw.parkedDefaults === 'object' ? raw.parkedDefaults : {};
+    s.schema = 4;
     return s;
+  }
+  function applyStartParked() { // syllabus words parked by default (e.g. poesía); only words not yet studied, and only once each
+    let changed = false;
+    (C.startParked || []).forEach(w => {
+      if (!IDX.words[w] || S.parkedDefaults[w]) return;
+      S.parkedDefaults[w] = true; changed = true;
+      if (!S.items[wid(w)] && !S.parked[w]) S.parked[w] = { at: Date.now(), auto: true };
+    });
+    if (changed) save();
   }
   function migratePath() { // runs once content is loaded; derives path progress from existing SRS items
     if (!S.needsPathMigration) return;
@@ -278,8 +290,8 @@
     const fresh = u.words.filter(w => !S.parked[w.id] && !knownCard(S.items[wid(w.id)]));
     const known = u.words.filter(w => !S.parked[w.id] && knownCard(S.items[wid(w.id)]));
     const parked = u.words.filter(w => S.parked[w.id]);
-    app.innerHTML = progressBar() + `<main class="card"><div class="label">Unit ${IDX.section.units.indexOf(u.id) + 1} · ${esc(IDX.section.cefr)}</div>
-      <h1>${esc(u.title)}</h1><p class="muted">${esc(u.titleEn)}</p>
+    app.innerHTML = progressBar() + `<main class="card"><div class="label">Unit ${IDX.section.units.indexOf(u.id) + 1} · ${esc(IDX.section.cefr)}${u.ta ? ' · <span class="badge ta">Tres Aguas</span>' : ''}</div>
+      <h1>${esc(u.title)}</h1><p class="muted">${esc(u.titleEn)}</p>${u.note ? `<p class="muted small">${esc(u.note)}</p>` : ''}
       <h3>New in this unit</h3><ul class="list">${fresh.map(w => `<li><span><span class="badge new">NEW</span> ${wordSpan(w.id, w.es)}</span><span class="muted">${esc(w.en)}</span></li>`).join('') || '<li class="muted">Nothing new — you already know these.</li>'}</ul>
       ${known.length ? `<p class="muted small">Already known: ${known.map(w => wordSpan(w.id, w.es)).join(', ')}</p>` : ''}
       ${parked.length ? `<p class="muted small">Parked: ${parked.map(w => wordSpan(w.id, w.es)).join(', ')}</p>` : ''}
@@ -620,7 +632,7 @@
       return `<div class="section-card current"><span class="cefr">${esc(s.cefr)}</span><div><b>${esc(s.title)}</b><div class="muted small">${esc(s.desc || '')}</div><div class="muted small">${doneUnits}/${s.units.length} units done</div></div></div>
         ${s.units.map((uid, n) => {
           const u = C.units[IDX.unitIdx[uid]];
-          return `<div class="unit ${unitDone(uid) ? 'udone' : ''}" id="unit-${uid}"><div class="unit-head"><div class="label">Unit ${n + 1}${S.path.testedOut[uid] ? ' · tested out' : ''}</div><div class="utitle">${esc(u.title)}</div><div class="muted small">${esc(u.titleEn)} · ${u.focus.map(p => esc(C.patterns[p].name.replace(/\s*\(.*\)\s*$/, ''))).join(' · ')}</div></div>
+          return `<div class="unit ${unitDone(uid) ? 'udone' : ''}${u.ta ? ' ta' : ''}" id="unit-${uid}"><div class="unit-head"><div class="label">Unit ${n + 1}${u.ta ? ' · <span class="badge ta">Tres Aguas</span>' : ''}${S.path.testedOut[uid] ? ' · tested out' : ''}</div><div class="utitle">${esc(u.title)}</div><div class="muted small">${esc(u.titleEn)} · ${u.focus.map(p => esc(C.patterns[p].name.replace(/\s*\(.*\)\s*$/, ''))).join(' · ')}</div></div>
             <div class="stones">${STONES.map((stn, i) => { const state = stoneState(uid, i); const jd = opts.justDone && opts.justDone.uid === uid && opts.justDone.stone === i;
               return `<div class="stone-wrap" style="--off:${offs[i]}"><button class="stone ${state}${jd ? ' just-done' : ''}" data-u="${uid}" data-s="${i}" aria-label="${esc(stn.label)}">${state === 'done' ? '✓' : state === 'locked' ? '🔒' : stn.icon}</button><span class="stone-label">${esc(stn.label)}${i === 3 && S.path.tests[uid] ? ` · ${S.path.tests[uid].best}/${S.path.tests[uid].total || 15}` : ''}</span></div>`; }).join('')}</div></div>`;
         }).join('')}`;
@@ -709,7 +721,7 @@
       const d = JSON.parse(txt); if (!d || !d.v || !d.items) throw new Error('not a backup');
       if (!silent && !confirm('Replace current progress with this backup?')) return false;
       delete d.exportedAt; delete d.app; delete d.appVersion;
-      S = normalize(d); migratePath(); save(); FX.applyClasses();
+      S = normalize(d); migratePath(); applyStartParked(); save(); FX.applyClasses();
       if (!silent) { renderProgress(); alert('Imported.'); }
       return true;
     } catch (e) { if (!silent) alert('Could not import: ' + e.message); return false; }
@@ -799,7 +811,7 @@
     initLongPress();
     try { C = await (await fetch('content.json')).json(); }
     catch (e) { app.innerHTML = '<main class="card"><p>Could not load lessons. Open once with internet to install them.</p></main>'; return; }
-    buildIndex(); migratePath();
+    buildIndex(); migratePath(); applyStartParked();
     if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
     renderHome();
   }

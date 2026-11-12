@@ -58,12 +58,15 @@ t('each unit has 4–5 words, a focus pattern, and cloze forms present in senten
   }
   C.placement.words.forEach(w => assert.ok(ids.has(w)));
 });
-t('later units recycle earlier words', () => {
-  const words = C.units.map(u => u.words.map(w => w.es.replace(/^(el|la) /, '')));
-  for (let i = 1; i < C.units.length; i++) {
-    const earlier = words.slice(0, i).flat();
-    const hits = C.units[i].sentences.filter(s => earlier.some(w => s.es.toLowerCase().includes(w.slice(0, -1))));
-    assert.ok(hits.length >= 1, C.units[i].id);
+const PATH = C.sections.find(s => s.units).units.map(id => C.units.find(u => u.id === id));
+t('later units (in path order) recycle earlier words in sentences and stories', () => {
+  const stems = u => u.words.map(w => w.es.replace(/^(el|la|los|las) /, '').toLowerCase()).map(w => w.length > 5 ? w.slice(0, -1) : w);
+  for (let i = 1; i < PATH.length; i++) {
+    const earlier = PATH.slice(0, i).flatMap(stems), u = PATH[i];
+    const hits = u.sentences.filter(s => earlier.some(w => s.es.toLowerCase().includes(w)));
+    assert.ok(hits.length >= 1, u.id + ' sentences recycle nothing');
+    const storyHits = u.story.lines.filter(l => earlier.some(w => l.es.toLowerCase().includes(w)));
+    if (!/^u[1-9]$/.test(u.id)) assert.ok(storyHits.length >= 1, u.id + ' story recycles nothing'); // v6 stories must; v1-v4 stories predate the rule
   }
 });
 t('APP_VERSION matches sw.js CACHE', () => {
@@ -143,5 +146,68 @@ t('Edit streak: today counted only if a lesson was done today', () => {
   s = Daily.edit(s, 1200, '2026-11-20', true); assert.deepEqual(Daily.current(s, '2026-11-20'), { count: 1200, doneToday: true });
   assert.equal(Daily.complete(s, '2026-11-20').count, 1200);
   assert.equal(Daily.current(Daily.edit(s, 0, '2026-11-20', true), '2026-11-20').count, 0);
+});
+
+// ---- v6: Batch 1 (syllabus units 1-15)
+const norm = x => String(x).toLowerCase().normalize('NFC').replace(/[…]|\.\.\./g, ' ').replace(/[¿?¡!.,;:“”"]/g, ' ').replace(/\s+/g, ' ').trim();
+t('B1 path has syllabus units 1-15 in order, Tres Aguas at every third stop', () => {
+  const titles = ['Trámites y mandados', 'La casa y las reparaciones', 'Primer mensaje por WhatsApp', 'El trabajo', 'De viaje', 'El proyecto en 30 segundos', 'La salud', 'En el mercado', '¿Dónde queda Tres Aguas?', 'El banco', 'La colonia y los vecinos', 'Lotes disponibles', 'El coche y el taller', 'Costumbres en la mesa', 'Cómo es el lote'];
+  assert.deepEqual(PATH.map(u => u.title), titles);
+  PATH.forEach((u, i) => assert.equal(!!u.ta, (i + 1) % 3 === 0, u.id + ' Tres Aguas flag'));
+  assert.equal(new Set(C.units.map(u => u.id)).size, C.units.length);
+  ['u1', 'u2', 'u3', 'u4', 'u5', 'u6', 'u7', 'u8', 'u9'].forEach(id => assert.ok(C.units.some(u => u.id === id), 'existing unit id kept: ' + id));
+});
+t('every story: 9-12 lines, 4 questions, each answerable from the lines shown before it', () => {
+  for (const u of PATH) {
+    const st = u.story; assert.ok(st.lines.length >= 9 && st.lines.length <= 12, u.id + ' lines ' + st.lines.length); assert.equal(st.qs.length, 4, u.id);
+    for (const q of st.qs) {
+      const seen = norm(st.lines.slice(0, q.after + 1).map(l => l.es).join(' '));
+      assert.ok(new Set(q.o.map(norm)).size === q.o.length, u.id + ' duplicate options: ' + q.q);
+      const m = q.q.match(/“([^”]*___[^”]*)”/);
+      if (m) { // grammar gap-fill: the correct option must reproduce a line already shown, the others must not
+        const fill = o => norm(m[1].replace('___', o));
+        assert.ok(seen.includes(fill(q.o[0])), `${u.id}: “${m[1]}” + ${q.o[0]} not in story`);
+        q.o.slice(1).forEach(o => assert.ok(!seen.includes(fill(o)) || fill(q.o[0]).includes(fill(o)), `${u.id}: distractor ${o} also matches`));
+        assert.ok((q.p && C.patterns[q.p]) || q.k, u.id + ' gap-fill needs a pattern or word');
+      } else if (q.k) { // comprehension: the word it grades must already have appeared (any form)
+        const w = C.units.flatMap(x => x.words).find(w => w.id === q.k);
+        const forms = [w.es, ...(w.esAlt || [])].map(f => norm(f.replace(/^(el|la|los|las) /, ''))).map(f => f.slice(0, Math.max(4, f.length - 2))); // stem, so solemos counts for soler
+        assert.ok(forms.some(f => seen.includes(f)), `${u.id}: “${q.q}” asks about ${q.k} before it appears`);
+      }
+    }
+  }
+});
+t('no missing audio text: every word, sentence, story line and pattern answer has Spanish to speak', () => {
+  for (const u of C.units) {
+    u.words.forEach(w => assert.ok(w.es && w.es.trim() && w.en && w.accept.length, u.id + ' ' + w.id));
+    u.sentences.forEach(x => assert.ok(x.es.trim() && x.en.trim() && !x.es.includes('___'), u.id + ' sentence'));
+    u.story.lines.forEach(l => assert.ok(l.es.trim() && l.en.trim() && !l.es.includes('___'), u.id + ' story line'));
+    assert.ok(u.story.title && u.title && u.titleEn, u.id + ' titles');
+  }
+  for (const [id, p] of Object.entries(C.patterns)) p.items.forEach(it => { const full = it.q.replace('___', it.o[0]); assert.ok(!full.includes('___') && full.trim().length > 3, id); });
+});
+t('every unit can build its test: 12 vocab + 3 short sentences available', () => {
+  for (let i = 0; i < PATH.length; i++) {
+    const upTo = PATH.slice(0, i + 1);
+    const short = new Set(upTo.flatMap(u => u.sentences.filter(x => x.es.split(' ').length <= 10).map(x => x.k)));
+    assert.ok(short.size >= 3, PATH[i].id + ' has only ' + short.size + ' sentence words for tile questions');
+    assert.ok(upTo.flatMap(u => u.words).length >= 5, PATH[i].id);
+  }
+});
+t('Tres Aguas content rules: Agua Dulce, no guaranteed returns or plusvalía, no crocodiles', () => {
+  const txt = JSON.stringify(PATH.filter(u => u.ta)).toLowerCase();
+  assert.ok(txt.includes('agua dulce'));
+  ['palmarito', 'cocodril', 'plusval', 'garantiz', 'rendimiento', 'ganancia segura', 'va a subir de precio'].forEach(bad => assert.ok(!txt.includes(bad), 'found ' + bad));
+  PATH.filter(u => u.ta).forEach(u => assert.ok(u.note && /practice examples/.test(u.note), u.id + ' illustrative note'));
+});
+t('new patterns have 8 items, a unit using them, and clitic patterns recur across the batch', () => {
+  ['clitic_usted', 'quedar_distancia', 'estar_participio', 'habitual', 'comparatives'].forEach(p => { assert.ok(C.patterns[p] && C.patterns[p].items.length >= 8, p); assert.ok(PATH.some(u => u.focus.includes(p)), p + ' unused'); });
+  const clitic = PATH.filter(u => u.focus.some(f => f.startsWith('clitic_'))).length; assert.ok(clitic >= 5, 'clitic units ' + clitic);
+  Object.keys(C.patterns).forEach(p => assert.ok(PATH.some(u => u.focus.includes(p)), p + ' not in any unit'));
+});
+t('startParked list holds word ids', () => {
+  assert.ok(Array.isArray(C.startParked) && C.startParked.includes('poesia'));
+  const ids = new Set(C.units.flatMap(u => u.words.map(w => w.id)));
+  C.startParked.forEach(id => assert.ok(/^[a-z]+$/.test(id), id));
 });
 console.log(`\n${n} tests passed`);
