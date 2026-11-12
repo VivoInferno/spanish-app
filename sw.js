@@ -2,7 +2,7 @@
 //  - app shell (html/js/css/json): network-first (revalidated, bypassing the HTTP cache), cache fallback when offline/slow
 //  - icons: cache-first
 //  - new versions activate immediately (skipWaiting + clients.claim); the page reloads once on controllerchange
-const CACHE = 'espanol-v3';
+const CACHE = 'espanol-v4';
 const ASSETS = ['./', 'index.html', 'styles.css', 'app.js', 'srs.js', 'check.js', 'fx.js', 'content.json', 'manifest.json',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 const NET_TIMEOUT = 3500;

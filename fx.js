@@ -36,6 +36,7 @@
       note(329.6, 0, 0.22, { type: 'sine', gain: 0.35, attack: 0.015, glideTo: 277 });
       note(246.9, 0.09, 0.28, { type: 'sine', gain: 0.28, attack: 0.02, glideTo: 220 }); },
     tap() { if (!ready() || speaking()) return; note(880, 0, 0.035, { type: 'sine', gain: 0.12, attack: 0.002, glideTo: 660 }); },
+    stone() { if (!ready()) return; [783.99, 1046.5, 1318.5].forEach((f, i) => note(f, i * 0.06, 0.35, { type: 'triangle', gain: 0.28 })); },
     complete() { if (!ready()) return; // gentle C-major chord, lightly arpeggiated
       [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => note(f, i * 0.05, 0.9 - i * 0.05, { type: 'triangle', gain: 0.22, attack: 0.02 })); }
   };
@@ -58,6 +59,17 @@
     }
     setTimeout(() => layer.remove(), 1000);
   }
+  function sparkle(cx, cy) {
+    if (!document.body.animate) return;
+    const layer = document.createElement('div'); layer.className = 'fx-layer'; document.body.appendChild(layer);
+    for (let i = 0; i < 12; i++) {
+      const p = document.createElement('i'); p.className = 'spark'; p.style.left = cx + 'px'; p.style.top = cy + 'px'; layer.appendChild(p);
+      const a = (i / 12) * Math.PI * 2, r = 38 + Math.random() * 22;
+      p.animate([{ transform: 'translate(-50%,-50%) scale(1)', opacity: 1 }, { transform: `translate(calc(-50% + ${Math.cos(a) * r}px), calc(-50% + ${Math.sin(a) * r}px)) scale(.3)`, opacity: 0 }],
+        { duration: 550, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'forwards' });
+    }
+    setTimeout(() => layer.remove(), 700);
+  }
   function applyClasses() { document.documentElement.classList.toggle('no-anim', !animOn()); }
 
   const FX = {
@@ -77,6 +89,12 @@
     correct(els) { sounds.correct(); vibrate(12); (els || []).forEach(el => retrigger(el, 'fx-pop')); retrigger(document.querySelector('main.card'), 'fx-flash-ok'); },
     miss(els) { sounds.miss(); vibrate([25, 40, 25]); (els || []).forEach(el => retrigger(el, 'fx-shake')); retrigger(document.querySelector('main.card'), 'fx-flash-bad'); },
     complete() { sounds.complete(); vibrate([15, 30, 15]); confetti(); },
+    stone(el) { // a completed stepping stone: soft chime, pop + ring, a few sparkles from the stone
+      sounds.stone(); vibrate(15);
+      if (!el || !animOn()) return;
+      retrigger(el, 'fx-stone');
+      const r = el.getBoundingClientRect(); sparkle(r.left + r.width / 2, r.top + r.height / 2);
+    },
     sounds
   };
   root.FX = FX;

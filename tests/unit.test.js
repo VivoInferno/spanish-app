@@ -71,4 +71,23 @@ t('APP_VERSION matches sw.js CACHE', () => {
   const c = fs.readFileSync(path.join(__dirname, '../sw.js'), 'utf8').match(/CACHE = 'espanol-(v\d+)'/)[1];
   assert.equal(v, c); console.log('   version', v);
 });
+t('v4 content: sections, ≥8 units with stories, valid story questions', () => {
+  const units = new Set(C.units.map(u => u.id));
+  const sec = C.sections.find(s => s.units); assert.ok(sec && sec.units.length >= 8);
+  sec.units.forEach(u => assert.ok(units.has(u)));
+  for (const u of C.units) {
+    assert.ok(u.story && u.story.lines.length >= 8, u.id + ' story');
+    for (const q of u.story.qs) {
+      assert.ok(q.after >= 0 && q.after < u.story.lines.length, u.id + ' q.after');
+      assert.ok(new Set(q.o).size === q.o.length && q.o.length >= 2, u.id + ' options');
+      if (q.k) assert.ok(u.words.some(w => w.id === q.k) || C.units.some(x => x.words.some(w => w.id === q.k)), q.k);
+      if (q.p) assert.ok(C.patterns[q.p], q.p);
+    }
+    const words = u.words.map(w => w.es.replace(/^(el|la) /, '').split(' ')[0].slice(0, 5).toLowerCase());
+    const text = u.story.lines.map(l => l.es.toLowerCase()).join(' ');
+    const used = words.filter(w => text.includes(w)).length;
+    assert.ok(used >= 3, `${u.id} story uses ${used} of its words`);
+  }
+  for (const [id, p] of Object.entries(C.patterns)) assert.ok(p.items.length >= 6, id);
+});
 console.log(`\n${n} tests passed`);

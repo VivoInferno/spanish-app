@@ -17,11 +17,13 @@ async def main():
         await page.goto(URL); await page.wait_for_selector('#go')
         # simulate an existing v1 user: old settings without sound/anim keys
         old = await page.evaluate("""(() => { const s = __app.state; s.placementDone = true; s.items['w:fuga'] = {s: 50, d: 3, reps: 4, lapses: 0, last: Date.now(), due: Date.now() + 40*864e5};
+            ['tramite','cita','recibo','entregar','comprobante'].forEach(w => s.items['w:' + w] = {s: 2, d: 5, reps: 1, lapses: 0, last: Date.now() - 3*864e5, due: Date.now() - 1000});
+            s.items['p:por_para'] = {s: 2, d: 5, reps: 1, lapses: 0, last: Date.now() - 3*864e5, due: Date.now() - 1000};
             const o = JSON.parse(JSON.stringify(s)); delete o.settings.sound; delete o.settings.anim; localStorage.setItem('spanish-app-state-v1', JSON.stringify(o)); return Object.keys(o.items).length; })()""")
-        await page.reload(); await page.wait_for_selector('#go')
+        await page.reload(); await page.wait_for_selector('#review')
         st = await page.evaluate("({items: Object.keys(__app.state.items).length, fuga: __app.state.items['w:fuga'].s, sound: __app.state.settings.sound, anim: __app.state.settings.anim})")
         print('migrated old state:', st, '(items before:', old, ')')
-        await page.click('#go')
+        await page.click('#review')
         audio = await page.evaluate("typeof FX === 'object'")
         shots = {'ok': False, 'bad': False}; k = 0
         for i in range(300):

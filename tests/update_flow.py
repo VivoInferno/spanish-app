@@ -1,4 +1,4 @@
-"""Simulates a deploy while the app is open: v3 running -> server gets v4 -> app returns to foreground -> auto reload into v4, progress intact."""
+"""Simulates a deploy while the app is open: v4 running -> server gets v5 -> app returns to foreground -> auto reload into v4, progress intact."""
 import asyncio, shutil, subprocess, sys, time, re, os
 from playwright.async_api import async_playwright
 SRC = '/workspace/spanish-app'; TMP = '/tmp/spanish-upd'; PORT = 8788
@@ -19,17 +19,17 @@ async def run(engine):
             await page.goto(url); await page.wait_for_selector('#go')
             await page.wait_for_function("navigator.serviceWorker.controller !== null", timeout=10000)
             await page.evaluate("(() => { const s = __app.state; s.placementDone = true; s.items['w:fuga'] = {s: 50, d: 3, reps: 4, lapses: 0, last: Date.now(), due: Date.now() + 40*864e5}; localStorage.setItem('spanish-app-state-v1', JSON.stringify(s)); })()")
-            await page.reload(); await page.wait_for_selector('#go')
+            await page.reload(); await page.wait_for_selector('.stone')
             v_before = await page.evaluate("__app.version"); label = await page.inner_text('.version')
-            setv(4)  # "deploy"
+            setv(5)  # "deploy"
             async with page.expect_navigation(timeout=15000):
                 await page.evaluate("Object.defineProperty(document, 'visibilityState', {configurable: true, get: () => 'visible'}); document.dispatchEvent(new Event('visibilitychange'));")
-            await page.wait_for_selector('#go')
+            await page.wait_for_selector('.stone')
             v_after = await page.evaluate("__app.version"); label2 = await page.inner_text('.version')
             fuga = await page.evaluate("__app.state.items['w:fuga'] && __app.state.items['w:fuga'].s")
             await page.wait_for_timeout(2000)
             still = await page.evaluate("__app.version")  # no reload loop
-            await ctx.set_offline(True); await page.reload(); await page.wait_for_selector('#go', timeout=8000)
+            await ctx.set_offline(True); await page.reload(); await page.wait_for_selector('.stone', timeout=8000)
             offline_v = await page.evaluate("__app.version"); await ctx.set_offline(False)
             print(f'{engine}: before={v_before} (label {label}) -> after={v_after} (label {label2}); progress kept={fuga == 50}; stable={still}; offline reload={offline_v}; errors={errors or "none"}')
             await b.close()
