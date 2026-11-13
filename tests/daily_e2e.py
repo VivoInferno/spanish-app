@@ -60,7 +60,7 @@ async def main():
         page.on('console', lambda m: errors.append(m.text) if m.type == 'error' else None)
         await page.clock.install(time=at(2026, 11, 11, 9)); await page.clock.pause_at(at(2026, 11, 11, 9))
         await page.goto(URL); await page.wait_for_selector('#daybar')
-        check(await page.evaluate("__app.version") == 'v8', 'app version is v8')
+        check(await page.evaluate("__app.version") == 'v8.1', 'app version is v8.1')
         # --- migration from v4 progress
         s = await page.evaluate("__app.state"); stored = await page.evaluate(f"JSON.parse(localStorage.getItem('{KEY}'))")
         diff = [k for k, v in raw.items() if k not in ('schema', 'settings', 'path') and s.get(k) != v]

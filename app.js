@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const APP_VERSION = 'v8'; // keep in sync with CACHE in sw.js (espanol-v8)
+  const APP_VERSION = 'v8.1'; // keep in sync with CACHE in sw.js (espanol-v8-1)
   const KEY = 'spanish-app-state-v1'; // unchanged since v1 — never rename
   const DAY = SRS.DAY;
   const STONES = [
@@ -15,7 +15,7 @@
 
   // ---------- state + migration ----------
   const defaults = () => ({ v: 1, schema: 5, placementDone: false, created: Date.now(), items: {}, pstats: {}, recent: {},
-    settings: { newPerSession: 5, rate: 0.9, autoAdvance: false, sound: true, anim: true, goalMin: Daily.GOAL_MIN, voice: '' }, sessions: 0,
+    settings: { newPerSession: 5, rate: 0.9, autoAdvance: false, sound: true, anim: true, goalMin: Daily.GOAL_MIN, voice: '', voice2: '' }, sessions: 0,
     path: { done: {}, tests: {}, testedOut: {} }, parked: {}, daily: {}, streak: Daily.seed(), parkedDefaults: {}, listenPauseUntil: 0, speakPauseUntil: 0 });
   function load() {
     let raw = null;
@@ -44,6 +44,8 @@
     // Both are optional additions; items, path, daily, streak, parked and every other field pass through untouched.
     s.speakPauseUntil = +raw.speakPauseUntil || 0;
     if (typeof s.settings.voice !== 'string') s.settings.voice = '';
+    // v8.1: settings.voice2 = second story voice ('' = automatic, Paulina first). Optional; schema stays 5.
+    if (typeof s.settings.voice2 !== 'string') s.settings.voice2 = '';
     s.schema = 5;
     return s;
   }
@@ -262,12 +264,15 @@
   }
 
   // ---------- speech ----------
-  let voice = null;
+  let voice = null, voice2 = null;
   // v8: Angélica (Enhanced/Premium) > other es-MX Enhanced/Premium > es-MX > es-US/419 > es-*, unless a voice is chosen in Settings.
   // iOS fills getVoices() late, so pick again on voiceschanged and on a few short retries.
   function pickVoice() {
     if (!('speechSynthesis' in window)) return;
-    voice = Voice.choose(speechSynthesis.getVoices(), S && S.settings.voice) || null;
+    const all = speechSynthesis.getVoices();
+    voice = Voice.choose(all, S && S.settings.voice) || null;
+    voice2 = Voice.second(all, voice, S && S.settings.voice2) || null;
+    if (story) story.cast = null; // re-cast on the next line if the voice list changed
     const el = document.getElementById('voiceSel'); // Settings opened before iOS listed its voices: refresh the picker once they arrive
     if (el && el.dataset.n === '0' && speechSynthesis.getVoices().some(Voice.isEs)) renderProgress();
   }
@@ -278,13 +283,21 @@
     let n = 0; const t = setInterval(() => { pickVoice(); if (++n >= 10 || (voice && speechSynthesis.getVoices().length)) clearInterval(t); }, 300);
   }
   const listenPaused = () => S && Listen.paused(S.listenPauseUntil, Date.now());
-  const autoSpeak = text => { if (!listenPaused()) speak(text); }; // automatic playback; tapping a 🔊 still plays
-  function speak(text, slow) {
+  const autoSpeak = (text, as) => { if (!listenPaused()) speak(text, false, as); }; // automatic playback; tapping a 🔊 still plays
+  // story speakers (v8.1): narrator + first character = main voice, second = second voice, more = cycle voices + pitch
+  function storyVoice(speaker) {
+    if (!story) return null;
+    if (!story.cast) story.cast = Voice.cast(story.u.story.lines.map(l => l.s), 'speechSynthesis' in window ? speechSynthesis.getVoices() : [], voice, voice2);
+    return story.cast[speaker || ''] || story.cast[''];
+  }
+  function speak(text, slow, as) {
     if (!('speechSynthesis' in window)) return false;
     speechSynthesis.cancel();
     if (!voice) pickVoice();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = voice ? voice.lang : 'es-MX'; if (voice) u.voice = voice;
+    const v = (as && as.voice) || voice;
+    u.lang = v ? v.lang : 'es-MX'; if (v) u.voice = v;
+    u.pitch = as && as.pitch ? as.pitch : 1;
     u.rate = (S.settings.rate || 0.9) * (slow ? 0.7 : 1);
     try { speechSynthesis.speak(u); } catch (e) { return false; } // never let audio break a lesson
     return true;
@@ -793,7 +806,7 @@
       const ok = r && r.ok;
       document.getElementById('fb').innerHTML = `<div class="feedback ${ok ? 'good' : 'miss'}">${ok ? '<div class="ok">✓ Correct</div>' : `<div class="bad">✗ Correct answer: <b>${esc(line.es)}</b></div>`}</div>`;
       if (ok) FX.correct([document.getElementById('line')]); else FX.miss([document.getElementById('line')]);
-      if (ok) autoSpeak(line.es);
+      if (ok) autoSpeak(line.es, storyVoice(line.s));
       document.getElementById('fb').scrollIntoView({ block: 'nearest' });
       foot.innerHTML = '<button class="btn primary" id="next">Continue</button>'; document.getElementById('next').onclick = step(finish);
     };
@@ -809,7 +822,7 @@
     const frac = (story.shown + Object.keys(story.answered).length + (story.tile && story.tile.done ? 1 : 0)) / (st.lines.length + st.qs.length + (story.tile ? 1 : 0));
     app.innerHTML = `<div class="topbar"><button class="icon" id="quit" aria-label="Close">✕</button><div class="bar"><span style="width:${story.bar || 0}%"></span></div>${lpHtml()}<button class="icon small-btn" id="en" aria-pressed="${story.showEn}">EN</button></div>
       <main class="card story ${story.entered ? 'no-enter' : ''}"><div class="label">Story · ${esc(u.title)}</div><h1>${esc(st.title)}</h1>
-      ${lines.map((l, k) => `<div class="sline ${k === lines.length - 1 ? 'fresh' : ''} ${tileDue && k === story.tile.after ? 'veil' : ''}" data-k="${k}">${l.s ? `<div class="speaker">${esc(l.s)}</div>` : ''}<div class="ses"><button class="icon speak" data-say="${esc(l.es)}">🔊</button> <span>${tokenize(l.es)}</span></div><div class="sen muted ${story.showEn ? '' : 'hidden'}">${esc(l.en)}</div></div>`).join('')}
+      ${lines.map((l, k) => `<div class="sline ${k === lines.length - 1 ? 'fresh' : ''} ${tileDue && k === story.tile.after ? 'veil' : ''}" data-k="${k}">${l.s ? `<div class="speaker">${esc(l.s)}</div>` : ''}<div class="ses"><button class="icon speak" data-say="${esc(l.es)}" data-spk="${esc(l.s || '')}">🔊</button> <span>${tokenize(l.es)}</span></div><div class="sen muted ${story.showEn ? '' : 'hidden'}">${esc(l.en)}</div></div>`).join('')}
       ${pendingQ ? `<div class="squestion"><div class="prompt">${esc(pendingQ.q)}</div><div class="options">${shuffle(pendingQ.o).map(o => `<button class="opt" data-o="${esc(o)}">${esc(o)}</button>`).join('')}</div><div id="fb"></div></div>` : ''}
       ${tileDue ? '<div class="squestion stile" id="stile"></div>' : ''}
       ${sayDue ? '<div class="squestion ssay" id="ssay"></div>' : ''}
@@ -817,9 +830,9 @@
     story.entered = true; bindQuit(); bindSpeak();
     const bar = app.querySelector('.bar span'); void bar.offsetWidth; story.bar = 100 * frac; bar.style.width = story.bar + '%';
     document.getElementById('en').onclick = () => { story.showEn = !story.showEn; renderStory(false); };
-    app.querySelectorAll('.sline .ses span').forEach(sp => sp.onclick = e => { if (!e.target.closest('[data-w]') || !lp.fired) speak(st.lines[+sp.closest('.sline').dataset.k].es); });
+    app.querySelectorAll('.sline .ses span').forEach(sp => sp.onclick = e => { if (!e.target.closest('[data-w]') || !lp.fired) { const l = st.lines[+sp.closest('.sline').dataset.k]; speak(l.es, false, storyVoice(l.s)); } });
     const last = app.querySelector('.sline.fresh'); if (last) last.scrollIntoView({ block: 'nearest', behavior: S.settings.anim === false ? 'auto' : 'smooth' });
-    if (speakLast && lines.length) autoSpeak(lines[lines.length - 1].es);
+    if (speakLast && lines.length) autoSpeak(lines[lines.length - 1].es, storyVoice(lines[lines.length - 1].s));
     if (pendingQ) {
       const qi = st.qs.indexOf(pendingQ);
       app.querySelectorAll('.squestion .opt').forEach(b => b.onclick = () => {
@@ -1023,18 +1036,25 @@
   // v8: Spanish voice picker. "Automatic" = best installed (Angélica Enhanced/Premium first); a chosen voice is saved by voiceURI.
   function voiceSettingsHtml() {
     const all = 'speechSynthesis' in window ? speechSynthesis.getVoices() : [];
-    const vs = Voice.spanish(all), auto = Voice.best(all);
+    const vs = Voice.spanish(all), auto = Voice.best(all), auto2 = Voice.second(all, voice, '');
     const cur = S.settings.voice || '';
     return `<div class="set voice-set"><label for="voiceSel">Voice</label><span class="row-inline"><select id="voiceSel" data-n="${vs.length}">
       <option value="" ${cur ? '' : 'selected'}>Automatic${auto ? ' · ' + esc(auto.name) : ''}</option>
       ${vs.map(v => `<option data-v="1" value="${esc(Voice.key(v))}" ${cur === Voice.key(v) ? 'selected' : ''}>${esc(v.name)} (${esc(v.lang)})${Voice.quality(v) ? ' ★' : ''}</option>`).join('')}
       </select><button class="btn secondary slim" id="voiceTest" type="button">Test</button></span></div>
-      <p class="muted small">Now using: <b id="voiceNow">${voice ? esc(voice.name + ' (' + voice.lang + ')') : 'default Spanish'}</b>${vs.length ? '' : ' · no Spanish voices listed yet'}. On iPhone, add voices in Settings › Accessibility › Spoken Content › Voices › Spanish.</p>`;
+      <div class="set voice-set"><label for="voice2Sel">Second voice <span class="muted small">stories</span></label><span class="row-inline"><select id="voice2Sel">
+      <option value="" ${S.settings.voice2 ? '' : 'selected'}>Automatic${auto2 ? ' · ' + esc(auto2.name) : ''}</option>
+      ${vs.filter(v => !voice || Voice.key(v) !== Voice.key(voice)).map(v => `<option value="${esc(Voice.key(v))}" ${S.settings.voice2 === Voice.key(v) ? 'selected' : ''}>${esc(v.name)} (${esc(v.lang)})${Voice.quality(v) ? ' ★' : ''}</option>`).join('')}
+      </select><button class="btn secondary slim" id="voice2Test" type="button">Test</button></span></div>
+      <p class="muted small">Now using: <b id="voiceNow">${voice ? esc(voice.name + ' (' + voice.lang + ')') : 'default Spanish'}</b>${vs.length ? '' : ' · no Spanish voices listed yet'}. ${voice2 ? ` Second story voice: <b id="voice2Now">${esc(voice2.name)}</b>.` : vs.length ? ' Only one Spanish voice, so story characters differ by pitch.' : ''} On iPhone, add voices in Settings › Accessibility › Spoken Content › Voices › Spanish.</p>`;
   }
   function bindVoiceSettings() {
     const sel = document.getElementById('voiceSel'); if (!sel) return;
-    sel.onchange = () => { S.settings.voice = sel.value; save(); pickVoice(); const n = document.getElementById('voiceNow'); if (n) n.textContent = voice ? voice.name + ' (' + voice.lang + ')' : 'default Spanish'; speak('Hola, así sueno. ¿Se lo mando mañana?'); };
+    sel.onchange = () => { S.settings.voice = sel.value; save(); pickVoice(); if (Voice.key(voice2) === Voice.key(voice)) { S.settings.voice2 = ''; save(); pickVoice(); } const n = document.getElementById('voiceNow'); if (n) n.textContent = voice ? voice.name + ' (' + voice.lang + ')' : 'default Spanish'; speak('Hola, así sueno. ¿Se lo mando mañana?'); };
     document.getElementById('voiceTest').onclick = () => speak('Hola, así sueno. ¿Se lo mando mañana?');
+    const s2 = document.getElementById('voice2Sel'), say2 = () => speak('¡Hola! Yo soy la segunda voz de las historias.', false, { voice: voice2 || voice, pitch: voice2 ? 1 : 1.1 });
+    if (s2) { s2.onchange = () => { S.settings.voice2 = s2.value; save(); pickVoice(); const n = document.getElementById('voice2Now'); if (n && voice2) n.textContent = voice2.name; say2(); };
+      document.getElementById('voice2Test').onclick = say2; }
   }
   function importBackup(txt, silent) {
     try {
@@ -1046,7 +1066,7 @@
       return true;
     } catch (e) { if (!silent) alert('Could not import: ' + e.message); return false; }
   }
-  function bindSpeak() { app.querySelectorAll('.speak').forEach(b => b.onclick = e => { e.preventDefault(); speak(b.dataset.say); }); }
+  function bindSpeak() { app.querySelectorAll('.speak').forEach(b => b.onclick = e => { e.preventDefault(); speak(b.dataset.say, false, b.dataset.spk != null ? storyVoice(b.dataset.spk) : null); }); }
 
   // ---------- parking ("Not a priority") via long-press ----------
   function park(w) {
@@ -1150,7 +1170,7 @@
     makeExercise: e => makeExercise(e), get content() { return C; }, importBackup: (t) => importBackup(t, true), openStone: (u, i) => openStone(u, i), testQueue: u => testQueue(C.units[IDX.unitIdx[u]]), practiceQueue: u => practiceQueue(C.units[IDX.unitIdx[u]]), dueIds: () => dueIds(Date.now()), currentPos: () => currentPos(),
     introQueue: u => introQueue(C.units[IDX.unitIdx[u]]), withTiles: (w, t) => withTiles(w, t), pickStoryTile: u => pickStoryTile(C.units[IDX.unitIdx[u]].story),
     forceEx: (type, sent) => { if (!run || run.answered) return; const e = run.queue[run.i] = Object.assign({}, run.queue[run.i], { ex: type }, sent ? { sent } : {}); run.ex = makeExercise(e); renderExercise(e, run.ex); },
-    speakPaused: () => speakPaused(), speakOk: () => speakOk(), cantSpeak: () => { const b = document.getElementById('cantSpeak'); if (b) b.click(); }, get voice() { return voice; }, pickVoice: () => pickVoice(), gloss: w => gloss(w), pickExercise: (id, rev) => pickExercise(IDX.words[id], rev), unblockSpeech: () => { speechBlocked = false; try { sessionStorage.removeItem('speech-blocked'); } catch (e) { /* ignore */ } }, get speechBlocked() { return speechBlocked; }, normalize: raw => normalize(raw),
+    speakPaused: () => speakPaused(), speakOk: () => speakOk(), cantSpeak: () => { const b = document.getElementById('cantSpeak'); if (b) b.click(); }, get voice() { return voice; }, get voice2() { return voice2; }, storyVoice: s => { const v = storyVoice(s); return v && { voice: v.voice && v.voice.name, pitch: v.pitch }; }, pickVoice: () => pickVoice(), gloss: w => gloss(w), pickExercise: (id, rev) => pickExercise(IDX.words[id], rev), unblockSpeech: () => { speechBlocked = false; try { sessionStorage.removeItem('speech-blocked'); } catch (e) { /* ignore */ } }, get speechBlocked() { return speechBlocked; }, normalize: raw => normalize(raw),
     tick: () => tick(), listenPaused: () => listenPaused(), cantListen: () => { const b = document.getElementById('cantListen'); if (b) b.click(); }, todayMinutes: () => Daily.minutesOn(S.daily, todayKey()), streakNow: () => Daily.current(S.streak, todayKey()) };
   boot();
 })();

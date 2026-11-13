@@ -1,9 +1,9 @@
-"""Simulates a deploy while the app is open: v8 running -> server gets v9 -> app returns to foreground -> auto reload into v9, progress intact."""
+"""Simulates a deploy while the app is open: v8.1 running -> server gets v9 -> app returns to foreground -> auto reload into v9, progress intact."""
 import asyncio, shutil, subprocess, sys, time, re, os
 from playwright.async_api import async_playwright
 SRC = '/workspace/spanish-app'; TMP = '/tmp/spanish-upd'; PORT = 8788
 def setv(n):
-    for f, pat, rep in [('sw.js', r"CACHE = 'espanol-v\d+'", f"CACHE = 'espanol-v{n}'"), ('app.js', r"APP_VERSION = 'v\d+'", f"APP_VERSION = 'v{n}'")]:
+    for f, pat, rep in [('sw.js', r"CACHE = 'espanol-v[\d-]+'", f"CACHE = 'espanol-v{n}'"), ('app.js', r"APP_VERSION = 'v[\d.]+'", f"APP_VERSION = 'v{n}'")]:
         p = os.path.join(TMP, f); s = open(p).read(); open(p, 'w').write(re.sub(pat, rep, s))
 async def run(engine):
     shutil.rmtree(TMP, ignore_errors=True); shutil.copytree(SRC, TMP, ignore=shutil.ignore_patterns('.git', 'screens', 'tests'))

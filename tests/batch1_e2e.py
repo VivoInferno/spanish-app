@@ -56,7 +56,7 @@ async def main():
                 await pg.goto(URL); await pg.wait_for_selector('.stone')
             else:
                 await pg.goto(URL); await pg.wait_for_selector('#go'); await pg.evaluate("s => __app.importBackup(s)", json.dumps(V5)); await pg.reload(); await pg.wait_for_selector('.stone')
-            check(await pg.evaluate("__app.version") == 'v8', f'[{mode}] app version is v8')
+            check(await pg.evaluate("__app.version") == 'v8.1', f'[{mode}] app version is v8.1')
             s = await pg.evaluate("__app.state"); stored = await pg.evaluate(f"JSON.parse(localStorage.getItem('{KEY}'))")
             keep = ['items', 'pstats', 'recent', 'parked', 'daily', 'streak', 'placementDone', 'placementSummary', 'sessions', 'created']
             check(all(s.get(k) == raw.get(k) for k in keep), f'[{mode}] SRS items ({len(raw["items"])}), stats, parked, daily history, streak unchanged')

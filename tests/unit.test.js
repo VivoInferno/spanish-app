@@ -71,8 +71,8 @@ t('later units (in path order) recycle earlier words in sentences and stories', 
 });
 t('APP_VERSION matches sw.js CACHE', () => {
   const fs = require('fs'), path = require('path');
-  const v = fs.readFileSync(path.join(__dirname, '../app.js'), 'utf8').match(/APP_VERSION = '(v\d+)'/)[1];
-  const c = fs.readFileSync(path.join(__dirname, '../sw.js'), 'utf8').match(/CACHE = 'espanol-(v\d+)'/)[1];
+  const v = fs.readFileSync(path.join(__dirname, '../app.js'), 'utf8').match(/APP_VERSION = '(v[\d.]+)'/)[1].replace(/\./g, '-');
+  const c = fs.readFileSync(path.join(__dirname, '../sw.js'), 'utf8').match(/CACHE = 'espanol-(v[\d-]+)'/)[1];
   assert.equal(v, c); console.log('   version', v);
 });
 t('v4 content: sections, ≥8 units with stories, valid story questions', () => {
@@ -321,18 +321,39 @@ t("v8 can't speak now: 10-minute pause helpers, speak is its own type", () => {
   assert.ok(Lsn.isSpeak('speak') && !Lsn.isSpeak('listen') && !Lsn.isAudio('speak'));
   assert.equal(Lsn.substituteSpeak(true), 'build'); assert.equal(Lsn.substituteSpeak(false), 'en2es');
 });
-t('v8 voice choice: Angélica Enhanced > es-MX Enhanced > es-MX > es-US > es-*; saved choice wins', () => {
+t('v8.1 voice choice: Angélica > Mónica > Paulina > es-MX Enhanced > es-MX > es-US > es-*; saved choice wins', () => {
   const v = (name, lang, uri) => ({ name, lang, voiceURI: uri || name, localService: true });
   const list = [v('Mónica', 'es-ES'), v('Paulina', 'es-MX'), v('Angélica', 'es-MX', 'com.apple.voice.compact.es-MX.Angelica'), v('Angélica (Enhanced)', 'es-MX', 'com.apple.voice.enhanced.es-MX.Angelica'), v('Samantha', 'en-US'), v('Juan (Enhanced)', 'es-MX'), v('Google español de Estados Unidos', 'es-US')];
   assert.equal(Voice.best(list).name, 'Angélica (Enhanced)');
-  assert.equal(Voice.best(list.filter(x => !/Ang/.test(x.name))).name, 'Juan (Enhanced)');
-  assert.equal(Voice.best(list.filter(x => !/Ang|Juan/.test(x.name))).name, 'Paulina');
-  assert.equal(Voice.best([v('Mónica', 'es-ES'), v('Google español de Estados Unidos', 'es-US')]).name, 'Google español de Estados Unidos');
+  assert.equal(Voice.best(list.filter(x => !/Ang/.test(x.name))).name, 'Mónica');
+  assert.equal(Voice.best(list.filter(x => !/Ang|Mónica/.test(x.name))).name, 'Paulina');
+  assert.equal(Voice.best(list.filter(x => !/Ang|Mónica|Paulina/.test(x.name))).name, 'Juan (Enhanced)');
+  assert.equal(Voice.best([v('Jorge', 'es-ES'), v('Google español de Estados Unidos', 'es-US')]).name, 'Google español de Estados Unidos');
   assert.equal(Voice.best([v('Mónica', 'es-ES'), v('Samantha', 'en-US')]).name, 'Mónica');
   assert.equal(Voice.best([v('Samantha', 'en-US')]), null);
   assert.equal(Voice.best([v('Angelica', 'es-MX'), v('Angelica (Premium)', 'es-MX')]).name, 'Angelica (Premium)', 'no-accent name, Premium');
   assert.equal(Voice.choose(list, 'Paulina').name, 'Paulina');
   assert.equal(Voice.choose(list, 'Removed voice').name, 'Angélica (Enhanced)', 'uninstalled saved voice falls back to automatic');
   assert.deepEqual(Voice.spanish(list).map(x => x.lang).filter(l => !l.startsWith('es')), []);
+});
+t('v8.1 voices: Mónica main on the iPhone list, Paulina second; Angélica still first if exposed', () => {
+  const v = (name, lang) => ({ name, lang, voiceURI: name });
+  const ip = [v('Paulina', 'es-MX'), v('Mónica', 'es-ES'), v('Samantha', 'en-US')];
+  const m = Voice.best(ip); assert.equal(m.name, 'Mónica'); assert.equal(Voice.second(ip, m, '').name, 'Paulina');
+  assert.equal(Voice.best([v('Paulina', 'es-MX'), v('Monica', 'es-ES')]).name, 'Monica');
+  assert.equal(Voice.best(ip.concat([v('Angélica', 'es-MX')])).name, 'Angélica');
+  assert.equal(Voice.second(ip, m, 'Mónica').name, 'Paulina', 'second can never be the main voice');
+  assert.equal(Voice.second([v('Mónica', 'es-ES')], m, ''), null);
+});
+t('v8.1 story cast: narrator + first character main, second character second voice, 3+ cycle with pitch', () => {
+  const v = (name, lang) => ({ name, lang, voiceURI: name }); const ip = [v('Mónica', 'es-ES'), v('Paulina', 'es-MX')];
+  const c = Voice.cast([null, 'A', 'B', null, 'C', 'D', 'E'], ip, ip[0], ip[1]);
+  const f = k => [c[k].voice && c[k].voice.name, c[k].pitch];
+  assert.deepEqual([f(''), f('A'), f('B'), f('C'), f('D'), f('E')], [['Mónica', 1], ['Mónica', 1], ['Paulina', 1], ['Mónica', 0.9], ['Paulina', 0.9], ['Mónica', 1.1]]);
+  const one = Voice.cast([null, 'A', 'B'], [ip[0]], ip[0], null); assert.deepEqual([one[''].pitch, one.A.pitch, one.B.pitch], [1, 0.9, 1.1]);
+  const none = Voice.cast([null, 'A', 'B'], [], null, null); assert.ok(none.A.pitch !== none.B.pitch);
+});
+t('v8.1 stories: every line has a speaker tag field (null = narrator) and dialogue has 2+ characters', () => {
+  C.units.forEach(u => { u.story.lines.forEach((l, k) => assert.ok('s' in l, u.id + ' line ' + k)); assert.ok(new Set(u.story.lines.map(l => l.s).filter(Boolean)).size >= 2, u.id); });
 });
 console.log(`\n${n} tests passed`);

@@ -1,6 +1,6 @@
 """v8: tile placeholders, speech-bubble prompts with tap hints + new-word highlight, 3-choice word picker (both directions),
 repeat-after-me speaking drill (mocked SpeechRecognition: success, retry, permission denied, unavailable, Can't speak now + pill),
-flip cards (check + flip = miss), synonym credit with Mexican-usage notes, voice choice (Angélica Enhanced first, Settings picker),
+flip cards (check + flip = miss), synonym credit with Mexican-usage notes, voice choice (Mónica first on the iPhone list, Settings picker),
 lossless migration from v4 / v5 / v7 exports, test still 12 + 3. Screenshots: screens/v8-*.png (WebKit iPhone 15)."""
 import asyncio, json, sys, os, re
 from playwright.async_api import async_playwright
@@ -35,10 +35,10 @@ window.SpeechSynthesisUtterance = class { constructor(t) { this.text = t; this.l
 if (window.speechSynthesis) {
   const def = (k, f) => { for (const o of [speechSynthesis, Object.getPrototypeOf(speechSynthesis)]) try { Object.defineProperty(o, k, { value: f, configurable: true, writable: true }); } catch (e) {} };
   def('getVoices', () => window.__voices);
-  def('speak', u => { window.__spoken.push({ text: u.text, voice: u.voice && u.voice.name, lang: u.lang }); });
+  def('speak', u => { window.__spoken.push({ text: u.text, voice: u.voice && u.voice.name, lang: u.lang, pitch: u.pitch }); });
   def('cancel', () => {});
-  setTimeout(() => { window.__voices = [mk('Mónica', 'es-ES'), mk('Paulina', 'es-MX'), mk('Angélica', 'es-MX', 'com.apple.voice.compact.es-MX.Angelica'),
-    mk('Angélica (Enhanced)', 'es-MX', 'com.apple.voice.enhanced.es-MX.Angelica'), mk('Samantha', 'en-US')];
+  // default = what Colby's iPhone web app actually lists (v8.1): Mónica + Paulina (+ an English voice). Tests can set __voiceList first.
+  setTimeout(() => { window.__voices = (window.__voiceList || [['Mónica', 'es-ES'], ['Paulina', 'es-MX'], ['Samantha', 'en-US']]).map(a => mk(...a));
     try { speechSynthesis.dispatchEvent(new Event('voiceschanged')); } catch (e) {} }, 400);
 }
 """
@@ -80,11 +80,11 @@ async def main():
         V7 = strip_meta(json.load(open(FIX + 'v7-export.json')))
         ctx = await new_ctx(b, p, V7); page = await ctx.new_page(); page.on('pageerror', lambda e: errors.append(str(e)))
         await page.goto(URL); await page.wait_for_selector('.stone')
-        check(await page.evaluate("__app.version") == 'v8', 'app version is v8')
+        check(await page.evaluate("__app.version") == 'v8.1', 'app version is v8.1')
         await page.wait_for_timeout(700)
 
         # ---- voice choice ----
-        check(await page.evaluate("__app.voice && __app.voice.name") == 'Angélica (Enhanced)', 'automatic voice = Angélica (Enhanced) once voiceschanged fires')
+        check(await page.evaluate("__app.voice && __app.voice.name") == 'Mónica', 'automatic voice = Mónica once voiceschanged fires (iPhone list: Mónica + Paulina)')
         # ---- intro stone of an untouched unit: picker right after a new word, new-word highlight ----
         await page.evaluate("__app.openStone('u10', 0)"); await page.click('#go'); await page.click('#go')
         await page.wait_for_function("__app.ex && __app.ex.kind"); ex = await page.evaluate("__app.ex")
@@ -92,7 +92,7 @@ async def main():
         check(await page.locator('.opt.big-opt').count() == 3, 'three large stacked buttons')
         check(await page.locator('.bubble .tok.new').count() >= 1 and 'New word' in (await page.text_content('.newlabel')), 'new word highlighted in the bubble + "New word" label')
         spk = await page.evaluate("__spoken.slice(-1)[0]")
-        check(spk and spk['voice'] == 'Angélica (Enhanced)', f'lesson audio uses the chosen voice ({spk})')
+        check(spk and spk['voice'] == 'Mónica', f'lesson audio uses the chosen voice ({spk})')
         await page.click(f'.opt:text-is("{ex["answer"]}")')
         check(await page.query_selector('.feedback.good') is not None, 'correct pick graded correct')
         await page.click('#next')
@@ -249,12 +249,12 @@ async def main():
         check(said, 'story has a say-the-line drill, graded with the recogniser')
         check(await page.query_selector('.stone') is not None and await page.evaluate("__app.state.path.done.u10[1]"), 'story completes')
         sv = await page.evaluate("[...new Set(__spoken.map(s => s.voice))]")
-        check(sv == ['Angélica (Enhanced)'], f'stories and lessons all speak with the chosen voice ({sv})')
+        check(set(sv) == {'Mónica', 'Paulina'}, f'lessons + stories use Mónica, with Paulina for the second character ({sv})')
 
         # ---- Settings voice picker ----
         await page.click('#prog'); await page.wait_for_selector('#voiceSel')
         opts = await page.evaluate("[...document.querySelectorAll('#voiceSel option')].map(o => o.textContent.trim())")
-        check(len(opts) == 5 and opts[0].startswith('Automatic') and 'Angélica (Enhanced)' in opts[0] and not any('Samantha' in o for o in opts) and opts[1].startswith('Angélica (Enhanced)'), f'voice picker lists installed Spanish voices, best first ({opts})')
+        check(len(opts) == 3 and opts[0].startswith('Automatic') and 'Mónica' in opts[0] and not any('Samantha' in o for o in opts) and opts[1].startswith('Mónica'), f'voice picker lists installed Spanish voices, best first ({opts})')
         await page.select_option('#voiceSel', 'Paulina'); await page.wait_for_timeout(100)
         check(await page.evaluate("__app.state.settings.voice") == 'Paulina' and await page.evaluate("__app.voice.name") == 'Paulina' and await page.evaluate("__spoken.slice(-1)[0].voice") == 'Paulina', 'choosing a voice saves it and speaks a sample with it')
         await page.click('#voiceTest'); check(await page.evaluate("__spoken.slice(-1)[0].voice") == 'Paulina', 'Test button plays the chosen voice')
@@ -262,7 +262,7 @@ async def main():
         await page.reload(); await page.wait_for_selector('.stone'); await page.wait_for_timeout(800)
         check(await page.evaluate("__app.voice && __app.voice.name") == 'Paulina', 'chosen voice survives a reload')
         await page.click('#prog'); await page.select_option('#voiceSel', ''); await page.wait_for_timeout(100)
-        check(await page.evaluate("__app.voice.name") == 'Angélica (Enhanced)', 'back to Automatic → Angélica (Enhanced)')
+        check(await page.evaluate("__app.voice.name") == 'Mónica', 'back to Automatic → Mónica')
         await ctx.close()
 
         # ---------------- no recogniser (some iOS builds / standalone PWA): speaking drills never appear ----------------
