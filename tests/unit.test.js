@@ -356,4 +356,34 @@ t('v8.1 story cast: narrator + first character main, second character second voi
 t('v8.1 stories: every line has a speaker tag field (null = narrator) and dialogue has 2+ characters', () => {
   C.units.forEach(u => { u.story.lines.forEach((l, k) => assert.ok('s' in l, u.id + ' line ' + k)); assert.ok(new Set(u.story.lines.map(l => l.s).filter(Boolean)).size >= 2, u.id); });
 });
+t('v9 recorded audio: lookup is case/space-insensitive, story speakers map to their voice, unknown → null / main', () => {
+  const Rec = require('../audio.js');
+  const man = { main: 'dalia', files: { dalia: { 'el trámite': 'aaa', 'tengo una cita.': 'bbb' }, jorge: { 'hola.': 'ccc' } }, cast: { u1: { '': 'dalia', 'Sr. Gómez': 'jorge' } } };
+  assert.equal(Rec.lookup(man, '  El  trámite '), 'audio/aaa.mp3'); assert.equal(Rec.lookup(man, 'Tengo una cita.'), 'audio/bbb.mp3');
+  assert.equal(Rec.lookup(man, 'Hola.', 'jorge'), 'audio/ccc.mp3'); assert.equal(Rec.lookup(man, 'Hola.'), null); assert.equal(Rec.lookup(null, 'x'), null);
+  assert.equal(Rec.lookup(man, 'el tra\u0301mite'), 'audio/aaa.mp3', 'NFD input still matches');
+  assert.equal(Rec.castFor(man, 'u1', 'Sr. Gómez'), 'jorge'); assert.equal(Rec.castFor(man, 'u1', null), 'dalia'); assert.equal(Rec.castFor(man, 'u1', 'Nadie'), 'dalia'); assert.equal(Rec.castFor(man, 'zz', 'X'), 'dalia');
+  assert.deepEqual(Rec.files(man).sort(), ['audio/aaa.mp3', 'audio/bbb.mp3', 'audio/ccc.mp3']);
+});
+t('v9 audio manifest: Dalia main, narrator Dalia and never a character voice, male characters get male voices, every story line recorded', () => {
+  const fs = require('fs'), path = require('path'), Rec = require('../audio.js');
+  const man = JSON.parse(fs.readFileSync(path.join(__dirname, '../audio/manifest.json'), 'utf8'));
+  assert.equal(man.main, 'dalia'); assert.equal(man.voices.dalia, 'es-MX-DaliaNeural'); assert.equal(man.voices.jorge, 'es-MX-JorgeNeural');
+  const male = new Set(['jorge', 'alonso', 'gonzalo']);
+  C.units.forEach(u => {
+    const cast = man.cast[u.id]; assert.ok(cast, u.id); assert.equal(cast[''], 'dalia');
+    const chars = Object.keys(cast).filter(Boolean); assert.equal(new Set(chars.map(k => cast[k])).size, chars.length, u.id + ': characters have distinct voices');
+    chars.forEach(k => { assert.notEqual(cast[k], 'dalia', u.id + ' ' + k); assert.equal(male.has(cast[k]), C.speakers[k] === 'm', u.id + ' ' + k + ' gender'); });
+    u.story.lines.forEach(l => assert.ok(Rec.lookup(man, l.es, Rec.castFor(man, u.id, l.s)), u.id + ': ' + l.es));
+    u.words.forEach(w => assert.ok(Rec.lookup(man, w.es), w.es)); u.sentences.forEach(x => assert.ok(Rec.lookup(man, x.es), x.es));
+  });
+  Rec.files(man).forEach(f => assert.ok(fs.existsSync(path.join(__dirname, '..', f)), f + ' exists'));
+});
+t('v9 content: every story speaker has a gender for voice casting', () => {
+  C.units.forEach(u => u.story.lines.forEach(l => { if (l.s) assert.ok(['m', 'f'].includes(C.speakers[l.s]), l.s); }));
+});
+t('v9 sw: audio.js + manifest precached, audio cache kept across updates, mp3 cache-first', () => {
+  const sw = require('fs').readFileSync(require('path').join(__dirname, '../sw.js'), 'utf8');
+  assert.ok(/'audio\.js', 'audio\/manifest\.json'/.test(sw)); assert.ok(sw.includes("k !== AUDIO_CACHE")); assert.ok(sw.includes('audioFirst(req)'));
+});
 console.log(`\n${n} tests passed`);

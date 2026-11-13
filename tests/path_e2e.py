@@ -2,6 +2,7 @@ import re
 """v4+ end-to-end: placement -> path -> all 4 stones of unit 1 -> unit 2 unlocked; long-press parking; v3 migration."""
 import asyncio, json, sys, os
 from playwright.async_api import async_playwright
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); import wkshim  # box WebKit can't decode MP3
 URL = sys.argv[1] if len(sys.argv) > 1 else 'http://127.0.0.1:8787/'
 ENGINE = sys.argv[2] if len(sys.argv) > 2 else 'chromium'
 OUT = '/workspace/spanish-app/screens'; os.makedirs(OUT, exist_ok=True)
@@ -55,7 +56,7 @@ async def main():
         page.on('console', lambda m: errors.append(m.text) if m.type == 'error' else None)
         page.on('pageerror', lambda e: errors.append(str(e)))
         await page.goto(URL); await page.wait_for_selector('#go')
-        check(await page.evaluate("__app.version") == 'v8.1', 'app version is v8.1')
+        check(await page.evaluate("__app.version") == 'v9', 'app version is v9')
         # --- placement
         await page.click('#go'); k = 0
         while not await page.query_selector('h1:has-text("Placement results")'):

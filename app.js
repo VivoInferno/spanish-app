@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const APP_VERSION = 'v8.1'; // keep in sync with CACHE in sw.js (espanol-v8-1)
+  const APP_VERSION = 'v9'; // keep in sync with CACHE in sw.js (espanol-v9)
   const KEY = 'spanish-app-state-v1'; // unchanged since v1 — never rename
   const DAY = SRS.DAY;
   const STONES = [
@@ -15,7 +15,7 @@
 
   // ---------- state + migration ----------
   const defaults = () => ({ v: 1, schema: 5, placementDone: false, created: Date.now(), items: {}, pstats: {}, recent: {},
-    settings: { newPerSession: 5, rate: 0.9, autoAdvance: false, sound: true, anim: true, goalMin: Daily.GOAL_MIN, voice: '', voice2: '' }, sessions: 0,
+    settings: { newPerSession: 5, rate: 0.9, autoAdvance: false, sound: true, anim: true, goalMin: Daily.GOAL_MIN, voice: '', voice2: '', voiceMode: 'recorded' }, sessions: 0,
     path: { done: {}, tests: {}, testedOut: {} }, parked: {}, daily: {}, streak: Daily.seed(), parkedDefaults: {}, listenPauseUntil: 0, speakPauseUntil: 0 });
   function load() {
     let raw = null;
@@ -46,6 +46,8 @@
     if (typeof s.settings.voice !== 'string') s.settings.voice = '';
     // v8.1: settings.voice2 = second story voice ('' = automatic, Paulina first). Optional; schema stays 5.
     if (typeof s.settings.voice2 !== 'string') s.settings.voice2 = '';
+    // v9: settings.voiceMode = 'recorded' (natural pre-recorded voices, default) or 'device' (Web Speech voices above). Schema stays 5.
+    if (s.settings.voiceMode !== 'device') s.settings.voiceMode = 'recorded';
     s.schema = 5;
     return s;
   }
@@ -120,6 +122,33 @@
       const pre = esc(tok.slice(0, tok.indexOf(core))), post = esc(tok.slice(tok.indexOf(core) + core.length));
       return pre + `<span class="tok${id ? ' w' : ''}${isNew ? ' new' : ''}"${id ? ` data-w="${id}"` : ''} data-g="${esc(core)}">${esc(core)}</span>` + post;
     }).join('');
+  }
+  // v9: the Spanish word cores tokenize() makes tappable (tap = hear the word), for the audio generator
+  function tokCores(text) {
+    let inParen = false; const out = [];
+    String(text).split(/\s+/).forEach(tok => {
+      if (!tok) return;
+      const wasParen = inParen || tok.startsWith('('); if (tok.startsWith('(')) inParen = true; if (tok.includes(')')) inParen = false;
+      const core = tok.replace(/^[¿¡“"(«—]+|[.,;:!?”"»)…—]+$/g, '');
+      if (core && /\p{L}/u.test(core) && !wasParen) out.push(core);
+    });
+    return out;
+  }
+  const VOICE_TEST = 'Hola, así sueno. ¿Se lo mando mañana?', VOICE2_TEST = '¡Hola! Yo soy la segunda voz de las historias.', RATE_TEST = 'Así suena ahora.';
+  // v9: every Spanish string the app can speak. main = default voice; story = [unitId, speaker, text] in that speaker's voice;
+  // second = the Settings "second voice" sample. tools/build_audio.py records these (content-hash names, only changed text is redone).
+  function speakables() {
+    const main = new Set(), story = [];
+    const add = t => { t = String(t || '').trim(); if (t && /\p{L}/u.test(t)) main.add(t); };
+    const toks = t => tokCores(t).forEach(add);
+    C.units.forEach(u => {
+      u.words.forEach(w => { add(w.es); toks(w.es); });
+      u.sentences.forEach(x => { add(x.es); toks(x.es); });
+      u.story.lines.forEach(l => { story.push([u.id, l.s || '', l.es.trim()]); toks(l.es); });
+    });
+    Object.values(C.patterns).forEach(p => p.items.forEach(it => { const full = it.q.replace('___', it.o[0]); add(full); add(full.replace(/\s*\([^)]*\)\s*$/, '')); toks(it.q); toks(full); }));
+    [VOICE_TEST, RATE_TEST].forEach(add);
+    return { main: [...main], story, second: [VOICE2_TEST] };
   }
   // English hint for one Spanish word: a course word gives its own meaning, anything else comes from content.json glosses
   function gloss(core) {
@@ -233,7 +262,7 @@
   }
   function cantListen(entry, btn) {
     if (!run || run.answered) return;
-    if ('speechSynthesis' in window) speechSynthesis.cancel();
+    hush();
     S.listenPauseUntil = Listen.start(Date.now()); save();
     FX.pause(btn);
     // same card, same item, nothing graded: rebuild it as a non-audio exercise (the paused flag makes makeExercise substitute)
@@ -288,9 +317,29 @@
   function storyVoice(speaker) {
     if (!story) return null;
     if (!story.cast) story.cast = Voice.cast(story.u.story.lines.map(l => l.s), 'speechSynthesis' in window ? speechSynthesis.getVoices() : [], voice, voice2);
-    return story.cast[speaker || ''] || story.cast[''];
+    const c = story.cast[speaker || ''] || story.cast[''] || {};
+    return Object.assign({}, c, { rec: Rec.castFor(Rec.man, story.u.id, speaker) }); // v9: recorded voice for this speaker
   }
+  // v9: recorded clips first (Settings › Voices = Natural), Web Speech for anything not recorded or if playback fails.
+  // Recorded speed follows the speed slider (0.9 = as recorded); the slow-replay button plays recordings at 0.75×.
+  const useRecorded = () => S.settings.voiceMode !== 'device' && !!Rec.man;
+  const recRate = slow => slow ? 0.75 : Math.max(0.6, Math.min(1.3, (S.settings.rate || 0.9) / 0.9));
   function speak(text, slow, as) {
+    if (useRecorded()) {
+      const main = Rec.man.main, vid = (as && as.rec) || main;
+      const path = Rec.lookup(Rec.man, text, vid) || (vid !== main ? Rec.lookup(Rec.man, text, main) : null);
+      if (path) {
+        if ('speechSynthesis' in window) try { speechSynthesis.cancel(); } catch (e) { /* ignore */ }
+        Rec.play(path, recRate(slow)).catch(() => deviceSpeak(text, slow, as));
+        return true;
+      }
+      if (window.__audioMiss) window.__audioMiss.push(text);
+    }
+    return deviceSpeak(text, slow, as);
+  }
+  function hush() { if (Rec.stop) Rec.stop(); if ('speechSynthesis' in window) try { speechSynthesis.cancel(); } catch (e) { /* ignore */ } } // v9: stop recorded + device audio
+  function deviceSpeak(text, slow, as) {
+    if (Rec.stop) Rec.stop();
     if (!('speechSynthesis' in window)) return false;
     speechSynthesis.cancel();
     if (!voice) pickVoice();
@@ -301,6 +350,16 @@
     u.rate = (S.settings.rate || 0.9) * (slow ? 0.7 : 1);
     try { speechSynthesis.speak(u); } catch (e) { return false; } // never let audio break a lesson
     return true;
+  }
+  // v9: recorded clips one unit needs (words, sentences, story lines in their cast voices, tap-hint words, its grammar items)
+  function unitAudio(u) {
+    if (!Rec.man) return [];
+    const out = new Set(), add = (t, v) => { const p = Rec.lookup(Rec.man, t, v); if (p) out.add(p); }, toks = t => tokCores(t).forEach(x => add(x));
+    u.words.forEach(w => { add(w.es); toks(w.es); });
+    u.sentences.forEach(x => { add(x.es); toks(x.es); });
+    u.story.lines.forEach(l => { add(l.es, Rec.castFor(Rec.man, u.id, l.s)); toks(l.es); });
+    u.focus.forEach(p => C.patterns[p].items.forEach(it => { const full = it.q.replace('___', it.o[0]); add(full); add(full.replace(/\s*\([^)]*\)\s*$/, '')); toks(it.q); toks(full); }));
+    return [...out];
   }
 
   // ---------- scheduling glue ----------
@@ -473,7 +532,7 @@
     const pct = Math.max(0, Math.min(100, 100 * frac)); if (run) run.barPct = pct;
     const el = app.querySelector('.bar span'); if (!el) return; void el.offsetWidth; el.style.width = pct + '%';
   }
-  function bindQuit(onQuit) { bindLp(); document.getElementById('quit').onclick = () => { if (run && run.mode === 'placement' && !confirm('Leave placement? Progress on it will be lost.')) return; if ('speechSynthesis' in window) speechSynthesis.cancel(); stopRec(); closeHint(); tick(); save(); run = null; story = null; (onQuit || renderHome)(); }; }
+  function bindQuit(onQuit) { bindLp(); document.getElementById('quit').onclick = () => { if (run && run.mode === 'placement' && !confirm('Leave placement? Progress on it will be lost.')) return; hush(); stopRec(); closeHint(); tick(); save(); run = null; story = null; (onQuit || renderHome)(); }; }
 
   function renderTheme(entry) {
     const u = C.units[IDX.unitIdx[run.uid]];
@@ -599,7 +658,7 @@
       if (rec) { try { rec.stop(); } catch (e) { /* ignore */ } return; } // second tap: stop and grade what was heard
       const Ctor = Speech.ctor(window);
       if (!Ctor) return h.blocked('unavailable');
-      if ('speechSynthesis' in window) speechSynthesis.cancel();
+      hush();
       let r;
       try { r = new Ctor(); } catch (e) { return h.blocked('unavailable'); }
       rec = r; r.lang = 'es-MX'; r.interimResults = false; r.maxAlternatives = 5; r.continuous = false;
@@ -740,6 +799,7 @@
   function openStone(uid, i) {
     persist();
     const u = C.units[IDX.unitIdx[uid]];
+    if (useRecorded()) Rec.prefetch(unitAudio(u)).catch(() => {}); // v9: this unit's recordings, cached for offline
     if (i === 1) return startStory(u);
     const meta = { uid, stone: i };
     if (i === 0) return startRun(introQueue(u), 'intro', meta);
@@ -1014,7 +1074,7 @@
     bindSpeak(); bindVoiceSettings();
     document.getElementById('back').onclick = () => renderHome();
     app.querySelectorAll('.unpark').forEach(b => b.onclick = () => { unpark(b.dataset.id); renderProgress(); });
-    document.getElementById('rate').onchange = e => { S.settings.rate = +e.target.value; save(); speak('Así suena ahora.'); };
+    document.getElementById('rate').onchange = e => { S.settings.rate = +e.target.value; save(); speak(RATE_TEST); };
     document.getElementById('snd').onchange = e => { S.settings.sound = e.target.checked; save(); if (e.target.checked) FX.sounds.correct(); };
     document.getElementById('anim').onchange = e => { S.settings.anim = e.target.checked; save(); FX.applyClasses(); };
     document.getElementById('auto').onchange = e => { S.settings.autoAdvance = e.target.checked; save(); };
@@ -1033,12 +1093,19 @@
     document.getElementById('replace').onclick = () => { if (confirm('Retake placement? Learned words and path progress are kept; grammar patterns get re-rated.')) { S.placementDone = false; save(); renderHome(); } };
     document.getElementById('reset').onclick = () => { if (confirm('Erase all progress on this phone? Export first if you want a backup.')) { S = defaults(); save(); renderHome(); } };
   }
-  // v8: Spanish voice picker. "Automatic" = best installed (Angélica Enhanced/Premium first); a chosen voice is saved by voiceURI.
+  // v9: Voices = Natural (recorded, default) or Device. Device pickers (v8/v8.1) choose the Web Speech voices, which also cover
+  // anything not recorded. "Automatic" = best installed (Angélica if exposed, then Mónica, then Paulina); saved by voiceURI.
+  const REC_NAMES = { dalia: 'Dalia', jorge: 'Jorge', paloma: 'Paloma', alonso: 'Alonso', salome: 'Salomé', gonzalo: 'Gonzalo' };
   function voiceSettingsHtml() {
     const all = 'speechSynthesis' in window ? speechSynthesis.getVoices() : [];
     const vs = Voice.spanish(all), auto = Voice.best(all), auto2 = Voice.second(all, voice, '');
-    const cur = S.settings.voice || '';
-    return `<div class="set voice-set"><label for="voiceSel">Voice</label><span class="row-inline"><select id="voiceSel" data-n="${vs.length}">
+    const cur = S.settings.voice || '', rec = S.settings.voiceMode !== 'device';
+    const chars = Rec.man ? [...new Set(Object.values(Rec.man.cast || {}).flatMap(c => Object.entries(c).filter(([k]) => k).map(([, v]) => v)))].map(v => REC_NAMES[v] || v) : [];
+    return `<div class="set voice-set"><label for="voiceMode">Voices</label><span class="row-inline"><select id="voiceMode">
+      <option value="recorded" ${rec ? 'selected' : ''}>Natural voices (recorded)</option><option value="device" ${rec ? '' : 'selected'}>Device voices</option>
+      </select><button class="btn secondary slim" id="recTest" type="button">Test</button></span></div>
+      <p class="muted small" id="recInfo">${rec ? (Rec.man ? `Dalia (Mexico) reads words, drills and story narration; story characters: ${esc(chars.join(', '))}. Anything not recorded uses the device voice below. <span id="recCached"></span>` : 'Recorded audio hasn’t loaded yet (open once online); using device voices for now.') : 'Using your iPhone’s voices for everything.'}</p>
+      <div class="set voice-set"><label for="voiceSel">${rec ? 'Device voice' : 'Voice'}</label><span class="row-inline"><select id="voiceSel" data-n="${vs.length}">
       <option value="" ${cur ? '' : 'selected'}>Automatic${auto ? ' · ' + esc(auto.name) : ''}</option>
       ${vs.map(v => `<option data-v="1" value="${esc(Voice.key(v))}" ${cur === Voice.key(v) ? 'selected' : ''}>${esc(v.name)} (${esc(v.lang)})${Voice.quality(v) ? ' ★' : ''}</option>`).join('')}
       </select><button class="btn secondary slim" id="voiceTest" type="button">Test</button></span></div>
@@ -1046,13 +1113,18 @@
       <option value="" ${S.settings.voice2 ? '' : 'selected'}>Automatic${auto2 ? ' · ' + esc(auto2.name) : ''}</option>
       ${vs.filter(v => !voice || Voice.key(v) !== Voice.key(voice)).map(v => `<option value="${esc(Voice.key(v))}" ${S.settings.voice2 === Voice.key(v) ? 'selected' : ''}>${esc(v.name)} (${esc(v.lang)})${Voice.quality(v) ? ' ★' : ''}</option>`).join('')}
       </select><button class="btn secondary slim" id="voice2Test" type="button">Test</button></span></div>
-      <p class="muted small">Now using: <b id="voiceNow">${voice ? esc(voice.name + ' (' + voice.lang + ')') : 'default Spanish'}</b>${vs.length ? '' : ' · no Spanish voices listed yet'}. ${voice2 ? ` Second story voice: <b id="voice2Now">${esc(voice2.name)}</b>.` : vs.length ? ' Only one Spanish voice, so story characters differ by pitch.' : ''} On iPhone, add voices in Settings › Accessibility › Spoken Content › Voices › Spanish.</p>`;
+      <p class="muted small">Device voice now: <b id="voiceNow">${voice ? esc(voice.name + ' (' + voice.lang + ')') : 'default Spanish'}</b>${vs.length ? '' : ' · no Spanish voices listed yet'}. ${voice2 ? ` Second story voice: <b id="voice2Now">${esc(voice2.name)}</b>.` : vs.length ? ' Only one Spanish voice, so story characters differ by pitch.' : ''} On iPhone, add voices in Settings › Accessibility › Spoken Content › Voices › Spanish.</p>`;
   }
   function bindVoiceSettings() {
     const sel = document.getElementById('voiceSel'); if (!sel) return;
-    sel.onchange = () => { S.settings.voice = sel.value; save(); pickVoice(); if (Voice.key(voice2) === Voice.key(voice)) { S.settings.voice2 = ''; save(); pickVoice(); } const n = document.getElementById('voiceNow'); if (n) n.textContent = voice ? voice.name + ' (' + voice.lang + ')' : 'default Spanish'; speak('Hola, así sueno. ¿Se lo mando mañana?'); };
-    document.getElementById('voiceTest').onclick = () => speak('Hola, así sueno. ¿Se lo mando mañana?');
-    const s2 = document.getElementById('voice2Sel'), say2 = () => speak('¡Hola! Yo soy la segunda voz de las historias.', false, { voice: voice2 || voice, pitch: voice2 ? 1 : 1.1 });
+    const mode = document.getElementById('voiceMode');
+    if (mode) mode.onchange = () => { S.settings.voiceMode = mode.value === 'device' ? 'device' : 'recorded'; save(); if (useRecorded()) Rec.prefetch(offlineAudio()).catch(() => {}); renderProgress(); speak(VOICE_TEST); };
+    let recT = 0; document.getElementById('recTest').onclick = () => (recT++ % 2 && Rec.man) ? speak(VOICE2_TEST, false, { rec: Rec.man.second }) : speak(VOICE_TEST); // alternates Dalia / Jorge
+    const cached = document.getElementById('recCached');
+    if (cached && Rec.man) { const need = offlineAudio(); Rec.cachedCount().then(n => { cached.textContent = `Saved for offline: ${Math.min(n, need.length)} of ${need.length} clips for your current units.`; }).catch(() => {}); }
+    sel.onchange = () => { S.settings.voice = sel.value; save(); pickVoice(); if (Voice.key(voice2) === Voice.key(voice)) { S.settings.voice2 = ''; save(); pickVoice(); } const n = document.getElementById('voiceNow'); if (n) n.textContent = voice ? voice.name + ' (' + voice.lang + ')' : 'default Spanish'; deviceSpeak(VOICE_TEST); };
+    document.getElementById('voiceTest').onclick = () => deviceSpeak(VOICE_TEST);
+    const s2 = document.getElementById('voice2Sel'), say2 = () => deviceSpeak(VOICE2_TEST, false, { voice: voice2 || voice, pitch: voice2 ? 1 : 1.1 });
     if (s2) { s2.onchange = () => { S.settings.voice2 = s2.value; save(); pickVoice(); const n = document.getElementById('voice2Now'); if (n && voice2) n.textContent = voice2.name; say2(); };
       document.getElementById('voice2Test').onclick = say2; }
   }
@@ -1164,13 +1236,32 @@
     catch (e) { app.innerHTML = '<main class="card"><p>Could not load lessons. Open once with internet to install them.</p></main>'; return; }
     buildIndex(); Check.setKnown(Check.knownFromContent(C)); Check.setSynonyms(C.synonyms); migratePath(); applyStartParked();
     initVoices();
+    await initRecorded();
     renderHome();
+  }
+  // v9: load the recorded-audio manifest (precached with the app; don't hold the home screen more than ~2.5 s for it),
+  // unlock the audio element on the first tap (iOS), then quietly cache audio for offline use.
+  async function initRecorded() {
+    ['pointerdown', 'touchend', 'click', 'keydown'].forEach(ev => document.addEventListener(ev, Rec.unlock, { capture: true, passive: true }));
+    await Promise.race([Rec.load(), new Promise(r => setTimeout(r, 2500))]);
+    if (!Rec.man) Rec.load(); // slow network: keep trying in the background; speech falls back to device voices meanwhile
+    setTimeout(() => { if (!Rec.man) return; Rec.prune().catch(() => {}); if (useRecorded() && S.settings.audioOffline !== false) Rec.prefetch(offlineAudio()).catch(() => {}); }, 4000);
+  }
+  // clips cached in the background after launch: every unit up to two past where you are (all done units included,
+  // since reviews reuse them), plus the Settings samples. Units further ahead are cached when opened.
+  function offlineAudio() {
+    const list = IDX.section ? IDX.section.units : C.units.map(u => u.id), cur = currentPos();
+    const uids = cur ? list.slice(0, list.indexOf(cur.uid) + 3) : list;
+    const out = new Set(); uids.forEach(uid => unitAudio(C.units[IDX.unitIdx[uid]]).forEach(p => out.add(p)));
+    [VOICE_TEST, RATE_TEST].forEach(t => { const p = Rec.lookup(Rec.man, t); if (p) out.add(p); });
+    const p2 = Rec.lookup(Rec.man, VOICE2_TEST, Rec.man.second); if (p2) out.add(p2);
+    return [...out];
   }
   window.__app = { version: APP_VERSION, get state() { return S; }, get ex() { return run && run.ex; }, get entry() { return run && run.queue[run.i]; }, get run() { return run; }, get story() { return story; },
     makeExercise: e => makeExercise(e), get content() { return C; }, importBackup: (t) => importBackup(t, true), openStone: (u, i) => openStone(u, i), testQueue: u => testQueue(C.units[IDX.unitIdx[u]]), practiceQueue: u => practiceQueue(C.units[IDX.unitIdx[u]]), dueIds: () => dueIds(Date.now()), currentPos: () => currentPos(),
     introQueue: u => introQueue(C.units[IDX.unitIdx[u]]), withTiles: (w, t) => withTiles(w, t), pickStoryTile: u => pickStoryTile(C.units[IDX.unitIdx[u]].story),
     forceEx: (type, sent) => { if (!run || run.answered) return; const e = run.queue[run.i] = Object.assign({}, run.queue[run.i], { ex: type }, sent ? { sent } : {}); run.ex = makeExercise(e); renderExercise(e, run.ex); },
-    speakPaused: () => speakPaused(), speakOk: () => speakOk(), cantSpeak: () => { const b = document.getElementById('cantSpeak'); if (b) b.click(); }, get voice() { return voice; }, get voice2() { return voice2; }, storyVoice: s => { const v = storyVoice(s); return v && { voice: v.voice && v.voice.name, pitch: v.pitch }; }, pickVoice: () => pickVoice(), gloss: w => gloss(w), pickExercise: (id, rev) => pickExercise(IDX.words[id], rev), unblockSpeech: () => { speechBlocked = false; try { sessionStorage.removeItem('speech-blocked'); } catch (e) { /* ignore */ } }, get speechBlocked() { return speechBlocked; }, normalize: raw => normalize(raw),
+    speakPaused: () => speakPaused(), speakOk: () => speakOk(), cantSpeak: () => { const b = document.getElementById('cantSpeak'); if (b) b.click(); }, get voice() { return voice; }, get voice2() { return voice2; }, storyVoice: s => { const v = storyVoice(s); return v && { voice: v.voice && v.voice.name, pitch: v.pitch }; }, pickVoice: () => pickVoice(), gloss: w => gloss(w), pickExercise: (id, rev) => pickExercise(IDX.words[id], rev), unblockSpeech: () => { speechBlocked = false; try { sessionStorage.removeItem('speech-blocked'); } catch (e) { /* ignore */ } }, get speechBlocked() { return speechBlocked; }, normalize: raw => normalize(raw), speakables: () => speakables(), speak: (t, slow, spk) => speak(t, slow, spk != null ? storyVoice(spk) : null), unitAudio: u => unitAudio(C.units[IDX.unitIdx[u]]), get recorded() { return useRecorded(); }, recStory: s => storyVoice(s) && storyVoice(s).rec, offlineAudio: () => offlineAudio(),
     tick: () => tick(), listenPaused: () => listenPaused(), cantListen: () => { const b = document.getElementById('cantListen'); if (b) b.click(); }, todayMinutes: () => Daily.minutesOn(S.daily, todayKey()), streakNow: () => Daily.current(S.streak, todayKey()) };
   boot();
 })();

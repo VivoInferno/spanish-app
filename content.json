@@ -7968,5 +7968,34 @@
    "wordOnly": true,
    "note": "Correct in Argentina! In Mexico a tire is una llanta."
   }
- ]
+ ],
+ "speakers": {
+  "Ejecutiva": "f",
+  "Laura": "f",
+  "Sr. Gómez": "m",
+  "Andrés": "m",
+  "Plomero": "m",
+  "Jefe": "m",
+  "Mariana": "f",
+  "Rodrigo": "m",
+  "Agente": "f",
+  "Itzel": "f",
+  "Doctor": "m",
+  "Elena": "f",
+  "Marco": "m",
+  "Doña Lupe": "f",
+  "Sofía": "f",
+  "Ejecutivo": "m",
+  "Don Ramón": "m",
+  "Sra. Pérez": "f",
+  "Carlos": "m",
+  "Paola": "f",
+  "Daniel": "m",
+  "Mecánico": "m",
+  "Sr. Ortega": "m",
+  "Javier": "m",
+  "Mark": "m",
+  "Don Rafa": "m",
+  "Doña Chela": "f"
+ }
 }

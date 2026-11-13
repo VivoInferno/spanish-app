@@ -1,9 +1,11 @@
 // Update-friendly offline strategy for iOS Home Screen apps:
 //  - app shell (html/js/css/json): network-first (revalidated, bypassing the HTTP cache), cache fallback when offline/slow
 //  - icons: cache-first
+//  - v9 recorded audio (audio/*.mp3, content-hashed names): cache-first in a separate 'espanol-audio' cache that survives
+//    app updates; the page fills it per unit (audio.js Rec.prefetch). audio/manifest.json is part of the app shell.
 //  - new versions activate immediately (skipWaiting + clients.claim); the page reloads once on controllerchange
-const CACHE = 'espanol-v8-1';
-const ASSETS = ['./', 'index.html', 'styles.css', 'app.js', 'srs.js', 'check.js', 'fx.js', 'daily.js', 'listen.js', 'speech.js', 'voice.js', 'content.json', 'manifest.json',
+const CACHE = 'espanol-v9', AUDIO_CACHE = 'espanol-audio';
+const ASSETS = ['./', 'index.html', 'styles.css', 'app.js', 'srs.js', 'check.js', 'fx.js', 'daily.js', 'listen.js', 'speech.js', 'voice.js', 'audio.js', 'audio/manifest.json', 'content.json', 'manifest.json',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 const NET_TIMEOUT = 3500;
 
@@ -14,7 +16,7 @@ self.addEventListener('install', e => {
   ))).then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE && k !== AUDIO_CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
 });
 self.addEventListener('message', e => { if (e.data === 'version' && e.source) e.source.postMessage({ version: CACHE }); });
 
@@ -40,9 +42,15 @@ async function cacheFirst(req) {
   if (cached) return cached;
   const res = await fetch(req); if (res.ok) cache.put(req, res.clone()); return res;
 }
+async function audioFirst(req) {
+  const cache = await caches.open(AUDIO_CACHE), key = cacheKey(req), cached = await cache.match(key);
+  if (cached) return cached;
+  const res = await fetch(new Request(req.url)); // full file (no Range): the page plays blob: URLs, so a 200 is all it needs
+  if (res.ok) cache.put(key, res.clone()); return res;
+}
 self.addEventListener('fetch', e => {
   const req = e.request; const url = new URL(req.url);
   if (req.method !== 'GET' || url.origin !== location.origin) return;
   if (url.pathname.endsWith('/sw.js')) return;
-  e.respondWith(/\/icons\//.test(url.pathname) ? cacheFirst(req) : networkFirst(req));
+  e.respondWith(/\/audio\/[0-9a-f]+\.mp3$/.test(url.pathname) ? audioFirst(req) : /\/icons\//.test(url.pathname) ? cacheFirst(req) : networkFirst(req));
 });

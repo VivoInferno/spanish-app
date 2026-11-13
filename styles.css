@@ -206,6 +206,7 @@ html,body,button,a,input,textarea,.tile,.opt,.btn{touch-action:manipulation}
 .flip-en{font-size:26px;font-weight:600}.flip-es{font-size:26px;font-weight:700;color:var(--accent)}
 .alt-note{margin:6px 0 0;font-size:15px;color:var(--fg);background:var(--accent-soft);border-radius:10px;padding:8px 10px}
 .voice-set select{max-width:210px;font-size:15px;padding:6px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--fg)}
+#voiceMode{max-width:240px}
 /* WebKit can flatten 3D inside animated cards, so faces are also swapped with visibility halfway through the turn */
 .face.back{visibility:hidden;transition:visibility 0s .22s}
 .flip.flipped .face.back{visibility:visible}

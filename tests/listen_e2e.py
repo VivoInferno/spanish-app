@@ -4,6 +4,7 @@ early re-enable from the 🔇 indicator, test stays 12 + 3."""
 import asyncio, json, sys, os, re
 from datetime import datetime, timezone, timedelta
 from playwright.async_api import async_playwright
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); import wkshim  # box WebKit can't decode MP3
 URL = sys.argv[1] if len(sys.argv) > 1 else 'http://127.0.0.1:8787/'
 ENGINE = sys.argv[2] if len(sys.argv) > 2 else 'chromium'
 OUT = '/workspace/spanish-app/screens'; os.makedirs(OUT, exist_ok=True)
@@ -53,12 +54,13 @@ async def main():
         raw = {k: v for k, v in V5.items() if k not in ('exportedAt', 'app', 'appVersion')}
         await ctx.add_init_script(f"if (!localStorage.getItem('{KEY}')) localStorage.setItem('{KEY}', {json.dumps(json.dumps(raw))})")
         # count speech calls (auto-play vs taps)
+        await ctx.route('**/audio/manifest.json', lambda r: r.fulfill(status=200, content_type='application/json', body='{}'))  # device voices (v9 has its own test)
         await ctx.add_init_script("window.__spoken = []; if (window.speechSynthesis) { const o = speechSynthesis.speak.bind(speechSynthesis); speechSynthesis.speak = u => { window.__spoken.push(u.text); try { o(u) } catch (e) {} }; }")
         page = await ctx.new_page(); errors = []
         page.on('pageerror', lambda e: errors.append(str(e)))
         await page.clock.install(time=T0); await page.clock.pause_at(T0)
         await page.goto(URL); await page.wait_for_selector('.stone')
-        check(await page.evaluate("__app.version") == 'v8.1', 'app version is v8.1')
+        check(await page.evaluate("__app.version") == 'v9', 'app version is v9')
         s = await page.evaluate("__app.state")
         check(s['listenPauseUntil'] == 0 and s['items'] == raw['items'] and s['streak'] == raw['streak'] and s['daily'] == raw['daily'] and s['schema'] == 5 and s['speakPauseUntil'] == 0, 'v6 data loads losslessly, listening on by default')
         flags = await page.evaluate("['es2en','en2es','cloze','listen','listenS','build'].map(t => [t, !!__app.makeExercise({id: 'w:fuga', ex: t}).audio])")

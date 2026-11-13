@@ -1,6 +1,7 @@
-"""Simulates a deploy while the app is open: v8.1 running -> server gets v9 -> app returns to foreground -> auto reload into v9, progress intact."""
+"""Simulates a deploy while the app is open: v9 running -> server gets v10 -> app returns to foreground -> auto reload into v10, progress intact."""
 import asyncio, shutil, subprocess, sys, time, re, os
 from playwright.async_api import async_playwright
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); import wkshim  # box WebKit can't decode MP3
 SRC = '/workspace/spanish-app'; TMP = '/tmp/spanish-upd'; PORT = 8788
 def setv(n):
     for f, pat, rep in [('sw.js', r"CACHE = 'espanol-v[\d-]+'", f"CACHE = 'espanol-v{n}'"), ('app.js', r"APP_VERSION = 'v[\d.]+'", f"APP_VERSION = 'v{n}'")]:
@@ -22,7 +23,7 @@ async def run(engine):
             await page.evaluate("(() => { const s = __app.state; s.placementDone = true; s.items['w:fuga'] = {s: 50, d: 3, reps: 4, lapses: 0, last: Date.now(), due: Date.now() + 40*864e5}; localStorage.setItem('spanish-app-state-v1', JSON.stringify(s)); })()")
             await page.reload(); await page.wait_for_selector('.stone')
             v_before = await page.evaluate("__app.version"); label = await page.inner_text('.version')
-            setv(9)  # "deploy" (v8 -> v9)
+            setv(10)  # "deploy" (v9 -> v10)
             async with page.expect_navigation(timeout=15000):
                 await page.evaluate("Object.defineProperty(document, 'visibilityState', {configurable: true, get: () => 'visible'}); document.dispatchEvent(new Event('visibilitychange'));")
             await page.wait_for_selector('.stone')

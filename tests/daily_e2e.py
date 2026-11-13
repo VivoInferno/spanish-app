@@ -4,6 +4,7 @@ pause after 60 s without input and while the app is hidden; local-midnight rollo
 import asyncio, json, sys, os, re
 from datetime import datetime, timezone, timedelta
 from playwright.async_api import async_playwright
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); import wkshim  # box WebKit can't decode MP3
 URL = sys.argv[1] if len(sys.argv) > 1 else 'http://127.0.0.1:8787/'
 ENGINE = sys.argv[2] if len(sys.argv) > 2 else 'chromium'
 OUT = '/workspace/spanish-app/screens'; os.makedirs(OUT, exist_ok=True)
@@ -60,7 +61,7 @@ async def main():
         page.on('console', lambda m: errors.append(m.text) if m.type == 'error' else None)
         await page.clock.install(time=at(2026, 11, 11, 9)); await page.clock.pause_at(at(2026, 11, 11, 9))
         await page.goto(URL); await page.wait_for_selector('#daybar')
-        check(await page.evaluate("__app.version") == 'v8.1', 'app version is v8.1')
+        check(await page.evaluate("__app.version") == 'v9', 'app version is v9')
         # --- migration from v4 progress
         s = await page.evaluate("__app.state"); stored = await page.evaluate(f"JSON.parse(localStorage.getItem('{KEY}'))")
         diff = [k for k, v in raw.items() if k not in ('schema', 'settings', 'path') and s.get(k) != v]

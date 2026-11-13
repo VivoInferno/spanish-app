@@ -6,6 +6,7 @@
 - a fast double tap on Check / Continue only moves one step (guard forced on with window.__forceTapGuard)"""
 import asyncio, json, sys, os, re
 from playwright.async_api import async_playwright
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); import wkshim  # box WebKit can't decode MP3
 URL = sys.argv[1] if len(sys.argv) > 1 else 'http://127.0.0.1:8787/'
 ENGINE = sys.argv[2] if len(sys.argv) > 2 else 'chromium'
 OUT = '/workspace/spanish-app/screens'; os.makedirs(OUT, exist_ok=True)
@@ -37,7 +38,7 @@ async def main():
         page = await ctx.new_page(); errors = []
         page.on('pageerror', lambda e: errors.append(str(e)))
         await page.goto(URL); await page.wait_for_selector('.stone')
-        check(await page.evaluate("__app.version") == 'v8.1', 'app version is v8.1')
+        check(await page.evaluate("__app.version") == 'v9', 'app version is v9')
 
         # ---- zoom off ----
         vp = await page.evaluate("document.querySelector('meta[name=viewport]').content")

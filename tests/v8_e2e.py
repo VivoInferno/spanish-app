@@ -4,6 +4,7 @@ flip cards (check + flip = miss), synonym credit with Mexican-usage notes, voice
 lossless migration from v4 / v5 / v7 exports, test still 12 + 3. Screenshots: screens/v8-*.png (WebKit iPhone 15)."""
 import asyncio, json, sys, os, re
 from playwright.async_api import async_playwright
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); import wkshim  # box WebKit can't decode MP3
 URL = sys.argv[1] if len(sys.argv) > 1 else 'http://127.0.0.1:8787/'
 ENGINE = sys.argv[2] if len(sys.argv) > 2 else 'chromium'
 OUT = '/workspace/spanish-app/screens'; os.makedirs(OUT, exist_ok=True)
@@ -43,10 +44,12 @@ if (window.speechSynthesis) {
 }
 """
 
-async def new_ctx(b, p, fixture=None, sr=True):
+async def new_ctx(b, p, fixture=None, sr=True, device=True):
     dev = dict(p.devices['iPhone 15']) if ENGINE == 'webkit' else dict(viewport={'width': 390, 'height': 844}, device_scale_factor=3, is_mobile=True, has_touch=True)
     ctx = await b.new_context(**dev, timezone_id='America/Mexico_City', service_workers='block')
     await ctx.add_init_script(MOCK_SR if sr else NO_SR); await ctx.add_init_script(MOCK_TTS)
+    if device:  # v8/v8.1 device-voice checks: hide the v9 recorded-audio manifest so speech goes through Web Speech
+        await ctx.route('**/audio/manifest.json', lambda r: r.fulfill(status=200, content_type='application/json', body='{}'))
     if fixture is not None:
         await ctx.add_init_script(f"if (!localStorage.getItem('{KEY}')) localStorage.setItem('{KEY}', {json.dumps(json.dumps(fixture))})")
     return ctx
@@ -80,7 +83,7 @@ async def main():
         V7 = strip_meta(json.load(open(FIX + 'v7-export.json')))
         ctx = await new_ctx(b, p, V7); page = await ctx.new_page(); page.on('pageerror', lambda e: errors.append(str(e)))
         await page.goto(URL); await page.wait_for_selector('.stone')
-        check(await page.evaluate("__app.version") == 'v8.1', 'app version is v8.1')
+        check(await page.evaluate("__app.version") == 'v9', 'app version is v9')
         await page.wait_for_timeout(700)
 
         # ---- voice choice ----
