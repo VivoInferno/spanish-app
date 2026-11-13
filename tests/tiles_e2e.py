@@ -38,7 +38,7 @@ async def main():
         page = await ctx.new_page(); errors = []
         page.on('pageerror', lambda e: errors.append(str(e)))
         await page.goto(URL); await page.wait_for_selector('.stone')
-        check(await page.evaluate("__app.version") == 'v9', 'app version is v9')
+        check(await page.evaluate("__app.version") == 'v9.1', 'app version is v9.1')
 
         # ---- zoom off ----
         vp = await page.evaluate("document.querySelector('meta[name=viewport]').content")

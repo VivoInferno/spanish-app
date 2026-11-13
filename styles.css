@@ -159,6 +159,7 @@ main.card.fx-dim{animation:fx-dim .35s ease-out}
 /* v7: no double-tap zoom */
 html,body,button,a,input,textarea,.tile,.opt,.btn{touch-action:manipulation}
 .stile{scroll-margin-bottom:120px}
+#ssay{scroll-margin-bottom:120px} /* v9.1: keep the mic, Can't speak now and the answer clear of the sticky footer */
 .sline.veil .ses span,.sline.veil .sen{filter:blur(6px);-webkit-user-select:none;user-select:none;pointer-events:none}
 /* ---------- v8 ---------- */
 :root{--new:#7c3aed;--newbg:#f3e8ff;--accent-soft:#ccfbf1;--slot:#e9e9e4}

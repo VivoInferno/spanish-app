@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const APP_VERSION = 'v9'; // keep in sync with CACHE in sw.js (espanol-v9)
+  const APP_VERSION = 'v9.1'; // keep in sync with CACHE in sw.js (espanol-v9-1)
   const KEY = 'spanish-app-state-v1'; // unchanged since v1 — never rename
   const DAY = SRS.DAY;
   const STONES = [
@@ -249,9 +249,11 @@
   function lpHtml() { // pills for both pauses: 🔇 listening, 🤐 speaking (v8). Tap a pill to turn that one back on early.
     const m = S ? Listen.minutesLeft(S.listenPauseUntil, Date.now()) : 0, k = S ? Listen.minutesLeft(S.speakPauseUntil, Date.now()) : 0;
     return (m ? `<button class="lp-ind" id="lpInd" type="button" title="Listening paused. Tap to turn it back on." aria-label="Listening paused, ${m} minutes left. Tap to turn listening back on.">🔇 <span id="lpMin">${m}</span> min</button>` : '')
-      + (k ? `<button class="lp-ind sp-ind" id="spInd" type="button" title="Speaking paused. Tap to turn it back on." aria-label="Speaking paused, ${k} minutes left. Tap to turn speaking back on.">🤐 <span id="spMin">${k}</span> min</button>` : '');
+      + (k ? `<button class="lp-ind sp-ind" id="spInd" type="button" title="Speaking paused. Tap to turn it back on." aria-label="Speaking paused, ${k} minutes left. Tap to turn speaking back on.">🤐 <span id="spMin">${k}</span> min</button>` : '')
+      // v9.1: speaking drills switched off for this session (mic failed / timed out twice, or permission refused): same pill, tap to retry
+      + (!k && speechBlocked && Speech.available(window) ? '<button class="lp-ind sp-ind" id="spOff" type="button" title="Speaking drills are off for now. Tap to turn them back on." aria-label="Speaking drills off. Tap to turn speaking back on.">🤐 off</button>' : '');
   }
-  function bindLp() { const b = document.getElementById('lpInd'); if (b) b.onclick = resumeListening; const c = document.getElementById('spInd'); if (c) c.onclick = resumeSpeaking; }
+  function bindLp() { const b = document.getElementById('lpInd'); if (b) b.onclick = resumeListening; const c = document.getElementById('spInd'); if (c) c.onclick = resumeSpeaking; const d = document.getElementById('spOff'); if (d) d.onclick = resumeSpeaking; }
   function updateLp() { // called every second: refresh minutes left, drop an indicator when its pause expires
     [['lpInd', 'lpMin', 'listenPauseUntil'], ['spInd', 'spMin', 'speakPauseUntil']].forEach(([bid, mid, f]) => {
       const b = document.getElementById(bid); if (!b) return;
@@ -274,6 +276,8 @@
   try { speechBlocked = sessionStorage.getItem('speech-blocked') === '1'; } catch (e) { /* ignore */ }
   const speakOk = () => !speechBlocked && !speakPaused() && Speech.available(window);
   function blockSpeech() { speechBlocked = true; try { sessionStorage.setItem('speech-blocked', '1'); } catch (e) { /* ignore */ } }
+  function unblockSpeech() { speechBlocked = false; micFails = 0; try { sessionStorage.removeItem('speech-blocked'); } catch (e) { /* ignore */ } }
+  let micFails = 0; // v9.1: recogniser hung / timed out / threw this session; 2 → speaking drills off for the session
   function cantSpeak(entry, btn) {
     if (!run || run.answered) return;
     stopRec();
@@ -282,8 +286,8 @@
     setTimeout(() => { if (!run || run.queue[run.i] !== entry) return; run.ex = makeExercise(entry); run.answered = false; renderExercise(entry, run.ex); toast('Speaking off for 10 minutes'); }, 180);
   }
   function resumeSpeaking() {
-    S.speakPauseUntil = 0; save();
-    const b = document.getElementById('spInd'); if (b) b.remove();
+    S.speakPauseUntil = 0; save(); unblockSpeech();
+    ['spInd', 'spOff'].forEach(id => { const b = document.getElementById(id); if (b) b.remove(); });
     toast('Speaking is back on');
   }
   function resumeListening() {
@@ -648,39 +652,82 @@
   function flipCard(on) { const c = document.getElementById('flipCard'); if (c) c.classList.toggle('flipped', on); }
 
   // ---------- v8 repeat-after-me: microphone + SpeechRecognition (es-MX) ----------
-  let rec = null;
-  function stopRec() { if (rec) { const r = rec; rec = null; try { r.onresult = r.onerror = r.onend = null; r.abort(); } catch (e) { /* ignore */ } } document.querySelectorAll('.mic.on').forEach(b => b.classList.remove('on')); }
+  // v9.1 hardening (iOS Home Screen apps): webkitSpeechRecognition there can hang without ever firing onresult/onend/onerror,
+  // start() can throw, and starting it while the v9 <audio> element or speechSynthesis still holds the audio session can stall.
+  // So: release all audio first, try/catch start(), a watchdog (8 s with no result, 12 s hard cap, 1.5 s after a stop tap),
+  // every handler ignores a stale recogniser, and the UI always comes back. Skip / Can't speak now are never disabled or covered.
+  // Two hangs/failures in a session switch speaking drills off for the session (toast + 🤐 pill to turn them back on).
+  const MIC_IDLE = 8000, MIC_CAP = 12000, MIC_STOP = 1500;
+  const micTimes = () => window.__micTimes || [MIC_IDLE, MIC_CAP, MIC_STOP]; // tests may shorten these
+  let rec = null, recT = [];
+  const clearRecTimers = () => { recT.forEach(clearTimeout); recT = []; };
+  function stopRec() {
+    clearRecTimers();
+    if (rec) { const r = rec; rec = null; r.onresult = r.onerror = r.onend = r.onnomatch = r.onspeechend = r.onaudiostart = null; try { r.abort(); } catch (e) { /* ignore */ } }
+    document.querySelectorAll('.mic.on').forEach(b => { b.classList.remove('on'); b.setAttribute('aria-pressed', 'false'); const l = b.querySelector('.mic-label'); if (l) l.textContent = 'Tap to speak'; });
+  }
+  function releaseAudio() { // free the audio session before the mic takes it (pause + drop the clip, cancel device speech)
+    if (Rec.release) Rec.release(); else if (Rec.stop) Rec.stop();
+    if ('speechSynthesis' in window) try { speechSynthesis.cancel(); } catch (e) { /* ignore */ }
+  }
   function mountMic(target, h) {
     const mic = document.getElementById('mic'), heard = document.getElementById('heard');
-    const setState = (on, msg) => { mic.classList.toggle('on', on); mic.querySelector('.mic-label').textContent = on ? 'Listening…' : 'Tap to speak'; if (msg != null) heard.innerHTML = msg; };
+    const setState = (on, msg) => { mic.classList.toggle('on', on); mic.setAttribute('aria-pressed', on ? 'true' : 'false'); mic.querySelector('.mic-label').textContent = on ? 'Listening… tap to stop' : 'Tap to speak'; if (msg != null) heard.innerHTML = msg; };
+    const AGAIN = 'I didn’t hear anything. Tap the mic and try again.';
+    // the recogniser hung, timed out or threw: recover the card; the second time this session, turn speaking drills off
+    const failed = (r, why) => {
+      if (r && rec !== r) return; stopRec(); micFails++;
+      if (micFails >= 2) { toast('Mic isn’t responding, so speaking drills are off for now'); return h.blocked(why || 'timeout'); }
+      setState(false, 'The mic didn’t respond. Tap it to try again, or use Skip.');
+    };
     mic.onclick = () => {
       if (h.locked()) return;
-      if (rec) { try { rec.stop(); } catch (e) { /* ignore */ } return; } // second tap: stop and grade what was heard
+      if (rec) { // tap to stop: grade what was heard; if iOS never answers the stop, give the card back anyway
+        const r = rec; try { r.stop(); } catch (e) { return failed(r, 'stop-failed'); }
+        mic.querySelector('.mic-label').textContent = 'Checking…';
+        recT.push(setTimeout(() => { if (rec === r) { stopRec(); setState(false, AGAIN); } }, micTimes()[2]));
+        return;
+      }
       const Ctor = Speech.ctor(window);
       if (!Ctor) return h.blocked('unavailable');
-      hush();
+      releaseAudio();
       let r;
       try { r = new Ctor(); } catch (e) { return h.blocked('unavailable'); }
-      rec = r; r.lang = 'es-MX'; r.interimResults = false; r.maxAlternatives = 5; r.continuous = false;
+      rec = r;
+      try { r.lang = 'es-MX'; r.interimResults = false; r.maxAlternatives = 5; r.continuous = false; } catch (e) { /* optional on some engines */ }
       let got = false;
+      const live = () => rec === r;
       r.onresult = e => {
-        got = true; const res = e.results[e.results.length - 1]; const alts = [];
-        for (let k = 0; k < res.length; k++) alts.push(res[k].transcript);
-        rec = null; setState(false);
+        if (!live()) return;
+        let alts = [];
+        try { const res = e.results[e.results.length - 1]; if (res && res.isFinal === false) return; for (let k = 0; k < res.length; k++) alts.push(res[k].transcript); } catch (err) { alts = []; }
+        got = true; stopRec(); setState(false); micFails = 0;
         const g = Speech.grade(alts, target);
         if (g.result !== 'wrong') return h.done(g);
+        if (!alts.length) return setState(false, AGAIN);
         if (h.retry(g)) { setState(false, `Heard: “${esc(g.heard)}”. <b>Try again.</b>`); FX.miss([mic]); return; }
         h.done(g);
       };
+      r.onnomatch = () => { if (!live()) return; stopRec(); setState(false, 'I couldn’t make that out. Tap the mic and try again.'); };
       r.onerror = e => {
-        rec = null; setState(false);
-        if (Speech.isBlocking(e.error)) return h.blocked(e.error);
-        setState(false, e.error === 'no-speech' ? 'I didn’t hear anything. Tap the mic and try again.' : '');
+        if (!live()) return;
+        const err = e && e.error; stopRec(); setState(false);
+        if (Speech.isBlocking(err)) { toast(err === 'not-allowed' || err === 'service-not-allowed' ? 'Mic not allowed, so speaking drills are off for now' : 'Mic unavailable, so speaking drills are off for now'); return h.blocked(err); }
+        if (err === 'aborted') return setState(false, '');
+        setState(false, err === 'no-speech' ? AGAIN : 'Something went wrong with the mic. Tap it to try again, or use Skip.');
       };
-      r.onend = () => { if (rec === r) { rec = null; setState(false, got ? null : 'I didn’t hear anything. Tap the mic and try again.'); } };
-      try { r.start(); setState(true, ''); } catch (e) { rec = null; h.blocked('start-failed'); }
+      r.onend = () => { if (!live()) return; stopRec(); setState(false, got ? null : AGAIN); };
+      try { r.start(); } catch (e) { rec = null; return failed(null, 'start-failed'); }
+      setState(true, '');
+      // watchdog: nothing within 8 s (no result / end / error) or 12 s in total → abort and give the card back
+      let last = performance.now();
+      ['onaudiostart', 'onsoundstart', 'onspeechstart'].forEach(k => { try { r[k] = () => { last = performance.now(); }; } catch (e) { /* ignore */ } });
+      const [tIdle, tCap] = micTimes();
+      const idle = () => { if (!live()) return; if (performance.now() - last >= tIdle - 50) return failed(r, 'timeout'); recT.push(setTimeout(idle, tIdle - (performance.now() - last))); };
+      recT.push(setTimeout(idle, tIdle), setTimeout(() => failed(r, 'timeout'), tCap));
     };
   }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && rec) stopRec(); });
 
   function answer(entry, ex, result, given) {
     run.answered = true; lastStep = performance.now();
@@ -1261,7 +1308,7 @@
     makeExercise: e => makeExercise(e), get content() { return C; }, importBackup: (t) => importBackup(t, true), openStone: (u, i) => openStone(u, i), testQueue: u => testQueue(C.units[IDX.unitIdx[u]]), practiceQueue: u => practiceQueue(C.units[IDX.unitIdx[u]]), dueIds: () => dueIds(Date.now()), currentPos: () => currentPos(),
     introQueue: u => introQueue(C.units[IDX.unitIdx[u]]), withTiles: (w, t) => withTiles(w, t), pickStoryTile: u => pickStoryTile(C.units[IDX.unitIdx[u]].story),
     forceEx: (type, sent) => { if (!run || run.answered) return; const e = run.queue[run.i] = Object.assign({}, run.queue[run.i], { ex: type }, sent ? { sent } : {}); run.ex = makeExercise(e); renderExercise(e, run.ex); },
-    speakPaused: () => speakPaused(), speakOk: () => speakOk(), cantSpeak: () => { const b = document.getElementById('cantSpeak'); if (b) b.click(); }, get voice() { return voice; }, get voice2() { return voice2; }, storyVoice: s => { const v = storyVoice(s); return v && { voice: v.voice && v.voice.name, pitch: v.pitch }; }, pickVoice: () => pickVoice(), gloss: w => gloss(w), pickExercise: (id, rev) => pickExercise(IDX.words[id], rev), unblockSpeech: () => { speechBlocked = false; try { sessionStorage.removeItem('speech-blocked'); } catch (e) { /* ignore */ } }, get speechBlocked() { return speechBlocked; }, normalize: raw => normalize(raw), speakables: () => speakables(), speak: (t, slow, spk) => speak(t, slow, spk != null ? storyVoice(spk) : null), unitAudio: u => unitAudio(C.units[IDX.unitIdx[u]]), get recorded() { return useRecorded(); }, recStory: s => storyVoice(s) && storyVoice(s).rec, offlineAudio: () => offlineAudio(),
+    speakPaused: () => speakPaused(), speakOk: () => speakOk(), cantSpeak: () => { const b = document.getElementById('cantSpeak'); if (b) b.click(); }, get voice() { return voice; }, get voice2() { return voice2; }, storyVoice: s => { const v = storyVoice(s); return v && { voice: v.voice && v.voice.name, pitch: v.pitch }; }, pickVoice: () => pickVoice(), gloss: w => gloss(w), pickExercise: (id, rev) => pickExercise(IDX.words[id], rev), unblockSpeech: () => unblockSpeech(), get micFails() { return micFails; }, get recActive() { return !!rec; }, get speechBlocked() { return speechBlocked; }, normalize: raw => normalize(raw), speakables: () => speakables(), speak: (t, slow, spk) => speak(t, slow, spk != null ? storyVoice(spk) : null), unitAudio: u => unitAudio(C.units[IDX.unitIdx[u]]), get recorded() { return useRecorded(); }, recStory: s => storyVoice(s) && storyVoice(s).rec, offlineAudio: () => offlineAudio(),
     tick: () => tick(), listenPaused: () => listenPaused(), cantListen: () => { const b = document.getElementById('cantListen'); if (b) b.click(); }, todayMinutes: () => Daily.minutesOn(S.daily, todayKey()), streakNow: () => Daily.current(S.streak, todayKey()) };
   boot();
 })();

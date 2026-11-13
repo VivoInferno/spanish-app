@@ -60,7 +60,7 @@ async def main():
         page.on('pageerror', lambda e: errors.append(str(e)))
         await page.clock.install(time=T0); await page.clock.pause_at(T0)
         await page.goto(URL); await page.wait_for_selector('.stone')
-        check(await page.evaluate("__app.version") == 'v9', 'app version is v9')
+        check(await page.evaluate("__app.version") == 'v9.1', 'app version is v9.1')
         s = await page.evaluate("__app.state")
         check(s['listenPauseUntil'] == 0 and s['items'] == raw['items'] and s['streak'] == raw['streak'] and s['daily'] == raw['daily'] and s['schema'] == 5 and s['speakPauseUntil'] == 0, 'v6 data loads losslessly, listening on by default')
         flags = await page.evaluate("['es2en','en2es','cloze','listen','listenS','build'].map(t => [t, !!__app.makeExercise({id: 'w:fuga', ex: t}).audio])")

@@ -83,7 +83,7 @@ async def main():
         V7 = strip_meta(json.load(open(FIX + 'v7-export.json')))
         ctx = await new_ctx(b, p, V7); page = await ctx.new_page(); page.on('pageerror', lambda e: errors.append(str(e)))
         await page.goto(URL); await page.wait_for_selector('.stone')
-        check(await page.evaluate("__app.version") == 'v9', 'app version is v9')
+        check(await page.evaluate("__app.version") == 'v9.1', 'app version is v9.1')
         await page.wait_for_timeout(700)
 
         # ---- voice choice ----
@@ -207,7 +207,7 @@ async def main():
         wb = SPK[2]; await fresh_entry(page, wb, 'speak'); await page.wait_for_selector('#mic'); prev = await page.evaluate(f"__app.state.items['w:{wb}'] || null")
         await page.evaluate("__sr.error = 'not-allowed'; __sr.say = null"); await page.click('#mic'); await page.wait_for_timeout(400)
         k = await page.evaluate(f"[__app.ex.kind, __app.run.answered, __app.speechBlocked, __app.state.items['w:{wb}'] || null]")
-        check(k[0] != 'speak' and not k[1] and k[2] and k[3] == prev and await page.query_selector('.toast.show') is None, f'mic permission denied: drill silently replaced, nothing graded ({k[:3]})')
+        check(k[0] != 'speak' and not k[1] and k[2] and k[3] == prev, f'mic permission denied: drill replaced (v9.1: with a short toast + 🤐 pill), nothing graded ({k[:3]})')
         kinds = await page.evaluate(f"Array.from({{length: 40}}, () => __app.makeExercise({{ id: 'w:{wb}', ex: 'speak' }}).kind)")
         check('speak' not in kinds, 'no more speaking drills this session after a denial')
         await page.evaluate("__app.unblockSpeech(); __sr.error = null")

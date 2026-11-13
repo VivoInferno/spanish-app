@@ -45,6 +45,8 @@
       const p = a.play(); return p && p.then ? p.then(() => { a.playbackRate = rate || 1; return true; }) : true;
     });
   };
+  // v9.1: hand the audio session back before the microphone starts (iOS): stop, drop the clip and reset the element
+  Rec.release = () => { seq++; if (!el) return; try { el.pause(); el.removeAttribute('src'); el.load(); } catch (e) { /* ignore */ } };
   Rec.playing = () => !!(el && !el.paused && !el.ended);
   // fill the offline audio cache with the given files (only missing ones), a few at a time
   Rec.prefetch = async (paths, onProgress) => {
