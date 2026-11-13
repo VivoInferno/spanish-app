@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const APP_VERSION = 'v7'; // keep in sync with CACHE in sw.js (espanol-v7)
+  const APP_VERSION = 'v8'; // keep in sync with CACHE in sw.js (espanol-v8)
   const KEY = 'spanish-app-state-v1'; // unchanged since v1 — never rename
   const DAY = SRS.DAY;
   const STONES = [
@@ -14,9 +14,9 @@
   let C, S, IDX;
 
   // ---------- state + migration ----------
-  const defaults = () => ({ v: 1, schema: 4, placementDone: false, created: Date.now(), items: {}, pstats: {}, recent: {},
-    settings: { newPerSession: 5, rate: 0.9, autoAdvance: false, sound: true, anim: true, goalMin: Daily.GOAL_MIN }, sessions: 0,
-    path: { done: {}, tests: {}, testedOut: {} }, parked: {}, daily: {}, streak: Daily.seed(), parkedDefaults: {}, listenPauseUntil: 0 });
+  const defaults = () => ({ v: 1, schema: 5, placementDone: false, created: Date.now(), items: {}, pstats: {}, recent: {},
+    settings: { newPerSession: 5, rate: 0.9, autoAdvance: false, sound: true, anim: true, goalMin: Daily.GOAL_MIN, voice: '' }, sessions: 0,
+    path: { done: {}, tests: {}, testedOut: {} }, parked: {}, daily: {}, streak: Daily.seed(), parkedDefaults: {}, listenPauseUntil: 0, speakPauseUntil: 0 });
   function load() {
     let raw = null;
     try { raw = JSON.parse(localStorage.getItem(KEY)); } catch (e) { /* fresh */ }
@@ -40,7 +40,11 @@
     s.parkedDefaults = raw.parkedDefaults && typeof raw.parkedDefaults === 'object' ? raw.parkedDefaults : {};
     // v7: listenPauseUntil (ms timestamp, 0 = listening on) is an optional new field; older data simply gets 0. Schema stays 4.
     s.listenPauseUntil = +raw.listenPauseUntil || 0;
-    s.schema = 4;
+    // v8 (schema 5): speakPauseUntil ("Can't speak now", 0 = on) and settings.voice ('' = automatic best Spanish voice).
+    // Both are optional additions; items, path, daily, streak, parked and every other field pass through untouched.
+    s.speakPauseUntil = +raw.speakPauseUntil || 0;
+    if (typeof s.settings.voice !== 'string') s.settings.voice = '';
+    s.schema = 5;
     return s;
   }
   function applyStartParked() { // syllabus words parked by default (e.g. poesía); only words not yet studied, and only once each
@@ -98,15 +102,61 @@
     });
     C.units.forEach(u => u.sentences.forEach(s => { const k = strip(s.f); if (!k.includes(' ')) IDX.forms[k] = IDX.forms[k] || s.k; }));
     IDX.section = C.sections.find(s => s.units) || null;
+    IDX.glossFold = {}; Object.entries(C.glosses || {}).forEach(([k, v]) => { IDX.glossFold[strip(k)] = IDX.glossFold[strip(k)] || v; });
+    IDX.sectionWords = (IDX.section ? IDX.section.units : C.units.map(u => u.id)).flatMap(uid => C.units[IDX.unitIdx[uid]].words.map(w => w.id));
   }
-  // wrap Spanish text so each tracked vocabulary word can be long-pressed
+  // wrap Spanish text: every word can be tapped for a hint (v8); tracked vocabulary words can also be long-pressed to park them.
+  // Words new to the learner in this lesson get the "new" highlight.
   function tokenize(text) {
+    let inParen = false;
     return text.split(/(\s+)/).map(tok => {
       if (/^\s+$/.test(tok)) return tok;
-      const core = tok.replace(/^[¿¡“"(«]+|[.,;:!?”"»)…]+$/g, '');
-      const id = IDX.forms[strip(core)];
-      return id ? esc(tok.slice(0, tok.indexOf(core))) + `<span class="tok w" data-w="${id}">${esc(core)}</span>` + esc(tok.slice(tok.indexOf(core) + core.length)) : esc(tok);
+      const wasParen = inParen || tok.startsWith('('); if (tok.startsWith('(')) inParen = true; if (tok.includes(')')) inParen = false;
+      const core = tok.replace(/^[¿¡“"(«—]+|[.,;:!?”"»)…—]+$/g, '');
+      if (!core || !/\p{L}/u.test(core) || wasParen) return esc(tok); // blanks, numbers-only and English hints in parentheses stay plain
+      const id = IDX.forms[strip(core)], isNew = id && run && run.newIds && run.newIds.has(id);
+      const pre = esc(tok.slice(0, tok.indexOf(core))), post = esc(tok.slice(tok.indexOf(core) + core.length));
+      return pre + `<span class="tok${id ? ' w' : ''}${isNew ? ' new' : ''}"${id ? ` data-w="${id}"` : ''} data-g="${esc(core)}">${esc(core)}</span>` + post;
     }).join('');
+  }
+  // English hint for one Spanish word: a course word gives its own meaning, anything else comes from content.json glosses
+  function gloss(core) {
+    const id = IDX.forms[strip(core)];
+    if (id) { const w = IDX.words[id]; return { es: w.es, en: w.en }; }
+    const low = String(core).toLowerCase(), g = (C.glosses || {})[low] || IDX.glossFold[strip(low)];
+    return g ? { es: low, en: g } : null;
+  }
+  function showHint(el) {
+    closeHint();
+    const g = gloss(el.dataset.g); if (!g) return;
+    const box = document.createElement('div'); box.className = 'hint-pop'; box.setAttribute('role', 'tooltip');
+    box.innerHTML = `<div class="hint-en">${esc(g.en)}</div>${strip(g.es) !== strip(el.dataset.g) ? `<div class="hint-es muted small">${esc(g.es)}</div>` : ''}`;
+    document.body.appendChild(box);
+    const r = el.getBoundingClientRect(), b = box.getBoundingClientRect();
+    box.style.left = Math.max(8, Math.min(window.innerWidth - b.width - 8, r.left + r.width / 2 - b.width / 2)) + 'px';
+    const below = r.bottom + 8, above = r.top - b.height - 8, fitsBelow = below + b.height < window.innerHeight - 90; // keep clear of the footer
+    box.style.top = (fitsBelow || above < 8 ? below : above) + window.scrollY + 'px'; box.classList.toggle('below', fitsBelow || above < 8);
+    el.classList.add('hinted'); hintEl = el;
+  }
+  let hintEl = null;
+  function closeHint() { document.querySelectorAll('.hint-pop').forEach(n => n.remove()); if (hintEl) hintEl.classList.remove('hinted'); hintEl = null; }
+  function initHints() { // tap a word: hint popover + hear the word. Tap elsewhere closes it. Long-press still parks.
+    document.addEventListener('click', e => {
+      const t = e.target.closest && e.target.closest('.tok[data-g]');
+      if (!t) { if (!(e.target.closest && e.target.closest('.hint-pop'))) closeHint(); return; }
+      if (lp.fired) return;
+      e.stopPropagation();
+      if (hintEl === t) return closeHint();
+      showHint(t); speak(t.dataset.g);
+    }, true);
+    ['scroll', 'resize'].forEach(ev => window.addEventListener(ev, closeHint, { passive: true }));
+  }
+  const newLabel = html => /class="tok[^"]*\bnew\b/.test(html) ? '<div class="newlabel"><span class="badge new">NEW</span> New word</div>' : '';
+  const AVATAR = '<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="23" fill="var(--accent-soft, #ccfbf1)"/><circle cx="24" cy="19" r="8" fill="var(--accent, #0f766e)"/><path d="M10 41c2-8 8-12 14-12s12 4 14 12" fill="var(--accent, #0f766e)"/></svg>';
+  // speech-bubble prompt: avatar + bubble with a speaker button. Spanish gets tappable, dotted-underlined words.
+  function bubble(text, lang, say) {
+    const body = lang === 'es' ? tokenize(text) : esc(text);
+    return `<div class="bubble-row"><div class="avatar">${AVATAR}</div><div class="bubble ${lang === 'es' ? 'es' : 'en'}">${say ? `<button class="icon speak bubble-spk" data-say="${esc(say)}" aria-label="Play">🔊</button>` : ''}<span class="btext" lang="${lang}">${body}</span></div></div>`;
   }
   const wordSpan = (id, text) => `<span class="w" data-w="${id}">${esc(text)}</span>`;
 
@@ -165,16 +215,19 @@
   setInterval(tick, 1000);
 
   // ---------- "Can't listen now" (10-minute pause on audio-only exercises) ----------
-  function lpHtml() {
-    const m = S ? Listen.minutesLeft(S.listenPauseUntil, Date.now()) : 0;
-    return m ? `<button class="lp-ind" id="lpInd" type="button" title="Listening paused. Tap to turn it back on." aria-label="Listening paused, ${m} minutes left. Tap to turn listening back on.">🔇 <span id="lpMin">${m}</span> min</button>` : '';
+  function lpHtml() { // pills for both pauses: 🔇 listening, 🤐 speaking (v8). Tap a pill to turn that one back on early.
+    const m = S ? Listen.minutesLeft(S.listenPauseUntil, Date.now()) : 0, k = S ? Listen.minutesLeft(S.speakPauseUntil, Date.now()) : 0;
+    return (m ? `<button class="lp-ind" id="lpInd" type="button" title="Listening paused. Tap to turn it back on." aria-label="Listening paused, ${m} minutes left. Tap to turn listening back on.">🔇 <span id="lpMin">${m}</span> min</button>` : '')
+      + (k ? `<button class="lp-ind sp-ind" id="spInd" type="button" title="Speaking paused. Tap to turn it back on." aria-label="Speaking paused, ${k} minutes left. Tap to turn speaking back on.">🤐 <span id="spMin">${k}</span> min</button>` : '');
   }
-  function bindLp() { const b = document.getElementById('lpInd'); if (b) b.onclick = resumeListening; }
-  function updateLp() { // called every second: refresh minutes left, drop the indicator when the pause expires
-    const b = document.getElementById('lpInd'); if (!b) return;
-    const m = Listen.minutesLeft(S.listenPauseUntil, Date.now());
-    if (!m) { b.remove(); S.listenPauseUntil = 0; save(); return; }
-    const el = document.getElementById('lpMin'); if (el && el.textContent !== String(m)) el.textContent = m;
+  function bindLp() { const b = document.getElementById('lpInd'); if (b) b.onclick = resumeListening; const c = document.getElementById('spInd'); if (c) c.onclick = resumeSpeaking; }
+  function updateLp() { // called every second: refresh minutes left, drop an indicator when its pause expires
+    [['lpInd', 'lpMin', 'listenPauseUntil'], ['spInd', 'spMin', 'speakPauseUntil']].forEach(([bid, mid, f]) => {
+      const b = document.getElementById(bid); if (!b) return;
+      const m = Listen.minutesLeft(S[f], Date.now());
+      if (!m) { b.remove(); S[f] = 0; save(); return; }
+      const el = document.getElementById(mid); if (el && el.textContent !== String(m)) el.textContent = m;
+    });
   }
   function cantListen(entry, btn) {
     if (!run || run.answered) return;
@@ -184,6 +237,24 @@
     // same card, same item, nothing graded: rebuild it as a non-audio exercise (the paused flag makes makeExercise substitute)
     setTimeout(() => { if (!run || run.queue[run.i] !== entry) return; run.ex = makeExercise(entry); run.answered = false; renderExercise(entry, run.ex); toast('Listening off for 10 minutes'); }, 180);
   }
+  // ---------- "Can't speak now" (v8): same 10-minute pause, for repeat-after-me drills ----------
+  const speakPaused = () => S && Listen.paused(S.speakPauseUntil, Date.now());
+  let speechBlocked = false; // recogniser missing, mic permission denied or service refused: no speaking drills this session
+  try { speechBlocked = sessionStorage.getItem('speech-blocked') === '1'; } catch (e) { /* ignore */ }
+  const speakOk = () => !speechBlocked && !speakPaused() && Speech.available(window);
+  function blockSpeech() { speechBlocked = true; try { sessionStorage.setItem('speech-blocked', '1'); } catch (e) { /* ignore */ } }
+  function cantSpeak(entry, btn) {
+    if (!run || run.answered) return;
+    stopRec();
+    S.speakPauseUntil = Listen.start(Date.now()); save();
+    FX.pause(btn);
+    setTimeout(() => { if (!run || run.queue[run.i] !== entry) return; run.ex = makeExercise(entry); run.answered = false; renderExercise(entry, run.ex); toast('Speaking off for 10 minutes'); }, 180);
+  }
+  function resumeSpeaking() {
+    S.speakPauseUntil = 0; save();
+    const b = document.getElementById('spInd'); if (b) b.remove();
+    toast('Speaking is back on');
+  }
   function resumeListening() {
     S.listenPauseUntil = 0; save();
     const b = document.getElementById('lpInd'); if (b) b.remove();
@@ -192,20 +263,31 @@
 
   // ---------- speech ----------
   let voice = null;
+  // v8: Angélica (Enhanced/Premium) > other es-MX Enhanced/Premium > es-MX > es-US/419 > es-*, unless a voice is chosen in Settings.
+  // iOS fills getVoices() late, so pick again on voiceschanged and on a few short retries.
   function pickVoice() {
     if (!('speechSynthesis' in window)) return;
-    const vs = speechSynthesis.getVoices();
-    voice = vs.find(v => /^es[-_]MX/i.test(v.lang)) || vs.find(v => /^es[-_](US|419)/i.test(v.lang)) || vs.find(v => /^es/i.test(v.lang)) || null;
+    voice = Voice.choose(speechSynthesis.getVoices(), S && S.settings.voice) || null;
+    const el = document.getElementById('voiceSel'); // Settings opened before iOS listed its voices: refresh the picker once they arrive
+    if (el && el.dataset.n === '0' && speechSynthesis.getVoices().some(Voice.isEs)) renderProgress();
+  }
+  function initVoices() {
+    if (!('speechSynthesis' in window)) return;
+    pickVoice();
+    if (speechSynthesis.addEventListener) speechSynthesis.addEventListener('voiceschanged', pickVoice); else speechSynthesis.onvoiceschanged = pickVoice;
+    let n = 0; const t = setInterval(() => { pickVoice(); if (++n >= 10 || (voice && speechSynthesis.getVoices().length)) clearInterval(t); }, 300);
   }
   const listenPaused = () => S && Listen.paused(S.listenPauseUntil, Date.now());
   const autoSpeak = text => { if (!listenPaused()) speak(text); }; // automatic playback; tapping a 🔊 still plays
   function speak(text, slow) {
     if (!('speechSynthesis' in window)) return false;
     speechSynthesis.cancel();
+    if (!voice) pickVoice();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = voice ? voice.lang : 'es-MX'; if (voice) u.voice = voice;
     u.rate = (S.settings.rate || 0.9) * (slow ? 0.7 : 1);
-    speechSynthesis.speak(u); return true;
+    try { speechSynthesis.speak(u); } catch (e) { return false; } // never let audio break a lesson
+    return true;
   }
 
   // ---------- scheduling glue ----------
@@ -261,10 +343,20 @@
     let type = entry.ex;
     if (!type) {
       const s = card ? card.s : 0;
-      type = s < 3 ? pick(['es2en', 'cloze', 'listen']) : s < 15 ? pick(['en2es', 'cloze', 'listen', 'es2en']) : pick(['en2es', 'listen', 'cloze']);
-      if (Listen.isAudio(type) && listenPaused()) type = s < 3 ? pick(['es2en', 'cloze']) : pick(['en2es', 'cloze', 'es2en']);
+      // v8 adds the word picker (pick / pickEn), flip cards and repeat-after-me (speak) to the review mix
+      type = s < 3 ? pick(['es2en', 'cloze', 'listen', 'pick', 'pickEn', 'flip']) : s < 15 ? pick(['en2es', 'cloze', 'listen', 'es2en', 'flip', 'speak', 'pick']) : pick(['en2es', 'listen', 'cloze', 'flip', 'speak']);
+      if (Listen.isAudio(type) && listenPaused()) type = s < 3 ? pick(['es2en', 'cloze', 'pickEn']) : pick(['en2es', 'cloze', 'es2en', 'flip']);
       type = withTiles(w.id, type); // practice and review: about 1 in 4 becomes a tile drill
     }
+    const inTest = run && run.mode === 'test'; // test vocab items stay word-level: a skipped speaking item becomes a flip card
+    if (Listen.isSpeak(type) && !speakOk()) type = inTest ? 'flip' : Listen.substituteSpeak(sents.some(x => tileTokens(x.es).length <= 10)); // can't speak now / no recogniser
+    if (type === 'speak') {
+      const short = sents.filter(x => tileTokens(x.es).length >= 3 && tileTokens(x.es).length <= 9);
+      const sent = entry.sent || (short.length ? pick(short) : null);
+      if (sent) return { kind: 'speak', label: 'Repeat after me', sayEs: sent.es, answers: [sent.es], opts: { lang: 'es', sentence: true }, reveal: { es: sent.es, en: sent.en }, speakAfter: sent.es, tries: 0 };
+      type = inTest ? 'flip' : 'build';
+    }
+    if (type === 'pick' || type === 'pickEn') return pickExercise(w, type === 'pickEn');
     if ((type === 'build' || type === 'buildEn') && sents.length) {
       const short = sents.filter(x => x.es.split(' ').length <= 10);
       const sent = entry.sent || pick(short.length ? short : sents);
@@ -277,11 +369,13 @@
     const sent = sents.length ? pick(sents) : null;
     const esAns = [w.es].concat(w.esAlt || []);
     switch (type) {
-      case 'es2en': return { kind: 'type', label: 'Translate to English', big: w.es, bigW: w.id, speakNow: w.es, answers: w.accept, opts: { lang: 'en', typo: true }, placeholder: 'English', reveal: { es: w.es, en: w.en, note: w.note, ex: sent } };
-      case 'en2es': return { kind: 'type', label: 'Translate to Spanish', big: w.en, bigW: w.id, answers: esAns, opts: { lang: 'es' }, placeholder: 'Español', reveal: { es: w.es, en: w.en, note: w.note, ex: sent }, speakAfter: w.es };
+      case 'es2en': return { kind: 'type', label: 'Translate to English', big: w.es, bubbleEs: w.es, bigW: w.id, speakNow: w.es, answers: w.accept, opts: { lang: 'en', typo: true }, placeholder: 'English', reveal: { es: w.es, en: w.en, note: w.note, ex: sent } };
+      // en2es / flip / cloze accept real synonyms (reparar for arreglar) with a note; dictation, speaking and tiles never do
+      case 'en2es': return { kind: 'type', label: 'Translate to Spanish', big: w.en, bigW: w.id, answers: esAns, alts: w.alt || [], opts: { lang: 'es' }, placeholder: 'Español', reveal: { es: w.es, en: w.en, note: w.note, ex: sent }, speakAfter: w.es };
+      case 'flip': return { kind: 'type', flip: true, label: 'Type in Spanish', big: w.en, answers: esAns, alts: w.alt || [], opts: { lang: 'es' }, placeholder: 'Type in Spanish', reveal: { es: w.es, en: w.en, note: w.note, ex: sent }, speakAfter: w.es, back: w.es };
       case 'cloze': {
         const blank = sent.es.replace(sent.f, '_____');
-        return { kind: 'type', label: 'Fill in the missing word', clozeEs: blank, sub: sent.en + (sent.h ? ` · (${sent.h})` : ` · (${w.en})`), answers: [sent.f], opts: { lang: 'es' }, placeholder: 'Español', reveal: { es: sent.es, en: sent.en, note: w.note }, speakAfter: sent.es };
+        return { kind: 'type', label: 'Fill in the missing word', clozeEs: blank, sub: sent.en + (sent.h ? ` · (${sent.h})` : ` · (${w.en})`), answers: [sent.f], alts: sent.alt || [], opts: { lang: 'es' }, placeholder: 'Español', reveal: { es: sent.es, en: sent.en, note: w.note }, speakAfter: sent.es };
       }
       default: {
         const useSentence = sent && (card && card.s >= 3 || type === 'listenS');
@@ -289,6 +383,21 @@
         return { kind: 'type', audio: true, label: useSentence ? 'Listen and type the sentence' : 'Listen and type the word', listen: text, answers: [text], opts: { lang: 'es', sentence: useSentence }, placeholder: 'Escribe lo que oyes', reveal: useSentence ? { es: sent.es, en: sent.en } : { es: w.es, en: w.en, note: w.note } };
       }
     }
+  }
+
+  // ---------- v8 word picker: one word, three big stacked choices; distractors from this section's vocabulary ----------
+  function pickExercise(w, reverse) {
+    const core = x => strip(x.es.replace(/^(el|la|los|las) /, ''));
+    const pool = IDX.sectionWords.map(id => IDX.words[id]).filter(x => x.id !== w.id && !S.parked[x.id] && core(x) !== core(w) && x.en !== w.en);
+    // prefer the same unit, then the same kind of word (noun with article vs. verb / adjective) so the choice is not given away
+    const kind = x => /^(el|la|los|las) /.test(x.es) ? 'n' : /(ar|er|ir|se)$/.test(x.es) ? 'v' : 'o';
+    const rank = x => (x.unit === w.unit ? 0 : 2) + (kind(x) === kind(w) ? 0 : 1) + Math.random() * 1.5;
+    const ds = pool.sort((a, b) => rank(a) - rank(b)).slice(0, 2);
+    const text = x => reverse ? x.en : x.es;
+    const options = shuffle([w].concat(ds).map(text));
+    return reverse
+      ? { kind: 'mc', pick: true, label: 'Select the correct meaning', bubbleEs: w.es, speakNow: w.es, options, answer: w.en, reveal: { es: w.es, en: w.en, note: w.note }, speakAfter: w.es }
+      : { kind: 'mc', pick: true, label: 'Select the correct translation', bubbleEn: w.en, options, answer: w.es, reveal: { es: w.es, en: w.en, note: w.note }, speakAfter: w.es };
   }
 
   // ---------- tile-order drills (word bank with 2 distractors) ----------
@@ -326,7 +435,9 @@
 
   // ---------- runner (placement, review, and the intro/practice/test stones share this) ----------
   let run = null;
-  function startRun(queue, mode, meta) { sessionStart(); run = Object.assign({ queue, i: 0, mode, results: [], firstDone: {}, score: 0, total: 0, misses: [] }, meta || {}); nextCard(); }
+  // words new to the learner (no card yet, or seen only once) get the purple "new" highlight in prompts during this run
+  function newIdsFor(queue) { const ids = new Set(); queue.forEach(e => { if (e.id && e.id.startsWith('w:')) { const c = S.items[e.id]; if (!c || ((c.reps || 0) < 2 && !c.known)) ids.add(e.id.slice(2)); } }); return ids; }
+  function startRun(queue, mode, meta) { sessionStart(); run = Object.assign({ queue, i: 0, mode, results: [], firstDone: {}, score: 0, total: 0, misses: [] }, meta || {}); run.newIds = mode === 'placement' ? new Set() : newIdsFor(queue); nextCard(); }
   function nextCard() {
     while (run.i < run.queue.length && run.queue[run.i].id && run.queue[run.i].id.startsWith('w:') && isParked(run.queue[run.i].id) && run.mode !== 'placement') run.i++;
     if (run.i >= run.queue.length) return finishRun();
@@ -349,7 +460,7 @@
     const pct = Math.max(0, Math.min(100, 100 * frac)); if (run) run.barPct = pct;
     const el = app.querySelector('.bar span'); if (!el) return; void el.offsetWidth; el.style.width = pct + '%';
   }
-  function bindQuit(onQuit) { bindLp(); document.getElementById('quit').onclick = () => { if (run && run.mode === 'placement' && !confirm('Leave placement? Progress on it will be lost.')) return; if ('speechSynthesis' in window) speechSynthesis.cancel(); tick(); save(); run = null; story = null; (onQuit || renderHome)(); }; }
+  function bindQuit(onQuit) { bindLp(); document.getElementById('quit').onclick = () => { if (run && run.mode === 'placement' && !confirm('Leave placement? Progress on it will be lost.')) return; if ('speechSynthesis' in window) speechSynthesis.cancel(); stopRec(); closeHint(); tick(); save(); run = null; story = null; (onQuit || renderHome)(); }; }
 
   function renderTheme(entry) {
     const u = C.units[IDX.unitIdx[run.uid]];
@@ -392,19 +503,28 @@
   }
 
   function renderExercise(entry, ex) {
+    closeHint();
     let prompt = '';
-    if (ex.kind === 'mc') prompt = `<div class="prompt">${esc(ex.prompt).replace('___', '<span class="blank">___</span>')}</div>`;
-    else if (ex.kind === 'build') prompt = ex.bigEs ? `<div class="prompt">${tokenize(ex.bigEs)} <button class="icon speak" data-say="${esc(ex.bigEs)}">🔊</button></div>` : `<div class="prompt en-prompt">${esc(ex.big)}</div>`;
+    if (ex.kind === 'mc' && ex.pick) prompt = ex.bubbleEs ? bubble(ex.bubbleEs, 'es', ex.speakNow) : bubble(ex.bubbleEn, 'en');
+    else if (ex.kind === 'mc') prompt = `<div class="prompt">${esc(ex.prompt).replace('___', '<span class="blank">___</span>')}</div>`;
+    else if (ex.kind === 'speak') prompt = bubble(ex.sayEs, 'es', ex.sayEs);
+    else if (ex.kind === 'build') prompt = ex.bigEs ? bubble(ex.bigEs, 'es', ex.bigEs) : bubble(ex.big, 'en');
     else if (ex.listen) prompt = `<div class="listen"><button class="btn play" id="play">🔊 Play</button><button class="btn secondary" id="slow">🐢 Slow</button></div>`;
     else if (ex.clozeEs) prompt = `<div class="prompt">${tokenize(ex.clozeEs).replace('_____', '<span class="blank">_____</span>')}</div><div class="muted sub">${esc(ex.sub)}</div>`;
+    else if (ex.flip) prompt = `<div class="flipstack"><div class="flip" id="flipCard"><div class="face front"><div class="flip-en">${esc(ex.big)}</div></div><div class="face back"><div class="flip-es">${esc(ex.back)}</div><button class="icon speak" data-say="${esc(ex.back)}" aria-label="Play">🔊</button></div></div></div>`;
+    else if (ex.bubbleEs) prompt = bubble(ex.bubbleEs, 'es', ex.speakNow);
     else prompt = `<div class="big">${ex.bigW ? wordSpan(ex.bigW, ex.big) : esc(ex.big)}${ex.speakNow ? ` <button class="icon speak" data-say="${esc(ex.speakNow)}">🔊</button>` : ''}</div>`;
     let input;
-    if (ex.kind === 'mc') input = `<div class="options">${ex.options.map((o, k) => `<button class="opt" data-k="${k}">${esc(o)}</button>`).join('')}</div>`;
+    if (ex.kind === 'mc') input = `<div class="options${ex.pick ? ' stack' : ''}">${ex.options.map((o, k) => `<button class="opt${ex.pick ? ' big-opt' : ''}" data-k="${k}">${esc(o)}</button>`).join('')}</div>`;
     else if (ex.kind === 'build') input = tilesHtml(ex);
+    else if (ex.kind === 'speak') input = `<div class="mic-wrap"><button class="mic" id="mic" type="button" aria-label="Tap and say the sentence"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-2.1A7 7 0 0 0 19 12z" fill="currentColor"/></svg><span class="mic-label">Tap to speak</span></button><div class="heard muted" id="heard" aria-live="polite"></div></div>`;
     else input = `<form id="f" autocomplete="off"><input id="ans" type="text" lang="${ex.opts.lang}" placeholder="${esc(ex.placeholder)}" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done"></form>`;
-    const cant = ex.audio ? '<button class="cant-listen" id="cantListen" type="button">🔇 No puedo escuchar ahora <span class="muted">· Can’t listen now</span></button>' : '';
-    app.innerHTML = progressBar() + `<main class="card"><div class="label">${run.mode === 'test' ? 'Test · ' : ''}${esc(ex.label)}</div>${prompt}${input}${cant}<div id="fb"></div></main>
-      <footer>${ex.kind === 'mc' ? '' : '<button class="btn secondary" id="skip">I don\'t know</button><button class="btn primary" id="check">Check</button>'}</footer>`;
+    const cant = ex.audio ? '<button class="cant-listen" id="cantListen" type="button">🔇 No puedo escuchar ahora <span class="muted">· Can’t listen now</span></button>'
+      : ex.kind === 'speak' ? '<button class="cant-listen" id="cantSpeak" type="button">🤐 No puedo hablar ahora <span class="muted">· Can’t speak now</span></button>' : '';
+    const label = `<div class="label">${run.mode === 'test' ? 'Test · ' : ''}${esc(ex.label)}</div>`;
+    const foot = ex.kind === 'mc' ? '' : ex.flip ? '<button class="btn secondary" id="skip" aria-label="Flip the card to see the answer">↻ Flip</button><button class="btn primary" id="check">Check</button>'
+      : ex.kind === 'speak' ? '<button class="btn secondary" id="skip">I don\'t know</button>' : '<button class="btn secondary" id="skip">I don\'t know</button><button class="btn primary" id="check">Check</button>';
+    app.innerHTML = progressBar() + `<main class="card ex-${ex.kind}${ex.flip ? ' ex-flip' : ''}">${newLabel(prompt)}${label}${prompt}${input}${cant}<div id="fb"></div></main><footer>${foot}</footer>`;
     bindQuit(); bindSpeak(); setBar(run.i / run.queue.length);
     if (ex.audio) document.getElementById('cantListen').onclick = e => cantListen(entry, e.currentTarget);
     if (ex.listen) {
@@ -413,6 +533,7 @@
       speak(ex.listen);
     }
     if (ex.kind === 'mc') {
+      if (ex.speakNow) autoSpeak(ex.speakNow);
       app.querySelectorAll('.opt').forEach(b => b.onclick = () => {
         if (run.answered) return;
         const ok = ex.options[+b.dataset.k] === ex.answer;
@@ -430,17 +551,70 @@
       document.getElementById('skip').onclick = () => { if (!run.answered) answer(entry, ex, 'wrong', ''); };
       return;
     }
+    if (ex.kind === 'speak') {
+      autoSpeak(ex.sayEs);
+      document.getElementById('cantSpeak').onclick = e => cantSpeak(entry, e.currentTarget);
+      document.getElementById('skip').onclick = () => { if (!run.answered) { stopRec(); answer(entry, ex, 'wrong', ''); } };
+      mountMic(ex.sayEs, {
+        locked: () => run.answered,
+        done: (r) => { ex.heard = r.heard; answer(entry, ex, r.result, r.heard); },
+        retry: (r) => { ex.tries++; return ex.tries < 2; }, // two tries, then it is graded
+        blocked: () => { blockSpeech(); if (!run || run.queue[run.i] !== entry || run.answered) return; run.ex = makeExercise(entry); renderExercise(entry, run.ex); }
+      });
+      return;
+    }
     const inp = document.getElementById('ans'); setTimeout(() => inp.focus(), 50);
-    const doCheck = () => { const v = inp.value; if (!v.trim()) return; const r = Check.check(v, ex.answers, ex.opts); ex.matched = r.answer; ex.res = r; answer(entry, ex, r.result, v); };
+    const doCheck = () => { const v = inp.value; if (!v.trim()) return; const r = ex.alts ? Check.checkAlt(v, ex.answers, ex.opts, ex.alts) : Check.check(v, ex.answers, ex.opts); ex.matched = r.result === 'alt' ? null : r.answer; ex.res = r; answer(entry, ex, r.result, v); };
     document.getElementById('f').onsubmit = e => { e.preventDefault(); if (run.answered) return advance(); doCheck(); };
     document.getElementById('check').onclick = () => run.answered ? advance() : doCheck();
-    document.getElementById('skip').onclick = () => { if (!run.answered) answer(entry, ex, 'wrong', ''); };
+    document.getElementById('skip').onclick = () => {
+      if (run.answered) return;
+      if (ex.flip) { flipCard(true); ex.flipped = true; } // turning the card over shows the answer: graded as a miss
+      answer(entry, ex, 'wrong', '');
+    };
+  }
+  function flipCard(on) { const c = document.getElementById('flipCard'); if (c) c.classList.toggle('flipped', on); }
+
+  // ---------- v8 repeat-after-me: microphone + SpeechRecognition (es-MX) ----------
+  let rec = null;
+  function stopRec() { if (rec) { const r = rec; rec = null; try { r.onresult = r.onerror = r.onend = null; r.abort(); } catch (e) { /* ignore */ } } document.querySelectorAll('.mic.on').forEach(b => b.classList.remove('on')); }
+  function mountMic(target, h) {
+    const mic = document.getElementById('mic'), heard = document.getElementById('heard');
+    const setState = (on, msg) => { mic.classList.toggle('on', on); mic.querySelector('.mic-label').textContent = on ? 'Listening…' : 'Tap to speak'; if (msg != null) heard.innerHTML = msg; };
+    mic.onclick = () => {
+      if (h.locked()) return;
+      if (rec) { try { rec.stop(); } catch (e) { /* ignore */ } return; } // second tap: stop and grade what was heard
+      const Ctor = Speech.ctor(window);
+      if (!Ctor) return h.blocked('unavailable');
+      if ('speechSynthesis' in window) speechSynthesis.cancel();
+      let r;
+      try { r = new Ctor(); } catch (e) { return h.blocked('unavailable'); }
+      rec = r; r.lang = 'es-MX'; r.interimResults = false; r.maxAlternatives = 5; r.continuous = false;
+      let got = false;
+      r.onresult = e => {
+        got = true; const res = e.results[e.results.length - 1]; const alts = [];
+        for (let k = 0; k < res.length; k++) alts.push(res[k].transcript);
+        rec = null; setState(false);
+        const g = Speech.grade(alts, target);
+        if (g.result !== 'wrong') return h.done(g);
+        if (h.retry(g)) { setState(false, `Heard: “${esc(g.heard)}”. <b>Try again.</b>`); FX.miss([mic]); return; }
+        h.done(g);
+      };
+      r.onerror = e => {
+        rec = null; setState(false);
+        if (Speech.isBlocking(e.error)) return h.blocked(e.error);
+        setState(false, e.error === 'no-speech' ? 'I didn’t hear anything. Tap the mic and try again.' : '');
+      };
+      r.onend = () => { if (rec === r) { rec = null; setState(false, got ? null : 'I didn’t hear anything. Tap the mic and try again.'); } };
+      try { r.start(); setState(true, ''); } catch (e) { rec = null; h.blocked('start-failed'); }
+    };
   }
 
   function answer(entry, ex, result, given) {
     run.answered = true; lastStep = performance.now();
     const ok = result !== 'wrong';
-    const g = result === 'exact' || result === 'typo' ? 3 : ok ? 2 : 1; // a one-letter slip counts as a normal correct answer
+    // a one-letter slip and a real synonym (v8 'alt') count as a normal correct answer; accents and "close" speech are Hard
+    const g = result === 'exact' || result === 'typo' || result === 'alt' ? 3 : ok ? 2 : 1;
     const isPattern = entry.id.startsWith('p:');
     const graded = run.mode !== 'placement' && !entry.practice && !run.firstDone[entry.id];
     if (run.mode === 'placement') run.results.push({ id: entry.id, ok });
@@ -453,10 +627,13 @@
     }
     const fb = document.getElementById('fb');
     const correctForm = ex.kind === 'mc' ? ex.answer : (ex.matched || ex.answers[0]);
-    const head = result === 'exact' ? '<div class="ok">✓ Correct</div>'
+    const head = result === 'alt' ? `<div class="ok">✓ Correct</div><p class="alt-note"><span aria-hidden="true">ℹ️</span> ${esc((ex.res.note || '').replace(/^Correct! /, ''))}${strip(ex.res.answer) !== strip(given) ? ` <span class="muted">Course word: <b>${esc(ex.res.answer)}</b></span>` : ''}</p>`
+      : result === 'close' ? `<div class="ok warn">✓ Close. Full line: <b>${esc(ex.answers[0])}</b>${ex.heard ? `<div class="muted small">Heard: “${esc(ex.heard)}”</div>` : ''}</div>`
+      : result === 'exact' ? '<div class="ok">✓ Correct</div>'
       : result === 'accent' ? `<div class="ok warn">✓ Watch the accents: <b>${esc(correctForm)}</b></div>`
       : result === 'typo' ? `<div class="ok typo">✓ Correct, watch the spelling: <b class="fixed">${Check.markFixes(correctForm, ex.res)}</b></div>`
-      : `<div class="bad">✗ ${ex.kind === 'mc' ? 'Answer' : 'Correct answer'}: <b>${esc(correctForm)}</b></div>`;
+      : ex.flipped ? `<div class="bad">↻ Flipped: <b>${esc(correctForm)}</b></div>`
+      : `<div class="bad">✗ ${ex.kind === 'mc' ? 'Answer' : 'Correct answer'}: <b>${esc(correctForm)}</b>${ex.kind === 'speak' && ex.heard ? `<div class="muted small">Heard: “${esc(ex.heard)}”</div>` : ''}</div>`;
     const rv = ex.reveal || {};
     let more = '';
     if (rv.es && rv.es !== correctForm) more += `<div class="rv-es">${tokenize(rv.es)} <button class="icon speak" data-say="${esc(ex.speakAfter || rv.es)}">🔊</button></div>`;
@@ -468,7 +645,9 @@
     bindSpeak();
     const inp = document.getElementById('ans'); if (inp) inp.readOnly = true;
     setBar((run.i + 1) / run.queue.length);
-    const chosen = ex.kind === 'mc' ? app.querySelector(ok ? '.opt.right' : '.opt.wrong') : ex.kind === 'build' ? document.getElementById('line') : inp;
+    const chosen = ex.kind === 'mc' ? app.querySelector(ok ? '.opt.right' : '.opt.wrong') : ex.kind === 'build' ? document.getElementById('line') : ex.kind === 'speak' ? document.getElementById('mic') : inp;
+    if (ex.flip) flipCard(true); // the card turns over after Check too, so the Spanish is on the card
+    if (ex.kind === 'speak') { const m = document.getElementById('mic'); if (m) m.disabled = true; }
     if (ok) FX.correct([chosen, fb.querySelector('.feedback')]); else FX.miss([chosen]);
     const footer = app.querySelector('footer');
     const extra = [];
@@ -487,7 +666,7 @@
     if (ok && result === 'exact' && S.settings.autoAdvance && run.mode !== 'placement') run.timer = setTimeout(advance, 900);
     else setTimeout(() => document.getElementById('next') && document.getElementById('next').focus(), 30);
   }
-  function advance() { if (!run || !stepOk()) return; clearTimeout(run.timer); run.i++; nextCard(); }
+  function advance() { if (!run || !stepOk()) return; clearTimeout(run.timer); stopRec(); closeHint(); run.i++; nextCard(); }
   function requeueAfterMiss(entry) {
     const q = run.queue, at = run.i;
     if (entry.id.startsWith('p:')) {
@@ -504,12 +683,13 @@
   function introQueue(u) {
     const q = [{ theme: true, id: '' }];
     const fresh = u.words.filter(w => !S.parked[w.id] && !knownCard(S.items[wid(w.id)]));
-    fresh.forEach(w => { q.push({ id: wid(w.id), intro: true }); q.push({ id: wid(w.id), ex: 'es2en' }); });
+    // first check right after each new word: the 3-choice picker (alternating directions)
+    fresh.forEach((w, k) => { q.push({ id: wid(w.id), intro: true }); q.push({ id: wid(w.id), ex: k % 2 ? 'pick' : 'pickEn' }); });
     u.focus.forEach(p => {
       if (!S.items[pid(p)]) { q.push({ id: pid(p), intro: true }); q.push({ id: pid(p) }); q.push({ id: pid(p), practice: true }); }
       else q.push({ id: pid(p) });
     });
-    shuffle(fresh).forEach(w => q.push({ id: wid(w.id), ex: withTiles(w.id, pick(['en2es', 'cloze', 'listen'])), practice: true }));
+    shuffle(fresh).forEach(w => q.push({ id: wid(w.id), ex: withTiles(w.id, pick(['en2es', 'cloze', 'listen', 'flip', 'speak', 'es2en'])), practice: true }));
     return q;
   }
   function practiceQueue(u, n) {
@@ -524,7 +704,8 @@
     const pats = ranked.filter(id => id.startsWith('p:'));
     if (chosen.filter(id => id.startsWith('p:')).length < 3) chosen = shuffle(chosen.filter(id => id.startsWith('w:')).slice(0, n - 3).concat(pats.slice(0, 3)));
     // fresh sentences: words lean on cloze / sentence listening, patterns pick unseen items
-    return shuffle(chosen).map(id => id.startsWith('w:') ? { id, ex: pick(['cloze', 'listenS', 'en2es', 'cloze']) } : { id });
+    // v8: flip cards, repeat-after-me and the picker join the mix (about 1 in 8 each)
+    return shuffle(chosen).map(id => id.startsWith('w:') ? { id, ex: withTiles(id.slice(2), pick(['cloze', 'listenS', 'en2es', 'cloze', 'flip', 'speak', 'cloze', 'pickEn'])) } : { id });
   }
   function testQueue(u) {
     const units = unitsUpTo(u.id).reverse(); // most recent first
@@ -532,7 +713,7 @@
     for (const x of units) for (const w of shuffle(x.words)) { if (vocab.length >= 12) break; if (!S.parked[w.id]) vocab.push(w.id); }
     // early in a section there may be fewer than 12 words: reuse them in a different exercise direction
     const uniq = vocab.slice(); for (let k = 0; vocab.length < 12 && uniq.length; k++) vocab.push(uniq[k % uniq.length]);
-    const types = ['en2es', 'cloze', 'es2en', 'listen'];
+    const types = ['flip', 'cloze', 'pick', 'listen', 'en2es', 'speak'];
     const seenType = {};
     const q = vocab.map((w, k) => { let t = types[k % types.length]; if (seenType[w] === t) t = types[(k + 1) % types.length]; seenType[w] = t; return { id: wid(w), ex: t }; });
     const sentPool = [];
@@ -570,7 +751,31 @@
 
   // ---------- story stone ----------
   let story = null;
-  function startStory(u) { sessionStart(); story = { u, shown: 1, answered: {}, showEn: false, tile: pickStoryTile(u.story) }; renderStory(true); }
+  function startStory(u) { sessionStart(); story = { u, shown: 1, answered: {}, showEn: false, tile: pickStoryTile(u.story) }; story.say = pickStorySay(u.story, story.tile); renderStory(true); }
+  function pickStorySay(st, tile) { // v8: one "say this line" moment per story, on a short line in the first half (only when speaking is possible)
+    if (!speakOk()) return null;
+    const ok = st.lines.map((l, k) => ({ l, k })).filter(({ l, k }) => k >= 1 && k < Math.max(2, Math.floor(st.lines.length / 2)) && (!tile || tile.after !== k) && tileTokens(l.es).length >= 3 && tileTokens(l.es).length <= 9);
+    const c = ok.length ? pick(ok) : null; return c ? { after: c.k, done: false } : null;
+  }
+  function mountStorySay() {
+    const st = story.u.story, line = st.lines[story.say.after];
+    const box = document.getElementById('ssay');
+    box.innerHTML = `<div class="label">Your turn · say the line</div><div class="muted small">${esc(line.en)}</div><div class="mic-wrap"><button class="mic" id="mic" type="button" aria-label="Tap and say the line"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-2.1A7 7 0 0 0 19 12z" fill="currentColor"/></svg><span class="mic-label">Tap to speak</span></button><div class="heard muted" id="heard" aria-live="polite"></div></div>
+      <button class="cant-listen" id="cantSpeak" type="button">🤐 No puedo hablar ahora <span class="muted">· Can’t speak now</span></button><div id="fb"></div>`;
+    setTimeout(() => box.scrollIntoView({ block: 'end', behavior: S.settings.anim === false ? 'auto' : 'smooth' }), 60);
+    const foot = app.querySelector('footer'); foot.innerHTML = '<button class="btn secondary" id="skip">Skip</button>';
+    const finish = () => { story.say.done = true; storyNext(); };
+    const show = r => {
+      story.say.checked = true; lastStep = performance.now(); const ok = r && r.result !== 'wrong';
+      document.getElementById('fb').innerHTML = `<div class="feedback ${ok ? 'good' : 'miss'}">${ok ? (r.result === 'close' ? '<div class="ok warn">✓ Close</div>' : '<div class="ok">✓ Correct</div>') : `<div class="bad">✗ The line: <b>${esc(line.es)}</b></div>`}${r && r.heard ? `<div class="muted small">Heard: “${esc(r.heard)}”</div>` : ''}</div>`;
+      const m = document.getElementById('mic'); if (ok) FX.correct([m]); else FX.miss([m]); m.disabled = true;
+      foot.innerHTML = '<button class="btn primary" id="next">Continue</button>'; document.getElementById('next').onclick = step(finish);
+    };
+    mountMic(line.es, { locked: () => !!story.say.checked, done: show, retry: () => { story.say.tries = (story.say.tries || 0) + 1; return story.say.tries < 2; },
+      blocked: () => { blockSpeech(); story.say.done = true; renderStory(false); } }); // silently skip
+    document.getElementById('cantSpeak').onclick = e => { stopRec(); S.speakPauseUntil = Listen.start(Date.now()); save(); FX.pause(e.currentTarget); story.say.done = true; setTimeout(() => { renderStory(false); toast('Speaking off for 10 minutes'); }, 180); };
+    document.getElementById('skip').onclick = step(() => { if (story.say.checked) return; stopRec(); finish(); });
+  }
   function pickStoryTile(st) { // one "rebuild this line" tile drill per story, on a short line in the second half
     const ok = st.lines.map((l, k) => ({ l, k })).filter(({ l, k }) => k >= Math.floor(st.lines.length / 2) && k < st.lines.length - 1 && tileTokens(l.es).length >= 4 && tileTokens(l.es).length <= 10);
     const c = ok.length ? pick(ok) : null; return c ? { after: c.k, done: false } : null;
@@ -597,16 +802,18 @@
   }
   function renderStory(speakLast) {
     const { u } = story, st = u.story, lines = st.lines.slice(0, story.shown);
-    const pendingQ = st.qs.find(q => q.after === story.shown - 1 && !story.answered[st.qs.indexOf(q)]);
+    const pendingQ = st.qs.find(q => q.after === story.shown - 1 && story.answered[st.qs.indexOf(q)] == null); // == null: a wrong answer (false) is answered too
     const tileDue = !pendingQ && story.tile && !story.tile.done && story.tile.after === story.shown - 1;
-    const done = story.shown >= st.lines.length && !pendingQ && !tileDue;
+    const sayDue = !pendingQ && !tileDue && story.say && !story.say.done && story.say.after === story.shown - 1 && speakOk();
+    const done = story.shown >= st.lines.length && !pendingQ && !tileDue && !sayDue;
     const frac = (story.shown + Object.keys(story.answered).length + (story.tile && story.tile.done ? 1 : 0)) / (st.lines.length + st.qs.length + (story.tile ? 1 : 0));
     app.innerHTML = `<div class="topbar"><button class="icon" id="quit" aria-label="Close">✕</button><div class="bar"><span style="width:${story.bar || 0}%"></span></div>${lpHtml()}<button class="icon small-btn" id="en" aria-pressed="${story.showEn}">EN</button></div>
       <main class="card story ${story.entered ? 'no-enter' : ''}"><div class="label">Story · ${esc(u.title)}</div><h1>${esc(st.title)}</h1>
       ${lines.map((l, k) => `<div class="sline ${k === lines.length - 1 ? 'fresh' : ''} ${tileDue && k === story.tile.after ? 'veil' : ''}" data-k="${k}">${l.s ? `<div class="speaker">${esc(l.s)}</div>` : ''}<div class="ses"><button class="icon speak" data-say="${esc(l.es)}">🔊</button> <span>${tokenize(l.es)}</span></div><div class="sen muted ${story.showEn ? '' : 'hidden'}">${esc(l.en)}</div></div>`).join('')}
       ${pendingQ ? `<div class="squestion"><div class="prompt">${esc(pendingQ.q)}</div><div class="options">${shuffle(pendingQ.o).map(o => `<button class="opt" data-o="${esc(o)}">${esc(o)}</button>`).join('')}</div><div id="fb"></div></div>` : ''}
       ${tileDue ? '<div class="squestion stile" id="stile"></div>' : ''}
-      </main><footer>${pendingQ || tileDue ? '' : `<button class="btn primary" id="next">${done ? 'Finish story' : 'Continue'}</button>`}</footer>`;
+      ${sayDue ? '<div class="squestion ssay" id="ssay"></div>' : ''}
+      </main><footer>${pendingQ || tileDue || sayDue ? '' : `<button class="btn primary" id="next">${done ? 'Finish story' : 'Continue'}</button>`}</footer>`;
     story.entered = true; bindQuit(); bindSpeak();
     const bar = app.querySelector('.bar span'); void bar.offsetWidth; story.bar = 100 * frac; bar.style.width = story.bar + '%';
     document.getElementById('en').onclick = () => { story.showEn = !story.showEn; renderStory(false); };
@@ -630,6 +837,7 @@
         document.getElementById('next').onclick = step(storyNext);
       });
     } else if (tileDue) mountStoryTile();
+    else if (sayDue) mountStorySay();
     else document.getElementById('next').onclick = step(storyNext);
   }
   function storyNext() {
@@ -637,6 +845,7 @@
     const pendingQ = st.qs.find(q => q.after === story.shown - 1 && story.answered[st.qs.indexOf(q)] == null);
     if (pendingQ) return renderStory(false);
     if (story.tile && !story.tile.done && story.tile.after === story.shown - 1) return renderStory(false);
+    if (story.say && !story.say.done && story.say.after === story.shown - 1 && speakOk()) return renderStory(false);
     if (story.shown >= st.lines.length) { sessionDone(); const uid = story.u.id; setStone(uid, 1, true); save(); story = null; return renderHome({ justDone: { uid, stone: 1 } }); }
     story.shown++; renderStory(true);
   }
@@ -782,14 +991,14 @@
       <label class="set">Auto-continue on correct <input id="auto" type="checkbox" ${S.settings.autoAdvance ? 'checked' : ''}></label>
       <div class="set">Edit streak <span class="row-inline"><input id="streakIn" type="number" inputmode="numeric" min="0" step="1" value="${Daily.current(S.streak, todayKey()).count}"><button class="btn secondary slim" id="streakSave">Save</button></span></div>
       <p class="muted small">Use this only to correct the number. Today counts once you finish a lesson.</p>
-      <p class="muted">Voice: ${voice ? esc(voice.name + ' (' + voice.lang + ')') : 'default Spanish'} <button class="icon speak" data-say="¿Me lo puedes mandar mañana?">🔊</button></p>
+      ${voiceSettingsHtml()}
       <h3>Backup</h3>
       <div class="row wrap"><button class="btn secondary" id="exp">Export progress</button><button class="btn secondary" id="copy">Copy to clipboard</button><label class="btn secondary">Import file<input id="imp" type="file" accept="application/json,.json" hidden></label></div>
       <textarea id="paste" placeholder="…or paste a backup here and tap Import pasted" rows="2"></textarea>
       <div class="row wrap"><button class="btn secondary" id="impPaste">Import pasted</button><button class="btn secondary" id="replace">Retake placement</button><button class="btn danger" id="reset">Reset everything</button></div>
       <p class="muted small">App ${APP_VERSION} · Content v${C.version} · ${C.units.length} units · ${IDX.wordOrder.length} words · ${Object.keys(C.patterns).length} patterns</p>
       </main><div id="toast" class="toast"></div>`;
-    bindSpeak();
+    bindSpeak(); bindVoiceSettings();
     document.getElementById('back').onclick = () => renderHome();
     app.querySelectorAll('.unpark').forEach(b => b.onclick = () => { unpark(b.dataset.id); renderProgress(); });
     document.getElementById('rate').onchange = e => { S.settings.rate = +e.target.value; save(); speak('Así suena ahora.'); };
@@ -810,6 +1019,22 @@
     document.getElementById('impPaste').onclick = () => importBackup(document.getElementById('paste').value);
     document.getElementById('replace').onclick = () => { if (confirm('Retake placement? Learned words and path progress are kept; grammar patterns get re-rated.')) { S.placementDone = false; save(); renderHome(); } };
     document.getElementById('reset').onclick = () => { if (confirm('Erase all progress on this phone? Export first if you want a backup.')) { S = defaults(); save(); renderHome(); } };
+  }
+  // v8: Spanish voice picker. "Automatic" = best installed (Angélica Enhanced/Premium first); a chosen voice is saved by voiceURI.
+  function voiceSettingsHtml() {
+    const all = 'speechSynthesis' in window ? speechSynthesis.getVoices() : [];
+    const vs = Voice.spanish(all), auto = Voice.best(all);
+    const cur = S.settings.voice || '';
+    return `<div class="set voice-set"><label for="voiceSel">Voice</label><span class="row-inline"><select id="voiceSel" data-n="${vs.length}">
+      <option value="" ${cur ? '' : 'selected'}>Automatic${auto ? ' · ' + esc(auto.name) : ''}</option>
+      ${vs.map(v => `<option data-v="1" value="${esc(Voice.key(v))}" ${cur === Voice.key(v) ? 'selected' : ''}>${esc(v.name)} (${esc(v.lang)})${Voice.quality(v) ? ' ★' : ''}</option>`).join('')}
+      </select><button class="btn secondary slim" id="voiceTest" type="button">Test</button></span></div>
+      <p class="muted small">Now using: <b id="voiceNow">${voice ? esc(voice.name + ' (' + voice.lang + ')') : 'default Spanish'}</b>${vs.length ? '' : ' · no Spanish voices listed yet'}. On iPhone, add voices in Settings › Accessibility › Spoken Content › Voices › Spanish.</p>`;
+  }
+  function bindVoiceSettings() {
+    const sel = document.getElementById('voiceSel'); if (!sel) return;
+    sel.onchange = () => { S.settings.voice = sel.value; save(); pickVoice(); const n = document.getElementById('voiceNow'); if (n) n.textContent = voice ? voice.name + ' (' + voice.lang + ')' : 'default Spanish'; speak('Hola, así sueno. ¿Se lo mando mañana?'); };
+    document.getElementById('voiceTest').onclick = () => speak('Hola, así sueno. ¿Se lo mando mañana?');
   }
   function importBackup(txt, silent) {
     try {
@@ -914,17 +1139,18 @@
   async function boot() {
     S = load();
     FX.init(() => S.settings);
-    initLongPress(); initNoZoom();
+    initLongPress(); initNoZoom(); initHints();
     try { C = await (await fetch('content.json')).json(); }
     catch (e) { app.innerHTML = '<main class="card"><p>Could not load lessons. Open once with internet to install them.</p></main>'; return; }
-    buildIndex(); Check.setKnown(Check.knownFromContent(C)); migratePath(); applyStartParked();
-    if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+    buildIndex(); Check.setKnown(Check.knownFromContent(C)); Check.setSynonyms(C.synonyms); migratePath(); applyStartParked();
+    initVoices();
     renderHome();
   }
   window.__app = { version: APP_VERSION, get state() { return S; }, get ex() { return run && run.ex; }, get entry() { return run && run.queue[run.i]; }, get run() { return run; }, get story() { return story; },
     makeExercise: e => makeExercise(e), get content() { return C; }, importBackup: (t) => importBackup(t, true), openStone: (u, i) => openStone(u, i), testQueue: u => testQueue(C.units[IDX.unitIdx[u]]), practiceQueue: u => practiceQueue(C.units[IDX.unitIdx[u]]), dueIds: () => dueIds(Date.now()), currentPos: () => currentPos(),
     introQueue: u => introQueue(C.units[IDX.unitIdx[u]]), withTiles: (w, t) => withTiles(w, t), pickStoryTile: u => pickStoryTile(C.units[IDX.unitIdx[u]].story),
     forceEx: (type, sent) => { if (!run || run.answered) return; const e = run.queue[run.i] = Object.assign({}, run.queue[run.i], { ex: type }, sent ? { sent } : {}); run.ex = makeExercise(e); renderExercise(e, run.ex); },
+    speakPaused: () => speakPaused(), speakOk: () => speakOk(), cantSpeak: () => { const b = document.getElementById('cantSpeak'); if (b) b.click(); }, get voice() { return voice; }, pickVoice: () => pickVoice(), gloss: w => gloss(w), pickExercise: (id, rev) => pickExercise(IDX.words[id], rev), unblockSpeech: () => { speechBlocked = false; try { sessionStorage.removeItem('speech-blocked'); } catch (e) { /* ignore */ } }, get speechBlocked() { return speechBlocked; }, normalize: raw => normalize(raw),
     tick: () => tick(), listenPaused: () => listenPaused(), cantListen: () => { const b = document.getElementById('cantListen'); if (b) b.click(); }, todayMinutes: () => Daily.minutesOn(S.daily, todayKey()), streakNow: () => Daily.current(S.streak, todayKey()) };
   boot();
 })();

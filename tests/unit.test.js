@@ -252,4 +252,87 @@ t('typo feedback highlights the fixed letter in the correct answer', () => {
   const r = Check.check('cotizaciom', ['la cotización']); assert.equal(Check.markFixes('la cotización', r), 'la cotizació<mark>n</mark>');
   const r2 = Check.check('mojnera', ['mojonera']); assert.equal(Check.markFixes('mojonera', r2), 'moj<mark>o</mark>nera');
 });
+
+// ---------------- v8 ----------------
+global.Check = Check;
+const Speech = require('../speech.js'), Voice = require('../voice.js');
+const Lsn = require('../listen.js');
+const allWords = C.units.flatMap(u => u.words), W8 = id => allWords.find(w => w.id === id);
+Check.setKnown(Check.knownFromContent(C)); Check.setSynonyms(C.synonyms);
+const A = (typed, w) => Check.checkAlt(typed, [w.es].concat(w.esAlt || []), { lang: 'es' }, w.alt || []);
+t('v8 synonyms: reparar for arreglar is correct with a Mexican-usage note', () => {
+  const r = A('reparar', W8('arreglar')); assert.equal(r.result, 'alt'); assert.ok(/arreglar is more common/.test(r.note)); assert.equal(r.answer, 'arreglar');
+});
+t('v8 synonyms: the main answer is still exact, a wrong word is still wrong', () => { assert.equal(A('arreglar', W8('arreglar')).result, 'exact'); assert.equal(A('romper', W8('arreglar')).result, 'wrong'); });
+t('v8 synonyms: article and accent tolerance apply to the alternate', () => { assert.equal(A('el neumatico', W8('llanta')).result, 'alt'); assert.equal(A('la reunion', W8('junta')).result, 'alt'); assert.equal(A('el fontanero', W8('plomero')).result, 'alt'); });
+t('v8 synonyms: a one-letter slip that lands on another real form is not credited (repara for arreglar)', () => assert.equal(A('repara', W8('arreglar')).result, 'wrong'));
+t('v8 synonyms: alternates inside sentences (cloze blanks + swaps), conjugated', () => {
+  assert.equal(Check.checkAlt('repararon', ['arreglaron'], { lang: 'es' }, []).result, 'alt');
+  assert.equal(Check.checkAlt('alquiláramos', ['rentáramos'], { lang: 'es' }, []).result, 'alt');
+  assert.equal(Check.checkAlt('deje el coche en el taller el lunes', ['Dejé el carro en el taller el lunes.'], { lang: 'es', sentence: true }, []).result, 'alt');
+  assert.equal(Check.checkAlt('conduje toda la noche', ['Manejé toda la noche.'], { lang: 'es', sentence: true }, []).result, 'alt');
+});
+t('v8 synonyms: other-gender swaps are never applied inside a sentence (por el demora)', () => {
+  assert.equal(Check.checkAlt('demora', ['retraso'], { lang: 'es' }, []).result, 'wrong');
+  assert.equal(A('la demora', W8('retraso')).result, 'alt', 'but as the word itself it is fine');
+});
+t('v8 synonyms: content has alt notes on vocab + sentences, Mexican mains (carro, not coche)', () => {
+  const wa = allWords.filter(w => w.alt).reduce((n, w) => n + w.alt.length, 0), sa = C.units.flatMap(u => u.sentences).filter(s => s.alt).length;
+  assert.ok(wa >= 20 && sa >= 15, wa + ' / ' + sa);
+  allWords.forEach(w => (w.alt || []).forEach(a => { assert.ok(a.w && /^Correct/.test(a.note), w.id); assert.notEqual(Check.stripAcc(a.w), Check.stripAcc(w.es.replace(/^(el|la|los|las) /, '')), w.id); }));
+  const es = JSON.stringify(C.units.map(u => [u.sentences.map(s => s.es), u.story.lines.map(l => l.es)]));
+  assert.ok(!/\bcoches?\b/.test(es), 'no coche in Spanish text'); assert.ok(/\bcarro\b/.test(es));
+  C.synonyms.forEach(d => assert.ok(d.main && d.alt && d.note, JSON.stringify(d)));
+});
+t('v8 glosses: every Spanish word in sentences, stories and grammar items has a hint', () => {
+  const strip = s => Check.stripAcc(String(s).toLowerCase());
+  const forms = new Set(); allWords.forEach(w => [w.es, ...(w.esAlt || [])].forEach(f => { const k = strip(f.replace(/^(el|la|los|las) /, '')); forms.add(k); forms.add(k + 's'); forms.add(k + 'es'); const f1 = k.split(' ')[0]; if (f1.length > 3) forms.add(f1); }));
+  C.units.forEach(u => u.sentences.forEach(s => { const k = strip(s.f); if (!k.includes(' ')) forms.add(k); }));
+  const G = new Set(Object.keys(C.glosses).map(strip)); const miss = new Set();
+  const scan = txt => txt.replace(/\([^)]*\)/g, ' ').split(/\s+/).forEach(tok => { const c = tok.replace(/^[¿¡“"(«—]+|[.,;:!?”"»)…—]+$/g, ''); if (!c || !/\p{L}/u.test(c)) return; const k = strip(c); if (!forms.has(k) && !G.has(k)) miss.add(c); });
+  C.units.forEach(u => { u.sentences.forEach(s => scan(s.es)); u.story.lines.forEach(l => scan(l.es)); });
+  Object.values(C.patterns).forEach(p => p.items.forEach(i => scan(i.q.replace('___', i.o[0]))));
+  assert.deepEqual([...miss], []);
+  Object.entries(C.glosses).forEach(([k, v]) => assert.ok(v && v.trim(), k));
+});
+t('v8 speech grading: punctuation, accents and digits ignored', () => {
+  assert.equal(Speech.grade(['pague 500 pesos por la consulta'], 'Pagué 500 pesos por la consulta.').result, 'exact');
+  assert.equal(Speech.grade(['pagué quinientos pesos por la consulta'], 'Pagué 500 pesos por la consulta.').result, 'exact');
+  assert.equal(Speech.grade(['Se los enviaré mañana'], 'Se los enviaré mañana.').result, 'exact');
+  assert.equal(Speech.grade(['se los enviare manana'], 'Se los enviaré mañana.').result, 'exact');
+});
+t('v8 speech grading: best of several alternatives; one dropped word in a long line is "close"', () => {
+  assert.equal(Speech.grade(['me lo mandas', 'me lo puedes mandar mañana'], '¿Me lo puedes mandar mañana?').result, 'exact');
+  assert.equal(Speech.grade(['pagué quinientos pesos por consulta'], 'Pagué 500 pesos por la consulta.').result, 'close');
+  assert.equal(Speech.grade(['me lo mandas mañana'], '¿Me lo puedes mandar mañana?').result, 'wrong', 'short line: no slack');
+});
+t('v8 speech grading: a clitic slip is never "close" (se lo vs se los)', () => {
+  assert.equal(Speech.grade(['si te pide el dinero no se lo des todavía'], 'Si te pide el dinero, no se los des todavía.').result, 'wrong');
+  assert.equal(Speech.grade([''], 'Hola.').result, 'wrong'); assert.equal(Speech.grade([], 'Hola.').result, 'wrong');
+});
+t('v8 speech feature check + blocking errors', () => {
+  assert.equal(Speech.available({}), false); assert.equal(Speech.available({ webkitSpeechRecognition: function () {} }), true); assert.equal(Speech.available({ SpeechRecognition: function () {} }), true);
+  ['not-allowed', 'service-not-allowed', 'audio-capture', 'network'].forEach(e => assert.ok(Speech.isBlocking(e), e));
+  ['no-speech', 'aborted'].forEach(e => assert.ok(!Speech.isBlocking(e), e));
+  assert.equal(Speech.numWords(150), 'ciento cincuenta'); assert.equal(Speech.numWords(45), 'cuarenta y cinco'); assert.equal(Speech.numWords(2026), 'dos mil veintiseis');
+});
+t("v8 can't speak now: 10-minute pause helpers, speak is its own type", () => {
+  const now = 1e12, until = Lsn.start(now); assert.equal(until - now, 600000); assert.ok(Lsn.paused(until, now + 599999)); assert.ok(!Lsn.paused(until, now + 600000));
+  assert.ok(Lsn.isSpeak('speak') && !Lsn.isSpeak('listen') && !Lsn.isAudio('speak'));
+  assert.equal(Lsn.substituteSpeak(true), 'build'); assert.equal(Lsn.substituteSpeak(false), 'en2es');
+});
+t('v8 voice choice: Angélica Enhanced > es-MX Enhanced > es-MX > es-US > es-*; saved choice wins', () => {
+  const v = (name, lang, uri) => ({ name, lang, voiceURI: uri || name, localService: true });
+  const list = [v('Mónica', 'es-ES'), v('Paulina', 'es-MX'), v('Angélica', 'es-MX', 'com.apple.voice.compact.es-MX.Angelica'), v('Angélica (Enhanced)', 'es-MX', 'com.apple.voice.enhanced.es-MX.Angelica'), v('Samantha', 'en-US'), v('Juan (Enhanced)', 'es-MX'), v('Google español de Estados Unidos', 'es-US')];
+  assert.equal(Voice.best(list).name, 'Angélica (Enhanced)');
+  assert.equal(Voice.best(list.filter(x => !/Ang/.test(x.name))).name, 'Juan (Enhanced)');
+  assert.equal(Voice.best(list.filter(x => !/Ang|Juan/.test(x.name))).name, 'Paulina');
+  assert.equal(Voice.best([v('Mónica', 'es-ES'), v('Google español de Estados Unidos', 'es-US')]).name, 'Google español de Estados Unidos');
+  assert.equal(Voice.best([v('Mónica', 'es-ES'), v('Samantha', 'en-US')]).name, 'Mónica');
+  assert.equal(Voice.best([v('Samantha', 'en-US')]), null);
+  assert.equal(Voice.best([v('Angelica', 'es-MX'), v('Angelica (Premium)', 'es-MX')]).name, 'Angelica (Premium)', 'no-accent name, Premium');
+  assert.equal(Voice.choose(list, 'Paulina').name, 'Paulina');
+  assert.equal(Voice.choose(list, 'Removed voice').name, 'Angélica (Enhanced)', 'uninstalled saved voice falls back to automatic');
+  assert.deepEqual(Voice.spanish(list).map(x => x.lang).filter(l => !l.startsWith('es')), []);
+});
 console.log(`\n${n} tests passed`);

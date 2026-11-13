@@ -16,7 +16,7 @@ def check(cond, msg):
 
 async def new_ctx(b, p):
     dev = dict(p.devices['iPhone 15']) if ENGINE == 'webkit' else dict(viewport={'width': 390, 'height': 844}, device_scale_factor=3, is_mobile=True, has_touch=True)
-    return await b.new_context(**dev, timezone_id='America/Mexico_City')
+    c = await b.new_context(**dev, timezone_id='America/Mexico_City'); await c.add_init_script("delete window.SpeechRecognition; delete window.webkitSpeechRecognition"); return c  # v8: no recogniser here; speaking drills are covered by v8_e2e
 
 async def solve_story_tile(page):
     """v7: a story may pause on a "rebuild the line" word bank; place the tiles in order and check."""
@@ -56,12 +56,12 @@ async def main():
                 await pg.goto(URL); await pg.wait_for_selector('.stone')
             else:
                 await pg.goto(URL); await pg.wait_for_selector('#go'); await pg.evaluate("s => __app.importBackup(s)", json.dumps(V5)); await pg.reload(); await pg.wait_for_selector('.stone')
-            check(await pg.evaluate("__app.version") == 'v7', f'[{mode}] app version is v7')
+            check(await pg.evaluate("__app.version") == 'v8', f'[{mode}] app version is v8')
             s = await pg.evaluate("__app.state"); stored = await pg.evaluate(f"JSON.parse(localStorage.getItem('{KEY}'))")
             keep = ['items', 'pstats', 'recent', 'parked', 'daily', 'streak', 'placementDone', 'placementSummary', 'sessions', 'created']
             check(all(s.get(k) == raw.get(k) for k in keep), f'[{mode}] SRS items ({len(raw["items"])}), stats, parked, daily history, streak unchanged')
             check(all(s['path']['done'].get(u) == v for u, v in raw['path']['done'].items()) and s['path']['tests'] == raw['path']['tests'], f'[{mode}] every unit’s stones and test scores unchanged')
-            check(s['schema'] == 4 and stored and stored['items'] == raw['items'], f'[{mode}] schema 4, saved under the same key')
+            check(s['schema'] == 5 and stored and stored['items'] == raw['items'], f'[{mode}] schema 5, saved under the same key')
             cur = await pg.evaluate("__app.currentPos()")
             check(cur == {'uid': 'ta1', 'stone': 0}, f'[{mode}] next stop is the new unit 3 (Primer mensaje por WhatsApp): {cur}')
             u3 = await pg.evaluate("[...document.querySelectorAll('#unit-u3 .stone')].map(b => b.classList.contains('done'))")

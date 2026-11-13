@@ -1,4 +1,4 @@
-"""Simulates a deploy while the app is open: v7 running -> server gets v8 -> app returns to foreground -> auto reload into v8, progress intact."""
+"""Simulates a deploy while the app is open: v8 running -> server gets v9 -> app returns to foreground -> auto reload into v9, progress intact."""
 import asyncio, shutil, subprocess, sys, time, re, os
 from playwright.async_api import async_playwright
 SRC = '/workspace/spanish-app'; TMP = '/tmp/spanish-upd'; PORT = 8788
@@ -13,6 +13,7 @@ async def run(engine):
         async with async_playwright() as p:
             b = await (p.webkit if engine == 'webkit' else p.chromium).launch()
             ctx = await b.new_context(**(dict(p.devices['iPhone 15']) if engine == 'webkit' else {'viewport': {'width': 390, 'height': 844}}))
+            await ctx.add_init_script("delete window.SpeechRecognition; delete window.webkitSpeechRecognition")  # v8: no recogniser; speaking drills are covered by v8_e2e
             page = await ctx.new_page(); errors = []
             page.on('pageerror', lambda e: errors.append(str(e)))
             url = f'http://127.0.0.1:{PORT}/'
@@ -21,7 +22,7 @@ async def run(engine):
             await page.evaluate("(() => { const s = __app.state; s.placementDone = true; s.items['w:fuga'] = {s: 50, d: 3, reps: 4, lapses: 0, last: Date.now(), due: Date.now() + 40*864e5}; localStorage.setItem('spanish-app-state-v1', JSON.stringify(s)); })()")
             await page.reload(); await page.wait_for_selector('.stone')
             v_before = await page.evaluate("__app.version"); label = await page.inner_text('.version')
-            setv(8)  # "deploy" (v7 -> v8)
+            setv(9)  # "deploy" (v8 -> v9)
             async with page.expect_navigation(timeout=15000):
                 await page.evaluate("Object.defineProperty(document, 'visibilityState', {configurable: true, get: () => 'visible'}); document.dispatchEvent(new Event('visibilitychange'));")
             await page.wait_for_selector('.stone')

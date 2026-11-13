@@ -1,5 +1,5 @@
 {
- "version": 3,
+ "version": 4,
  "dialect": "es-MX",
  "patterns": {
   "clitic_future": {
@@ -29,7 +29,7 @@
      "n": "le + la → se la. La = la llave."
     },
     {
-     "q": "¿Me vas a prestar tu coche el sábado? — Sí, ___.",
+     "q": "¿Me vas a prestar tu carro el sábado? — Sí, ___.",
      "o": [
       "te lo prestaré",
       "te le prestaré",
@@ -556,7 +556,7 @@
    "explain": "Accidental se: se + me/te/le/nos/les + verb, and the verb agrees with the thing (se me olvidaron las llaves). Impersonal/passive se: se habla, se venden casas.",
    "items": [
     {
-     "q": "Ay, ___ las llaves en el coche.",
+     "q": "Ay, ___ las llaves en el carro.",
      "o": [
       "se me olvidaron",
       "me olvidaron",
@@ -1765,6 +1765,12 @@
      "en": "plumber",
      "accept": [
       "plumber"
+     ],
+     "alt": [
+      {
+       "w": "fontanero",
+       "note": "Correct! Fontanero is Spain; in Mexico you call el plomero."
+      }
      ]
     },
     {
@@ -1789,7 +1795,13 @@
       "not working",
       "broken down"
      ],
-     "note": "Mexico: for machines and appliances (el refri está descompuesto)."
+     "note": "Mexico: for machines and appliances (el refri está descompuesto).",
+     "alt": [
+      {
+       "w": "averiado",
+       "note": "Correct! Averiado is understood, but in Mexico something broken is descompuesto."
+      }
+     ]
     },
     {
      "id": "arreglar",
@@ -1800,6 +1812,16 @@
       "to repair",
       "to arrange",
       "to sort out"
+     ],
+     "alt": [
+      {
+       "w": "reparar",
+       "note": "Correct! In Mexico, arreglar is more common for everyday fixes."
+      },
+      {
+       "w": "componer",
+       "note": "Correct! Componer is heard in Mexico too, but arreglar is the everyday word."
+      }
      ]
     },
     {
@@ -1811,7 +1833,13 @@
       "tap",
       "key"
      ],
-     "note": "In Mexico la llave is both the key and the faucet."
+     "note": "In Mexico la llave is both the key and the faucet.",
+     "alt": [
+      {
+       "w": "grifo",
+       "note": "Correct! Grifo is understood; in Mexico the faucet is la llave."
+      }
+     ]
     }
    ],
    "sentences": [
@@ -1819,50 +1847,146 @@
      "es": "La llave del baño tenía una fuga y llamé al plomero.",
      "en": "The bathroom faucet had a leak and I called the plumber.",
      "k": "fuga",
-     "f": "fuga"
+     "f": "fuga",
+     "swaps": [
+      {
+       "w": "fontanero",
+       "for": "plomero"
+      }
+     ]
     },
     {
      "es": "Cuando llegué, el refri estaba descompuesto.",
      "en": "When I got there, the fridge was broken.",
      "k": "descompuesto",
-     "f": "descompuesto"
+     "f": "descompuesto",
+     "alt": [
+      {
+       "f": "averiado",
+       "note": "Correct! Averiado is understood, but in Mexico something broken is descompuesto."
+      }
+     ],
+     "swaps": [
+      {
+       "w": "refrigerador",
+       "for": "refri"
+      },
+      {
+       "w": "averiado",
+       "for": "descompuesto"
+      }
+     ]
     },
     {
      "es": "El plomero vino ayer, pero no pudo arreglar la fuga.",
      "en": "The plumber came yesterday, but he couldn't fix the leak.",
      "k": "arreglar",
-     "f": "arreglar"
+     "f": "arreglar",
+     "alt": [
+      {
+       "f": "reparar",
+       "note": "Correct! In Mexico, arreglar is more common for everyday fixes."
+      }
+     ],
+     "swaps": [
+      {
+       "w": "reparar",
+       "for": "arreglar"
+      },
+      {
+       "w": "fontanero",
+       "for": "plomero"
+      }
+     ]
     },
     {
      "es": "Se me olvidó entregarle el recibo al plomero.",
      "en": "I forgot to give the plumber the receipt.",
      "k": "plomero",
-     "f": "plomero"
+     "f": "plomero",
+     "alt": [
+      {
+       "f": "fontanero",
+       "note": "Correct! Fontanero is Spain; in Mexico you call el plomero."
+      }
+     ],
+     "swaps": [
+      {
+       "w": "fontanero",
+       "for": "plomero"
+      }
+     ]
     },
     {
      "es": "Mientras arreglaba la llave, se le cayó una pieza.",
      "en": "While he was fixing the faucet, he dropped a part.",
      "k": "llave",
-     "f": "llave"
+     "f": "llave",
+     "swaps": [
+      {
+       "w": "reparaba",
+       "for": "arreglaba"
+      }
+     ]
     },
     {
      "es": "Hice una cita con el plomero para el lunes.",
      "en": "I made an appointment with the plumber for Monday.",
      "k": "plomero",
-     "f": "plomero"
+     "f": "plomero",
+     "alt": [
+      {
+       "f": "fontanero",
+       "note": "Correct! Fontanero is Spain; in Mexico you call el plomero."
+      }
+     ],
+     "swaps": [
+      {
+       "w": "fontanero",
+       "for": "plomero"
+      }
+     ]
     },
     {
      "es": "El elevador estuvo descompuesto toda la semana.",
      "en": "The elevator was out of order all week.",
      "k": "descompuesto",
-     "f": "descompuesto"
+     "f": "descompuesto",
+     "alt": [
+      {
+       "f": "averiado",
+       "note": "Correct! Averiado is understood, but in Mexico something broken is descompuesto."
+      }
+     ],
+     "swaps": [
+      {
+       "w": "ascensor",
+       "for": "elevador"
+      },
+      {
+       "w": "averiado",
+       "for": "descompuesto"
+      }
+     ]
     },
     {
      "es": "¿Ya te arreglaron la llave?",
      "en": "Did they fix your faucet yet?",
      "k": "arreglar",
      "f": "arreglaron",
-     "h": "arreglar, preterite ellos"
+     "h": "arreglar, preterite ellos",
+     "alt": [
+      {
+       "f": "repararon",
+       "note": "Correct! In Mexico, arreglar is more common for everyday fixes."
+      }
+     ],
+     "swaps": [
+      {
+       "w": "repararon",
+       "for": "arreglaron"
+      }
+     ]
     }
    ],
    "story": {
@@ -1981,7 +2105,13 @@
       "board",
       "board meeting"
      ],
-     "note": "Mexico uses la junta for a work meeting; la reunión also works."
+     "note": "Mexico uses la junta for a work meeting; la reunión also works.",
+     "alt": [
+      {
+       "w": "reunión",
+       "note": "Correct! Reunión works everywhere; for work meetings Mexicans usually say la junta."
+      }
+     ]
     },
     {
      "id": "presupuesto",
@@ -2033,13 +2163,31 @@
      "es": "La junta es a las nueve en la sala grande.",
      "en": "The meeting is at nine in the big room.",
      "k": "junta",
-     "f": "junta"
+     "f": "junta",
+     "alt": [
+      {
+       "f": "reunión",
+       "note": "Correct! Reunión works everywhere; for work meetings Mexicans usually say la junta."
+      }
+     ],
+     "swaps": [
+      {
+       "w": "reunión",
+       "for": "junta"
+      }
+     ]
     },
     {
      "es": "Necesito que me mandes el presupuesto antes de la junta.",
      "en": "I need you to send me the budget before the meeting.",
      "k": "presupuesto",
-     "f": "presupuesto"
+     "f": "presupuesto",
+     "swaps": [
+      {
+       "w": "reunión",
+       "for": "junta"
+      }
+     ]
     },
     {
      "es": "Ojalá que aprueben la propuesta esta semana.",
@@ -2058,7 +2206,17 @@
      "es": "Le pedí al plomero un presupuesto para arreglar la fuga.",
      "en": "I asked the plumber for an estimate to fix the leak.",
      "k": "presupuesto",
-     "f": "presupuesto"
+     "f": "presupuesto",
+     "swaps": [
+      {
+       "w": "reparar",
+       "for": "arreglar"
+      },
+      {
+       "w": "fontanero",
+       "for": "plomero"
+      }
+     ]
     },
     {
      "es": "Es importante que el cliente apruebe el presupuesto pronto.",
@@ -2071,7 +2229,19 @@
      "es": "Mi jefe está en una junta; te llama cuando termine.",
      "en": "My boss is in a meeting; he'll call you when he's done.",
      "k": "junta",
-     "f": "junta"
+     "f": "junta",
+     "alt": [
+      {
+       "f": "reunión",
+       "note": "Correct! Reunión works everywhere; for work meetings Mexicans usually say la junta."
+      }
+     ],
+     "swaps": [
+      {
+       "w": "reunión",
+       "for": "junta"
+      }
+     ]
     },
     {
      "es": "Mandé la propuesta, pero todavía no me contestan.",
@@ -2202,6 +2372,12 @@
      "en": "delay",
      "accept": [
       "delay"
+     ],
+     "alt": [
+      {
+       "w": "demora",
+       "note": "Correct! Demora and atraso are understood; for a delayed flight or bus Mexicans usually say retraso."
+      }
      ]
     },
     {
@@ -2223,7 +2399,17 @@
      "accept": [
       "ticket"
      ],
-     "note": "Mexico: el boleto. Spain: el billete."
+     "note": "Mexico: el boleto. Spain: el billete.",
+     "alt": [
+      {
+       "w": "billete",
+       "note": "Correct in Spain! In Mexico a ticket is un boleto; un billete is a banknote."
+      },
+      {
+       "w": "pasaje",
+       "note": "Correct! Pasaje is understood; Mexicans usually say el boleto."
+      }
+     ]
     },
     {
      "id": "rentar",
@@ -2234,7 +2420,13 @@
       "to lease",
       "to hire"
      ],
-     "note": "Mexico: rentar. Spain: alquilar."
+     "note": "Mexico: rentar. Spain: alquilar.",
+     "alt": [
+      {
+       "w": "alquilar",
+       "note": "Correct! Alquilar is standard Spanish; in Mexico you will hear rentar (and la renta)."
+      }
+     ]
     }
    ],
    "sentences": [
@@ -2254,33 +2446,101 @@
      "es": "Por el retraso, perdimos la conexión.",
      "en": "Because of the delay, we missed our connection.",
      "k": "retraso",
-     "f": "retraso"
+     "f": "retraso",
+     "alt": [
+      {
+       "f": "atraso",
+       "note": "Correct! Demora and atraso are understood; for a delayed flight or bus Mexicans usually say retraso."
+      }
+     ],
+     "swaps": [
+      {
+       "w": "atraso",
+       "for": "retraso"
+      }
+     ]
     },
     {
      "es": "Compré los boletos para Oaxaca por internet.",
      "en": "I bought the tickets to Oaxaca online.",
      "k": "boleto",
      "f": "boletos",
-     "h": "plural"
+     "h": "plural",
+     "alt": [
+      {
+       "f": "pasajes",
+       "note": "Correct! Pasaje is understood; Mexicans usually say el boleto."
+      }
+     ],
+     "swaps": [
+      {
+       "w": "pasajes",
+       "for": "boletos"
+      }
+     ]
     },
     {
-     "es": "Si rentáramos un coche, podríamos ir a la playa.",
+     "es": "Si rentáramos un carro, podríamos ir a la playa.",
      "en": "If we rented a car, we could go to the beach.",
      "k": "rentar",
      "f": "rentáramos",
-     "h": "rentar, imperfect subjunctive nosotros"
+     "h": "rentar, imperfect subjunctive nosotros",
+     "alt": [
+      {
+       "f": "alquiláramos",
+       "note": "Correct! Alquilar is standard Spanish; in Mexico you will hear rentar (and la renta)."
+      }
+     ],
+     "swaps": [
+      {
+       "w": "coche",
+       "for": "carro"
+      },
+      {
+       "w": "alquiláramos",
+       "for": "rentáramos"
+      }
+     ]
     },
     {
      "es": "¿Me podría dar el recibo del boleto, por favor?",
      "en": "Could you give me the receipt for the ticket, please?",
      "k": "boleto",
-     "f": "boleto"
+     "f": "boleto",
+     "alt": [
+      {
+       "f": "pasaje",
+       "note": "Correct! Pasaje is understood; Mexicans usually say el boleto."
+      }
+     ],
+     "swaps": [
+      {
+       "w": "pasaje",
+       "for": "boleto"
+      }
+     ]
     },
     {
      "es": "Si no hubiera retraso, llegaríamos a tiempo a la junta.",
      "en": "If there were no delay, we'd get to the meeting on time.",
      "k": "retraso",
-     "f": "retraso"
+     "f": "retraso",
+     "alt": [
+      {
+       "f": "atraso",
+       "note": "Correct! Demora and atraso are understood; for a delayed flight or bus Mexicans usually say retraso."
+      }
+     ],
+     "swaps": [
+      {
+       "w": "reunión",
+       "for": "junta"
+      },
+      {
+       "w": "atraso",
+       "for": "retraso"
+      }
+     ]
     },
     {
      "es": "Antes de la caseta hay una gasolinera.",
@@ -2292,7 +2552,23 @@
      "es": "Quiero rentar un departamento por seis meses.",
      "en": "I want to rent an apartment for six months.",
      "k": "rentar",
-     "f": "rentar"
+     "f": "rentar",
+     "alt": [
+      {
+       "f": "alquilar",
+       "note": "Correct! Alquilar is standard Spanish; in Mexico you will hear rentar (and la renta)."
+      }
+     ],
+     "swaps": [
+      {
+       "w": "alquilar",
+       "for": "rentar"
+      },
+      {
+       "w": "piso",
+       "for": "departamento"
+      }
+     ]
     }
    ],
    "story": {
@@ -2335,12 +2611,12 @@
      },
      {
       "s": "Itzel",
-      "es": "¡Por fin! Mañana rentamos un coche para ir a Hierve el Agua.",
+      "es": "¡Por fin! Mañana rentamos un carro para ir a Hierve el Agua.",
       "en": "Finally! Tomorrow we'll rent a car to go to Hierve el Agua."
      },
      {
       "s": "Rodrigo",
-      "es": "Perfecto. Yo pago la renta del coche y tú la gasolina.",
+      "es": "Perfecto. Yo pago la renta del carro y tú la gasolina.",
       "en": "Perfect. I'll pay for the car rental and you pay for the gas."
      }
     ],
@@ -2414,6 +2690,12 @@
      "accept": [
       "pill",
       "tablet"
+     ],
+     "alt": [
+      {
+       "w": "píldora",
+       "note": "Correct! Píldora is understood; Mexicans usually say la pastilla."
+      }
      ]
     },
     {
@@ -2461,13 +2743,31 @@
      "en": "The doctor prescribed me some pills for my blood pressure.",
      "k": "recetar",
      "f": "recetó",
-     "h": "recetar, preterite él"
+     "h": "recetar, preterite él",
+     "swaps": [
+      {
+       "w": "píldoras",
+       "for": "pastillas"
+      }
+     ]
     },
     {
      "es": "Tómese una pastilla cada ocho horas.",
      "en": "Take one pill every eight hours.",
      "k": "pastilla",
-     "f": "pastilla"
+     "f": "pastilla",
+     "alt": [
+      {
+       "f": "píldora",
+       "note": "Correct! Píldora is understood; Mexicans usually say la pastilla."
+      }
+     ],
+     "swaps": [
+      {
+       "w": "píldora",
+       "for": "pastilla"
+      }
+     ]
     },
     {
      "es": "Estoy un poco mareado desde la mañana.",
@@ -2503,7 +2803,13 @@
      "es": "Llegué al consultorio y el doctor iba con una hora de retraso.",
      "en": "I got to the doctor's office and the doctor was running an hour late.",
      "k": "consultorio",
-     "f": "consultorio"
+     "f": "consultorio",
+     "swaps": [
+      {
+       "w": "atraso",
+       "for": "retraso"
+      }
+     ]
     }
    ],
    "story": {
@@ -2651,7 +2957,17 @@
       "exchange",
       "loose change"
      ],
-     "note": "¿Tiene cambio? = Do you have change?"
+     "note": "¿Tiene cambio? = Do you have change?",
+     "alt": [
+      {
+       "w": "vuelto",
+       "note": "Correct in South America! In Mexico your change is el cambio."
+      },
+      {
+       "w": "feria",
+       "note": "Correct! Feria is Mexican slang for change or cash; el cambio is the neutral word."
+      }
+     ]
     },
     {
      "id": "regatear",
@@ -2681,7 +2997,13 @@
      "es": "¿Me puede pesar un kilo de jitomate?",
      "en": "Can you weigh me a kilo of tomatoes?",
      "k": "pesar",
-     "f": "pesar"
+     "f": "pesar",
+     "swaps": [
+      {
+       "w": "tomate",
+       "for": "jitomate"
+      }
+     ]
     },
     {
      "es": "Disculpe, no tengo cambio; solo traigo un billete de quinientos.",
@@ -2903,7 +3225,13 @@
      "es": "Ya te hice la transferencia; revisa tu cuenta.",
      "en": "I already sent you the transfer; check your account.",
      "k": "transferencia",
-     "f": "transferencia"
+     "f": "transferencia",
+     "swaps": [
+      {
+       "w": "checa",
+       "for": "revisa"
+      }
+     ]
     },
     {
      "es": "En el estado de cuenta aparece un cargo que no reconozco.",
@@ -2934,14 +3262,30 @@
      "es": "Cuando revisé el estado de cuenta, ya me habían cobrado la comisión.",
      "en": "When I checked the statement, they had already charged me the fee.",
      "k": "comision",
-     "f": "comisión"
+     "f": "comisión",
+     "swaps": [
+      {
+       "w": "chequé",
+       "for": "revisé"
+      }
+     ]
     },
     {
      "es": "El plomero me cobró ochocientos pesos por arreglar la fuga.",
      "en": "The plumber charged me 800 pesos to fix the leak.",
      "k": "cobrar",
      "f": "cobró",
-     "h": "cobrar, preterite él"
+     "h": "cobrar, preterite él",
+     "swaps": [
+      {
+       "w": "reparar",
+       "for": "arreglar"
+      },
+      {
+       "w": "fontanero",
+       "for": "plomero"
+      }
+     ]
     }
    ],
    "story": {
@@ -3144,20 +3488,38 @@
      "es": "La vecina con quien hablé dice que el portón está descompuesto.",
      "en": "The neighbor I talked to says the gate is broken.",
      "k": "porton",
-     "f": "portón"
+     "f": "portón",
+     "swaps": [
+      {
+       "w": "averiado",
+       "for": "descompuesto"
+      }
+     ]
     },
     {
      "es": "Lo que más me molesta es que dejen la basura en la banqueta.",
      "en": "What bothers me most is that they leave the trash on the sidewalk.",
      "k": "basura",
-     "f": "basura"
+     "f": "basura",
+     "swaps": [
+      {
+       "w": "acera",
+       "for": "banqueta"
+      }
+     ]
     },
     {
      "es": "Los vecinos se quejaron del ruido en la junta de condóminos.",
      "en": "The neighbors complained about the noise at the condo owners' meeting.",
      "k": "quejarse",
      "f": "quejaron",
-     "h": "quejarse, preterite ellos"
+     "h": "quejarse, preterite ellos",
+     "swaps": [
+      {
+       "w": "reunión",
+       "for": "junta"
+      }
+     ]
     }
    ],
    "story": {
@@ -3290,6 +3652,16 @@
       "tire",
       "tyre",
       "wheel"
+     ],
+     "alt": [
+      {
+       "w": "neumático",
+       "note": "Correct! Neumático is the technical word; in Mexico everyone says la llanta."
+      },
+      {
+       "w": "goma",
+       "note": "Correct in Argentina! In Mexico a tire is una llanta."
+      }
      ]
     },
     {
@@ -3304,7 +3676,13 @@
       "punctured",
       "flat tire"
      ],
-     "note": "Mexico: una llanta ponchada = a flat tire."
+     "note": "Mexico: una llanta ponchada = a flat tire.",
+     "alt": [
+      {
+       "w": "pinchado",
+       "note": "Correct in Spain! In Mexico a flat tire is una llanta ponchada."
+      }
+     ]
     },
     {
      "id": "revisar",
@@ -3317,6 +3695,12 @@
       "to look over",
       "to examine",
       "to look at"
+     ],
+     "alt": [
+      {
+       "w": "checar",
+       "note": "Correct! Checar is very Mexican and casual; revisar is the neutral word."
+      }
      ]
     },
     {
@@ -3331,29 +3715,65 @@
    ],
    "sentences": [
     {
-     "es": "Dejé el coche en el taller el lunes.",
+     "es": "Dejé el carro en el taller el lunes.",
      "en": "I left the car at the shop on Monday.",
      "k": "taller",
-     "f": "taller"
+     "f": "taller",
+     "swaps": [
+      {
+       "w": "coche",
+       "for": "carro"
+      }
+     ]
     },
     {
      "es": "Se me ponchó una llanta en la carretera.",
      "en": "I got a flat tire on the highway.",
      "k": "llanta",
-     "f": "llanta"
+     "f": "llanta",
+     "swaps": [
+      {
+       "w": "pinchó",
+       "for": "ponchó"
+      }
+     ]
     },
     {
      "es": "La llanta está ponchada; hay que cambiarla.",
      "en": "The tire is flat; it needs to be changed.",
      "k": "ponchado",
      "f": "ponchada",
-     "h": "feminine"
+     "h": "feminine",
+     "alt": [
+      {
+       "f": "pinchada",
+       "note": "Correct in Spain! In Mexico a flat tire is una llanta ponchada."
+      }
+     ],
+     "swaps": [
+      {
+       "w": "pinchada",
+       "for": "ponchada"
+      }
+     ]
     },
     {
      "es": "¿Me puede revisar el aceite, por favor?",
      "en": "Can you check the oil for me, please?",
      "k": "revisar",
-     "f": "revisar"
+     "f": "revisar",
+     "alt": [
+      {
+       "f": "checar",
+       "note": "Correct! Checar is very Mexican and casual; revisar is the neutral word."
+      }
+     ],
+     "swaps": [
+      {
+       "w": "checar",
+       "for": "revisar"
+      }
+     ]
     },
     {
      "es": "Hay que cambiarle el aceite cada cinco mil kilómetros.",
@@ -3366,7 +3786,19 @@
      "en": "I want the mechanic to check the brakes before the trip.",
      "k": "revisar",
      "f": "revise",
-     "h": "revisar, subjunctive él"
+     "h": "revisar, subjunctive él",
+     "alt": [
+      {
+       "f": "cheque",
+       "note": "Correct! Checar is very Mexican and casual; revisar is the neutral word."
+      }
+     ],
+     "swaps": [
+      {
+       "w": "cheque",
+       "for": "revise"
+      }
+     ]
     },
     {
      "es": "El taller que me recomendaste me cobró muy poco.",
@@ -3378,13 +3810,25 @@
      "es": "Si se te poncha una llanta, llámame y te ayudo.",
      "en": "If you get a flat tire, call me and I'll help you.",
      "k": "llanta",
-     "f": "llanta"
+     "f": "llanta",
+     "swaps": [
+      {
+       "w": "pincha",
+       "for": "poncha"
+      }
+     ]
     },
     {
-     "es": "El coche está tirando aceite; llévalo al taller.",
+     "es": "El carro está tirando aceite; llévalo al taller.",
      "en": "The car is leaking oil; take it to the shop.",
      "k": "aceite",
-     "f": "aceite"
+     "f": "aceite",
+     "swaps": [
+      {
+       "w": "coche",
+       "for": "carro"
+      }
+     ]
     }
    ],
    "story": {
@@ -3407,7 +3851,7 @@
      },
      {
       "s": null,
-      "es": "Se paran después de la caseta y revisan el coche.",
+      "es": "Se paran después de la caseta y revisan el carro.",
       "en": "They pull over after the toll booth and check the car."
      },
      {
@@ -3510,7 +3954,13 @@
       "potential buyer",
       "sales lead"
      ],
-     "note": "In Mexican real estate, un prospecto is a lead."
+     "note": "In Mexican real estate, un prospecto is a lead.",
+     "alt": [
+      {
+       "w": "cliente potencial",
+       "note": "Correct! Cliente potencial works; Mexican sales teams usually say prospecto."
+      }
+     ]
     },
     {
      "id": "interesado",
@@ -3560,7 +4010,13 @@
       "happy to help",
       "with gladness"
      ],
-     "note": "Con gusto is the standard friendly yes: Con gusto le ayudo."
+     "note": "Con gusto is the standard friendly yes: Con gusto le ayudo.",
+     "alt": [
+      {
+       "w": "con mucho gusto",
+       "note": "Correct! Con mucho gusto works too; con gusto is the everyday Mexican reply."
+      }
+     ]
     }
    ],
    "sentences": [
@@ -3760,7 +4216,13 @@
       "gated community",
       "planned community"
      ],
-     "note": "A fraccionamiento is a planned subdivision of lots, often gated."
+     "note": "A fraccionamiento is a planned subdivision of lots, often gated.",
+     "alt": [
+      {
+       "w": "desarrollo",
+       "note": "Correct! Desarrollo is also used in Mexico; for a lot subdivision the usual word is fraccionamiento."
+      }
+     ]
     },
     {
      "id": "frentealmar",
@@ -4027,7 +4489,13 @@
       "be close",
       "be near"
      ],
-     "note": "Quedar = to be located. ¿Dónde queda? Queda cerca del aeropuerto."
+     "note": "Quedar = to be located. ¿Dónde queda? Queda cerca del aeropuerto.",
+     "alt": [
+      {
+       "w": "estar cerca",
+       "note": "Correct! Estar cerca works; Mexicans often say queda cerca for places."
+      }
+     ]
     },
     {
      "id": "desviacion",
@@ -4052,6 +4520,12 @@
       "intersection",
       "crossroads",
       "interchange"
+     ],
+     "alt": [
+      {
+       "w": "cruce",
+       "note": "Correct! Cruce works; Mexican road signs call a highway junction el entronque."
+      }
      ]
     }
    ],
@@ -4066,7 +4540,13 @@
      "es": "La carretera costera es muy bonita, pero de noche hay que manejar con cuidado.",
      "en": "The coastal highway is very pretty, but at night you have to drive carefully.",
      "k": "carreteracostera",
-     "f": "carretera costera"
+     "f": "carretera costera",
+     "swaps": [
+      {
+       "w": "conducir",
+       "for": "manejar"
+      }
+     ]
     },
     {
      "es": "La laguna de Manialtepec queda muy cerca del fraccionamiento.",
@@ -4081,10 +4561,16 @@
      "f": "laguna"
     },
     {
-     "es": "El aeropuerto queda cerca, a quince minutos en coche.",
+     "es": "El aeropuerto queda cerca, a quince minutos en carro.",
      "en": "The airport is close, fifteen minutes by car.",
      "k": "quedarcerca",
-     "f": "queda cerca"
+     "f": "queda cerca",
+     "swaps": [
+      {
+       "w": "coche",
+       "for": "carro"
+      }
+     ]
     },
     {
      "es": "¿El centro queda cerca? Sí, a unos dieciocho minutos.",
@@ -4266,7 +4752,13 @@
       "apartados",
       "apartadas"
      ],
-     "note": "Un lote apartado has a deposit on it but isn’t paid off. Apartar = to put on hold."
+     "note": "Un lote apartado has a deposit on it but isn’t paid off. Apartar = to put on hold.",
+     "alt": [
+      {
+       "w": "reservado",
+       "note": "Correct! Reservado is fine; in Mexican real estate a lot on hold is apartado."
+      }
+     ]
     },
     {
      "id": "vendido",
@@ -4330,7 +4822,19 @@
      "es": "El lote de la esquina está apartado desde el lunes.",
      "en": "The corner lot has been on hold since Monday.",
      "k": "apartado",
-     "f": "apartado"
+     "f": "apartado",
+     "alt": [
+      {
+       "f": "reservado",
+       "note": "Correct! Reservado is fine; in Mexican real estate a lot on hold is apartado."
+      }
+     ],
+     "swaps": [
+      {
+       "w": "reservado",
+       "for": "apartado"
+      }
+     ]
     },
     {
      "es": "Se lo apartamos hoy si nos manda el comprobante de pago.",
@@ -4572,7 +5076,13 @@
      "es": "Después de la junta, nos quedamos de sobremesa hasta las seis.",
      "en": "After the meeting, we stayed at the table talking until six.",
      "k": "sobremesa",
-     "f": "sobremesa"
+     "f": "sobremesa",
+     "swaps": [
+      {
+       "w": "reunión",
+       "for": "junta"
+      }
+     ]
     },
     {
      "es": "Los domingos solemos comer en casa de mis suegros.",
@@ -4760,7 +5270,13 @@
       "size",
       "land area"
      ],
-     "note": "La superficie is given in metros cuadrados (m²)."
+     "note": "La superficie is given in metros cuadrados (m²).",
+     "alt": [
+      {
+       "w": "área",
+       "note": "Correct! Área is fine in conversation; Mexican plans and deeds say superficie."
+      }
+     ]
     },
     {
      "id": "frente",
@@ -4800,7 +5316,13 @@
       "property lines",
       "abutting properties"
      ],
-     "note": "Las colindancias say what borders each side of a lot: al norte, al sur…"
+     "note": "Las colindancias say what borders each side of a lot: al norte, al sur…",
+     "alt": [
+      {
+       "w": "linderos",
+       "note": "Correct! Linderos is understood; Mexican deeds usually list las colindancias."
+      }
+     ]
     },
     {
      "id": "pendiente",
@@ -4811,6 +5333,12 @@
       "incline",
       "grade",
       "gradient"
+     ],
+     "alt": [
+      {
+       "w": "inclinación",
+       "note": "Correct! Inclinación is understood; for a lot builders usually say la pendiente."
+      }
      ]
     }
    ],
@@ -5067,5 +5595,2378 @@
   "disfraz",
   "autobiografia",
   "cienciaficcion"
+ ],
+ "glosses": {
+  "150": "150 (ciento cincuenta)",
+  "5": "5 (cinco)",
+  "500": "500 (quinientos)",
+  "a": "to / at",
+  "abierto": "open",
+  "abre": "opens",
+  "abrir": "to open",
+  "abrí": "I opened",
+  "abuela": "grandmother",
+  "abuelo": "grandfather",
+  "acaba": "has just (acabar de)",
+  "acabó": "finished / ran out",
+  "acapulco": "Acapulco (city)",
+  "acceso": "access",
+  "aclaración": "clarification",
+  "acostumbra": "is used to / usually does",
+  "acostumbrar": "to get used to",
+  "acostumbré": "I got used to",
+  "administrador": "administrator / manager",
+  "aeropuerto": "airport",
+  "agendamos": "we schedule / shall we schedule?",
+  "agendar": "to schedule",
+  "agua": "water",
+  "aguacates": "avocados",
+  "aguas": "waters",
+  "ahora": "now",
+  "ahorita": "right now / in a bit",
+  "ahí": "there",
+  "al": "to the (a + el)",
+  "algo": "something",
+  "alguien": "someone",
+  "alguna": "some / any",
+  "allá": "over there",
+  "amaneció": "woke up / it dawned",
+  "amiga": "friend (f.)",
+  "ana": "Ana (name)",
+  "andrés": "Andrés (name)",
+  "anoche": "last night",
+  "antes": "before",
+  "anuncio": "ad / announcement",
+  "aparece": "appears / shows up",
+  "apartar": "to reserve / set aside",
+  "aparto": "I reserve / set aside",
+  "app": "app",
+  "aprobada": "approved",
+  "aquí": "here",
+  "arquitecto": "architect",
+  "arregla": "fixes",
+  "arreglaba": "used to fix",
+  "arregle": "fix (subj.) / fixes",
+  "arreglen": "fix (subj., they)",
+  "arregló": "fixed",
+  "arriba": "up / upstairs",
+  "asesora": "advisor (f.)",
+  "así": "like this / so",
+  "autopista": "highway / toll road",
+  "avisado": "told / warned",
+  "ay": "oh",
+  "ayer": "yesterday",
+  "ayuda": "help / helps",
+  "ayudar": "to help",
+  "ayudarme": "to help me",
+  "ayudo": "I help",
+  "año": "year",
+  "bajarle": "to lower (it)",
+  "bajos": "Bajos (de Chila, town)",
+  "banco": "bank",
+  "banqueta": "sidewalk",
+  "barato": "cheap",
+  "baño": "bathroom",
+  "biblioteca": "library",
+  "bien": "well / good",
+  "bienvenida": "welcome (f.)",
+  "bienvenido": "welcome",
+  "billete": "bill / ticket",
+  "bonita": "pretty",
+  "bonito": "nice / pretty",
+  "buen": "good",
+  "buenas": "good (greeting)",
+  "bueno": "good / well / hello (phone)",
+  "buenos": "good",
+  "buscarlo": "to look for it",
+  "busco": "I look for",
+  "busque": "look for (usted)",
+  "cabeza": "head",
+  "cada": "each / every",
+  "café": "coffee",
+  "calle": "street",
+  "calles": "streets",
+  "cambia": "changes",
+  "cambiamos": "we change / changed",
+  "cambiarla": "to change it",
+  "cambiarle": "to change (for him/her)",
+  "cambiaron": "they changed",
+  "cambie": "change (usted)",
+  "caminamos": "we walk / walked",
+  "camino": "road / way",
+  "camión": "bus / truck",
+  "cara": "expensive / face",
+  "cargo": "charge",
+  "carlos": "Carlos (name)",
+  "carro": "car (MX)",
+  "carros": "cars (MX)",
+  "carta": "letter / menu",
+  "casa": "house / home",
+  "casas": "houses",
+  "casi": "almost",
+  "casos": "cases",
+  "cayó": "fell",
+  "celular": "cell phone",
+  "cenar": "to have dinner",
+  "centro": "downtown / center",
+  "cerca": "near",
+  "cerrada": "closed",
+  "cerrado": "closed",
+  "cerrar": "to close",
+  "chela": "Chela (name)",
+  "chila": "Chila (Bajos de Chila, town)",
+  "chocolate": "chocolate",
+  "cien": "one hundred",
+  "ciento": "hundred",
+  "cierra": "closes",
+  "cinco": "five",
+  "ciudad": "city",
+  "claro": "of course / clear",
+  "claves": "codes / lot numbers",
+  "cliente": "client",
+  "clientes": "clients",
+  "cobrado": "charged",
+  "cobramos": "we charge / charged",
+  "cobran": "they charge",
+  "cobraron": "they charged",
+  "cocina": "kitchen",
+  "colonia": "neighborhood",
+  "come": "eats",
+  "comer": "to eat",
+  "comida": "food / meal",
+  "como": "like / as / since",
+  "comparte": "shares",
+  "completamente": "completely",
+  "completar": "to complete",
+  "comprarlas": "to buy them",
+  "compraría": "would buy",
+  "compro": "I buy",
+  "compré": "I bought",
+  "compró": "bought",
+  "comunes": "common / shared",
+  "con": "with",
+  "condóminos": "condo owners / co-owners",
+  "conexión": "connection",
+  "confirma": "confirms",
+  "confirmo": "I confirm",
+  "conmigo": "with me",
+  "conoce": "knows / is familiar with",
+  "conocer": "to meet / get to know",
+  "conozca": "know / meet (subj.)",
+  "construcción": "construction",
+  "construir": "to build",
+  "consulta": "appointment / consultation",
+  "contento": "happy",
+  "contesta": "answers",
+  "contestan": "they answer",
+  "contestar": "to answer",
+  "contesten": "answer (subj., they)",
+  "contrato": "contract",
+  "copa": "glass (wine)",
+  "correo": "email / mail",
+  "costera": "coastal (highway)",
+  "costo": "cost",
+  "costumbre": "custom / habit",
+  "costó": "cost (past)",
+  "crecí": "I grew up",
+  "creo": "I think / believe",
+  "cuadrados": "square",
+  "cuando": "when",
+  "cuanto": "as much as / as soon as",
+  "cuarenta": "forty",
+  "cuatro": "four",
+  "cuatrocientos": "four hundred",
+  "cuenta": "account / bill",
+  "cuidado": "careful / care",
+  "cuáles": "which (ones)?",
+  "cuánto": "how much?",
+  "cuántos": "how many?",
+  "cámbielo": "change it (usted)",
+  "cómo": "how?",
+  "da": "gives",
+  "daniel": "Daniel (name)",
+  "dar": "to give",
+  "daré": "I will give",
+  "de": "of / from",
+  "debo": "I must / owe",
+  "deja": "leaves / lets",
+  "deje": "leave / let (usted)",
+  "dejen": "let / leave (subj., they)",
+  "dejo": "I leave / let",
+  "dejé": "I left",
+  "dejó": "left",
+  "del": "of the (de + el)",
+  "delicioso": "delicious",
+  "departamento": "apartment",
+  "depende": "it depends",
+  "depósito": "deposit",
+  "derecha": "right",
+  "des": "give (subj., tú)",
+  "descontó": "discounted / took off",
+  "desde": "since / from",
+  "después": "after / later",
+  "devolver": "to return (an item)",
+  "devolviste": "you returned",
+  "devolví": "I returned",
+  "dice": "says",
+  "dicho": "said",
+  "diciembre": "December",
+  "dieciocho": "eighteen",
+  "diecisiete": "seventeen",
+  "diez": "ten",
+  "digas": "tell (subj., tú)",
+  "dije": "I said",
+  "dijiste": "you said",
+  "dijo": "said",
+  "dinero": "money",
+  "dio": "gave",
+  "disculpe": "excuse me (usted)",
+  "doce": "twelve",
+  "doctor": "doctor",
+  "documentos": "documents",
+  "domicilio": "address / residence",
+  "domingo": "Sunday",
+  "domingos": "Sundays",
+  "don": "Mr. (respectful, with first name)",
+  "donde": "where",
+  "dormir": "to sleep",
+  "dos": "two",
+  "doña": "Mrs. (respectful, with first name)",
+  "dudo": "I doubt",
+  "duele": "hurts",
+  "dueña": "owner (f.)",
+  "dueño": "owner",
+  "dulce": "sweet (Agua Dulce)",
+  "durar": "to last",
+  "dámelo": "give it to me",
+  "dáselas": "give them to him/her",
+  "dé": "give (subj., usted)",
+  "déjeme": "let me (usted)",
+  "día": "day",
+  "días": "days",
+  "dígame": "tell me (usted)",
+  "dónde": "where?",
+  "edificio": "building",
+  "el": "the",
+  "elena": "Elena (name)",
+  "elevador": "elevator",
+  "empezamos": "we start / started",
+  "en": "in / on",
+  "encanta": "loves (me encanta = I love)",
+  "encantan": "love (plural thing)",
+  "enseñar": "to show / teach",
+  "enseño": "I show / teach",
+  "enséñenselas": "show them to him/her (ustedes)",
+  "entiendas": "understand (subj., tú)",
+  "entiendo": "I understand",
+  "entonces": "so / then",
+  "entrada": "entrance",
+  "entran": "go in / enter",
+  "entre": "between / among",
+  "entrega": "delivers / delivery",
+  "entregarle": "to hand over to him/her",
+  "entrego": "I hand over / deliver",
+  "enviaré": "I will send",
+  "envié": "I sent",
+  "envíemela": "send it to me (usted)",
+  "equipo": "team / equipment",
+  "era": "was",
+  "eran": "were",
+  "es": "is",
+  "esa": "that",
+  "esas": "those",
+  "escoge": "chooses",
+  "escondido": "Escondido (Puerto Escondido)",
+  "escribe": "writes",
+  "escribió": "wrote",
+  "escrito": "written",
+  "ese": "that",
+  "eso": "that",
+  "esos": "those",
+  "español": "Spanish",
+  "espera": "waits / wait",
+  "esperando": "waiting",
+  "esperes": "wait (subj., tú)",
+  "espero": "I hope / wait",
+  "esquina": "corner",
+  "esta": "this",
+  "estaba": "was",
+  "estamos": "we are",
+  "estar": "to be",
+  "estas": "these",
+  "este": "this",
+  "esto": "this",
+  "estos": "these",
+  "estoy": "I am",
+  "estuvo": "was",
+  "está": "is",
+  "están": "are",
+  "esté": "is (subj.)",
+  "exacta": "exact",
+  "excelente": "excellent",
+  "explica": "explains",
+  "explicar": "to explain",
+  "explicaron": "they explained",
+  "explicaré": "I will explain",
+  "explico": "I explain",
+  "explíquemelo": "explain it to me (usted)",
+  "extranjero": "foreigner / foreign",
+  "factura": "invoice",
+  "facturas": "invoices",
+  "faltan": "are missing / are left",
+  "faltaron": "were missing",
+  "familia": "family",
+  "farmacia": "pharmacy",
+  "favor": "favor (por favor = please)",
+  "fecha": "date",
+  "fiesta": "party",
+  "fila": "line / queue",
+  "fin": "end",
+  "firmado": "signed",
+  "flores": "flowers",
+  "fotos": "photos",
+  "fregadero": "kitchen sink",
+  "frenos": "brakes",
+  "fresca": "fresh / cool",
+  "frío": "cold",
+  "fuera": "were (subj.) / outside",
+  "fueron": "they went / were",
+  "fui": "I went / was",
+  "fuimos": "we went",
+  "funcionaba": "was working",
+  "fácil": "easy",
+  "fútbol": "soccer",
+  "ganara": "won (subj.)",
+  "gasolina": "gas",
+  "gasolinera": "gas station",
+  "gente": "people",
+  "gimnasio": "gym",
+  "gold": "Gold (phase name)",
+  "gracias": "thank you",
+  "grande": "big",
+  "grandes": "big",
+  "guadalajara": "Guadalajara (city)",
+  "gusta": "likes (me gusta = I like)",
+  "gustaría": "would like",
+  "gusto": "pleasure",
+  "gómez": "Gómez (surname)",
+  "ha": "has",
+  "habla": "speaks",
+  "hablaría": "would talk",
+  "hablas": "you speak",
+  "hablé": "I spoke",
+  "habló": "spoke",
+  "habría": "would have",
+  "había": "there was / had",
+  "habían": "had (they)",
+  "hace": "does / makes / ago",
+  "hacemos": "we do / make",
+  "hacer": "to do / make",
+  "hacia": "toward",
+  "hago": "I do / make",
+  "hambre": "hunger",
+  "has": "you have (done)",
+  "hasta": "until / even",
+  "hay": "there is / there are",
+  "haz": "do / make (tú)",
+  "he": "I have (done)",
+  "hecha": "made / done",
+  "hecho": "done / made",
+  "hemos": "we have (done)",
+  "hermana": "sister",
+  "hermano": "brother",
+  "hermanos": "siblings / brothers",
+  "hice": "I did / made",
+  "hierve": "boils",
+  "hola": "hello",
+  "hora": "hour / time",
+  "horas": "hours",
+  "hoy": "today",
+  "hubiera": "had (subj.)",
+  "hábiles": "business (días hábiles = business days)",
+  "iba": "was going",
+  "idea": "idea",
+  "identificación": "ID",
+  "igual": "the same / equal",
+  "iguales": "the same",
+  "importa": "matters",
+  "importante": "important",
+  "incluir": "to include",
+  "ine": "INE (voter ID card)",
+  "información": "information",
+  "ingeniero": "engineer",
+  "inglés": "English",
+  "interesa": "interests",
+  "interna": "internal",
+  "internet": "internet",
+  "invertir": "to invest",
+  "invita": "invites",
+  "ir": "to go",
+  "iría": "would go",
+  "itzel": "Itzel (name)",
+  "izquierda": "left",
+  "javier": "Javier (name)",
+  "jefe": "boss",
+  "jitomate": "tomato",
+  "joven": "young / young man",
+  "jueves": "Thursday",
+  "jugaba": "used to play",
+  "justo": "just / right",
+  "kilo": "kilo",
+  "kilómetro": "kilometer",
+  "kilómetros": "kilometers",
+  "l-689": "L-689 (lot code)",
+  "l-702": "L-702 (lot code)",
+  "l-703": "L-703 (lot code)",
+  "la": "the / her / it",
+  "lado": "side",
+  "lados": "sides",
+  "ladran": "bark",
+  "las": "the / them",
+  "laura": "Laura (name)",
+  "le": "(to) him / her / you",
+  "lee": "reads",
+  "lejos": "far",
+  "les": "(to) them / you all",
+  "levanta": "raises / gets up",
+  "levanté": "I got up",
+  "libros": "books",
+  "licenciada": "title for a professional woman (Lic.)",
+  "lista": "list / ready",
+  "listo": "ready",
+  "listos": "ready",
+  "llama": "calls",
+  "llamar": "to call",
+  "llamo": "I call / my name is",
+  "llamé": "I called",
+  "llamó": "called",
+  "llega": "arrives",
+  "llegado": "arrived",
+  "llegar": "to arrive",
+  "llegaríamos": "we would arrive",
+  "llego": "I arrive",
+  "llegue": "arrives (subj.)",
+  "lleguen": "arrive (subj., they)",
+  "llegues": "arrive (subj., tú)",
+  "llegué": "I arrived",
+  "llegó": "arrived",
+  "lleva": "takes / carries / has been",
+  "llevo": "I take / I have been",
+  "llueva": "rains (subj.)",
+  "llámame": "call me",
+  "llévalo": "take it",
+  "lo": "it / him",
+  "los": "the / them",
+  "lote": "lot",
+  "lotería": "lottery",
+  "lotes": "lots",
+  "lugar": "place",
+  "lunes": "Monday",
+  "lupe": "Lupe (name)",
+  "luz": "light / electricity",
+  "lástima": "shame / pity",
+  "maestro": "teacher / master builder",
+  "maleta": "suitcase",
+  "mamá": "mom",
+  "manda": "sends",
+  "mandan": "they send",
+  "mandar": "to send",
+  "mandarle": "to send (to him/her)",
+  "mandaron": "they sent",
+  "mandarás": "you will send",
+  "mandaré": "I will send",
+  "mandaste": "you sent",
+  "mande": "send (subj.) / pardon?",
+  "mandemos": "send (subj., we)",
+  "mandes": "send (subj., tú)",
+  "mando": "I send",
+  "mandársela": "to send it to him/her",
+  "mandé": "I sent",
+  "maneja": "drives",
+  "manejando": "driving",
+  "manejar": "to drive",
+  "mangos": "mangoes",
+  "manialtepec": "Manialtepec (lagoon)",
+  "mapa": "map",
+  "mar": "sea",
+  "marco": "Marco (name)",
+  "mariana": "Mariana (name)",
+  "mark": "Mark (name)",
+  "martes": "Tuesday",
+  "maíz": "corn",
+  "mañana": "tomorrow / morning",
+  "me": "me / to me",
+  "mecánico": "mechanic",
+  "media": "half",
+  "medianoche": "midnight",
+  "medicina": "medicine",
+  "medidas": "measurements",
+  "mejor": "better / best",
+  "menos": "less / minus",
+  "mensaje": "message",
+  "mercado": "market",
+  "mes": "month",
+  "mesa": "table",
+  "meses": "months",
+  "metro": "metro / meter",
+  "metros": "meters",
+  "mi": "my",
+  "mide": "measures",
+  "mientras": "while",
+  "mil": "thousand",
+  "minutos": "minutes",
+  "mis": "my",
+  "misma": "same",
+  "mismo": "same",
+  "miércoles": "Wednesday",
+  "mole": "mole (sauce)",
+  "molesta": "bothers",
+  "monterrey": "Monterrey (city)",
+  "muchas": "many",
+  "mucho": "a lot / much",
+  "mudarse": "to move (house)",
+  "muy": "very",
+  "mándamelo": "send it to me",
+  "mándemelas": "send them to me (usted)",
+  "más": "more",
+  "mérida": "Mérida (city)",
+  "méxico": "Mexico",
+  "música": "music",
+  "nada": "nothing",
+  "nadie": "nobody",
+  "naranjas": "oranges",
+  "necesita": "needs",
+  "necesitas": "you need",
+  "necesito": "I need",
+  "niño": "child / boy",
+  "niños": "children",
+  "no": "no / not",
+  "noche": "night",
+  "noches": "nights / evening",
+  "nombre": "name",
+  "norte": "north",
+  "nos": "us / to us",
+  "notario": "notary",
+  "noventa": "ninety",
+  "novios": "bride and groom / couple",
+  "nuestro": "our",
+  "nueva": "new",
+  "nueve": "nine",
+  "nuevo": "new",
+  "nuevos": "new",
+  "nunca": "never",
+  "o": "or",
+  "oaxaca": "Oaxaca",
+  "ochenta": "eighty",
+  "ocho": "eight",
+  "ochocientos": "eight hundred",
+  "oficina": "office",
+  "ojalá": "I hope / hopefully",
+  "olvidaron": "they forgot",
+  "olvide": "forget (subj.)",
+  "olvidó": "forgot",
+  "original": "original",
+  "ortega": "Ortega (surname)",
+  "otra": "another",
+  "otras": "other",
+  "otro": "another",
+  "otros": "others",
+  "oyó": "heard",
+  "oía": "could hear / used to hear",
+  "oíste": "you heard",
+  "paciencia": "patience",
+  "pagamos": "we pay / paid",
+  "pagaste": "you paid",
+  "pago": "payment / I pay",
+  "pagué": "I paid",
+  "palmeras": "palm trees",
+  "pantalla": "screen",
+  "paola": "Paola (name)",
+  "papeles": "papers / documents",
+  "papá": "dad",
+  "papás": "parents",
+  "para": "for / in order to",
+  "paran": "they stop",
+  "pasa": "happens / come in",
+  "pasado": "last / past",
+  "pasamos": "we pass / spent",
+  "pasar": "to pass / happen",
+  "pastel": "cake",
+  "pastor": "al pastor (spit-roasted pork)",
+  "pasé": "I passed / spent",
+  "pasó": "happened / passed",
+  "patio": "patio / yard",
+  "pedro": "Pedro (name)",
+  "pedí": "I asked for / ordered",
+  "pensaba": "was thinking",
+  "pensábamos": "we were thinking",
+  "pensé": "I thought",
+  "perder": "to lose / miss",
+  "perdieron": "they lost",
+  "perdimos": "we lost / missed",
+  "perdón": "sorry / excuse me",
+  "perfecto": "perfect",
+  "pero": "but",
+  "perros": "dogs",
+  "pesarlo": "to weigh it",
+  "pescado": "fish (food)",
+  "pesos": "pesos",
+  "picante": "spicy",
+  "pide": "asks for",
+  "pidieron": "they asked for",
+  "pido": "I ask for / order",
+  "pieza": "part / piece",
+  "piso": "floor",
+  "plano": "plan / blueprint",
+  "platicando": "chatting",
+  "playa": "beach",
+  "plus": "Plus (phase name)",
+  "poblano": "poblano (pepper)",
+  "poco": "a little",
+  "podamos": "can (subj., we)",
+  "podría": "could",
+  "podríamos": "we could",
+  "poncha": "gets a flat",
+  "ponchó": "got a flat",
+  "pone": "puts",
+  "por": "for / by / through",
+  "porque": "because",
+  "precio": "price",
+  "precios": "prices",
+  "pregunta": "question / asks",
+  "preocupa": "worries",
+  "preocupe": "worry (usted)",
+  "preparaba": "used to make / prepare",
+  "preparo": "I prepare",
+  "presión": "pressure",
+  "prestar": "to lend",
+  "prestaré": "I will lend",
+  "primer": "first",
+  "primera": "first",
+  "primero": "first",
+  "primo": "cousin",
+  "principal": "main",
+  "principio": "beginning",
+  "probado": "tried / tasted",
+  "problema": "problem",
+  "promete": "promises",
+  "pronto": "soon",
+  "proyecto": "project",
+  "pude": "I could / managed",
+  "pudo": "could / managed",
+  "puebla": "Puebla (city)",
+  "puede": "can",
+  "puedo": "I can",
+  "puente": "bridge",
+  "puerta": "door",
+  "puerto": "port (Puerto Escondido)",
+  "puntual": "on time",
+  "pásale": "come in (tú)",
+  "pásele": "come in (usted)",
+  "que": "that / which",
+  "queda": "is located / remains",
+  "quedamos": "we agreed / stayed",
+  "quedó": "was left / turned out",
+  "quien": "who",
+  "quiere": "wants",
+  "quieren": "they want",
+  "quiero": "I want",
+  "quince": "fifteen",
+  "quinientos": "five hundred",
+  "quiso": "wanted / tried",
+  "quitan": "take away / remove",
+  "quién": "who?",
+  "qué": "what?",
+  "rafa": "Rafa (name)",
+  "raro": "strange",
+  "razón": "reason / right",
+  "receipt": "(English) el recibo",
+  "receta": "prescription / recipe",
+  "recetaron": "they prescribed",
+  "reciba": "receive (subj.)",
+  "recibe": "receives",
+  "recibió": "received",
+  "recoger": "to pick up",
+  "recomendaste": "you recommended",
+  "recomendó": "recommended",
+  "recomiendo": "I recommend",
+  "reconozco": "I recognize",
+  "reembolso": "refund",
+  "refacción": "spare part",
+  "refri": "fridge",
+  "refris": "fridges",
+  "regalo": "gift",
+  "reglas": "rules",
+  "regresa": "comes back",
+  "regrese": "come back (subj.)",
+  "regrésese": "go back (usted)",
+  "renta": "rent",
+  "rentamos": "we rent / rented",
+  "reporte": "report",
+  "reservar": "to book / reserve",
+  "restaurante": "restaurant",
+  "resuelto": "solved",
+  "retiro": "withdrawal",
+  "revisa": "checks",
+  "revisan": "they check",
+  "reviso": "I check",
+  "rico": "delicious / rich",
+  "rodrigo": "Rodrigo (name)",
+  "rompió": "broke",
+  "rota": "broken",
+  "roto": "broken",
+  "rumbo": "heading (to)",
+  "rápido": "fast",
+  "ríen": "laugh",
+  "saber": "to know",
+  "sabido": "known",
+  "sabrá": "will know",
+  "sabía": "knew",
+  "saca": "takes out",
+  "sala": "living room",
+  "sale": "leaves / comes out",
+  "salga": "leaves (subj.)",
+  "salgas": "leave (subj., tú)",
+  "salgo": "I leave",
+  "salieron": "they left",
+  "salimos": "we leave / left",
+  "salir": "to leave / go out",
+  "salió": "left / came out",
+  "salud": "cheers / health",
+  "salí": "I left",
+  "saquen": "take out (subj., they)",
+  "saqué": "I took out",
+  "se": "himself / herself / (to) him-her",
+  "secreto": "secret",
+  "seguido": "often",
+  "segunda": "second",
+  "segundo": "second",
+  "segundos": "seconds",
+  "seis": "six",
+  "semana": "week",
+  "semáforo": "traffic light",
+  "sepa": "knows (subj.)",
+  "ser": "to be",
+  "señor": "sir / Mr.",
+  "señora": "ma'am / Mrs.",
+  "señores": "ladies and gentlemen / Mr. and Mrs.",
+  "si": "if",
+  "siempre": "always",
+  "siente": "feels",
+  "siento": "I feel / I'm sorry (lo siento)",
+  "sigue": "is still / continues",
+  "sigues": "you're still / continue",
+  "siguiente": "next",
+  "sin": "without",
+  "siéntese": "sit down (usted)",
+  "sofía": "Sofía (name)",
+  "solo": "only / alone",
+  "solíamos": "we used to",
+  "son": "are",
+  "sorpresas": "surprises",
+  "soy": "I am",
+  "su": "his / her / your / their",
+  "suave": "smooth / soft",
+  "suaves": "smooth / soft",
+  "sube": "goes up",
+  "suegros": "in-laws",
+  "suelen": "usually (do)",
+  "suena": "sounds",
+  "suerte": "luck",
+  "sur": "south",
+  "sábado": "Saturday",
+  "sábados": "Saturdays",
+  "sé": "I know",
+  "sí": "yes",
+  "súper": "super / supermarket",
+  "tacos": "tacos",
+  "tamaños": "sizes",
+  "también": "also",
+  "tan": "so",
+  "tanto": "so much",
+  "tantos": "so many",
+  "tarda": "takes (time)",
+  "tarde": "late / afternoon",
+  "tardes": "afternoons / good afternoon",
+  "tarea": "homework",
+  "tarjeta": "card",
+  "taxi": "taxi",
+  "te": "you / to you",
+  "teléfono": "phone",
+  "tema": "topic",
+  "temprano": "early",
+  "tenemos": "we have",
+  "tenga": "have (subj., usted)",
+  "tengas": "have (subj., tú)",
+  "tengo": "I have",
+  "tenido": "had",
+  "tenía": "had",
+  "tenías": "you had",
+  "termine": "finishes (subj.)",
+  "terreno": "land / plot",
+  "texas": "Texas",
+  "tiempo": "time / weather",
+  "tienda": "store",
+  "tiene": "has",
+  "tienen": "they have",
+  "tirando": "throwing / dumping",
+  "toca": "touches / it's (your) turn",
+  "toda": "all / whole",
+  "todas": "all",
+  "todavía": "still / yet",
+  "todo": "all / everything",
+  "todos": "all / everyone",
+  "tomando": "taking / drinking",
+  "tome": "take (usted)",
+  "toquen": "touch / play (subj., they)",
+  "trabaja": "works",
+  "trabajo": "work / I work",
+  "traer": "to bring",
+  "traerán": "they will bring",
+  "traes": "you bring",
+  "traigo": "I bring",
+  "tranquila": "calm (f.)",
+  "tranquilo": "calm / relax",
+  "treinta": "thirty",
+  "tres": "three",
+  "tráfico": "traffic",
+  "tráigamela": "bring it to me (usted)",
+  "tu": "your",
+  "turno": "turn",
+  "tus": "your",
+  "tuviera": "had (subj.)",
+  "tómese": "take (usted)",
+  "tú": "you",
+  "ubicación": "location",
+  "un": "a / an",
+  "una": "a / an",
+  "unas": "some",
+  "uno": "one",
+  "unos": "some / about",
+  "usa": "uses",
+  "usted": "you (formal)",
+  "ustedes": "you all",
+  "va": "goes",
+  "vacaciones": "vacation",
+  "vale": "is worth / OK",
+  "vamos": "let's go / we go",
+  "van": "they go",
+  "varios": "several",
+  "vas": "you go",
+  "ve": "sees / go (tú)",
+  "vea": "see (subj.)",
+  "veces": "times",
+  "veinte": "twenty",
+  "veinticuatro": "twenty-four",
+  "ven": "come (tú) / they see",
+  "vendedora": "saleswoman",
+  "venden": "they sell",
+  "vender": "to sell",
+  "vendiendo": "selling",
+  "vendría": "would come",
+  "venga": "come (usted)",
+  "ventana": "window",
+  "ventas": "sales",
+  "veo": "I see",
+  "ver": "to see",
+  "veranos": "summers",
+  "verdad": "truth / right?",
+  "verduras": "vegetables",
+  "verlo": "to see it",
+  "vez": "time (occasion)",
+  "vi": "I saw",
+  "viaje": "trip",
+  "viene": "comes",
+  "vienen": "they come",
+  "viernes": "Friday",
+  "vino": "came / wine",
+  "vio": "saw",
+  "vista": "view",
+  "visto": "seen",
+  "vive": "lives",
+  "vivido": "lived",
+  "vivo": "I live",
+  "vivía": "used to live",
+  "volando": "flying",
+  "voy": "I'm going",
+  "vuelo": "flight",
+  "vuelta": "turn / return",
+  "vuelve": "comes back",
+  "vámonos": "let's go",
+  "whatsapp": "WhatsApp",
+  "y": "and",
+  "ya": "already / now",
+  "yo": "I",
+  "zapatos": "shoes",
+  "ándele": "come on / go ahead",
+  "áreas": "areas",
+  "éramos": "we were"
+ },
+ "synonyms": [
+  {
+   "main": "arreglar",
+   "alt": "reparar",
+   "note": "Correct! In Mexico, arreglar is more common for everyday fixes.",
+   "forms": [
+    [
+     "reparar",
+     "arreglar"
+    ],
+    [
+     "reparo",
+     "arreglo"
+    ],
+    [
+     "reparas",
+     "arreglas"
+    ],
+    [
+     "repara",
+     "arregla"
+    ],
+    [
+     "reparamos",
+     "arreglamos"
+    ],
+    [
+     "reparan",
+     "arreglan"
+    ],
+    [
+     "reparé",
+     "arreglé"
+    ],
+    [
+     "reparaste",
+     "arreglaste"
+    ],
+    [
+     "reparó",
+     "arregló"
+    ],
+    [
+     "reparasteis",
+     "arreglasteis"
+    ],
+    [
+     "repararon",
+     "arreglaron"
+    ],
+    [
+     "reparaba",
+     "arreglaba"
+    ],
+    [
+     "reparabas",
+     "arreglabas"
+    ],
+    [
+     "reparábamos",
+     "arreglábamos"
+    ],
+    [
+     "reparaban",
+     "arreglaban"
+    ],
+    [
+     "repararé",
+     "arreglaré"
+    ],
+    [
+     "repararás",
+     "arreglarás"
+    ],
+    [
+     "reparará",
+     "arreglará"
+    ],
+    [
+     "repararemos",
+     "arreglaremos"
+    ],
+    [
+     "repararán",
+     "arreglarán"
+    ],
+    [
+     "repararía",
+     "arreglaría"
+    ],
+    [
+     "repararías",
+     "arreglarías"
+    ],
+    [
+     "repararíamos",
+     "arreglaríamos"
+    ],
+    [
+     "repararían",
+     "arreglarían"
+    ],
+    [
+     "repare",
+     "arregle"
+    ],
+    [
+     "repares",
+     "arregles"
+    ],
+    [
+     "reparemos",
+     "arreglemos"
+    ],
+    [
+     "reparen",
+     "arreglen"
+    ],
+    [
+     "reparara",
+     "arreglara"
+    ],
+    [
+     "repararas",
+     "arreglaras"
+    ],
+    [
+     "reparáramos",
+     "arregláramos"
+    ],
+    [
+     "repararan",
+     "arreglaran"
+    ],
+    [
+     "reparando",
+     "arreglando"
+    ],
+    [
+     "reparado",
+     "arreglado"
+    ],
+    [
+     "reparada",
+     "arreglada"
+    ],
+    [
+     "reparados",
+     "arreglados"
+    ],
+    [
+     "reparadas",
+     "arregladas"
+    ],
+    [
+     "repararlo",
+     "arreglarlo"
+    ],
+    [
+     "repararla",
+     "arreglarla"
+    ],
+    [
+     "repararlos",
+     "arreglarlos"
+    ],
+    [
+     "repararlas",
+     "arreglarlas"
+    ],
+    [
+     "repararle",
+     "arreglarle"
+    ],
+    [
+     "repararme",
+     "arreglarme"
+    ]
+   ]
+  },
+  {
+   "main": "arreglar",
+   "alt": "componer",
+   "wordOnly": true,
+   "note": "Correct! Componer is heard in Mexico too, but arreglar is the everyday word."
+  },
+  {
+   "main": "carro",
+   "alt": "coche",
+   "forms": [
+    [
+     "coche",
+     "carro"
+    ],
+    [
+     "coches",
+     "carros"
+    ]
+   ],
+   "note": "Correct! Coche is understood, but in Mexico people say carro."
+  },
+  {
+   "main": "manejar",
+   "alt": "conducir",
+   "forms": [
+    [
+     "conducir",
+     "manejar"
+    ],
+    [
+     "conduzco",
+     "manejo"
+    ],
+    [
+     "conduces",
+     "manejas"
+    ],
+    [
+     "conduce",
+     "maneja"
+    ],
+    [
+     "conducimos",
+     "manejamos"
+    ],
+    [
+     "conducen",
+     "manejan"
+    ],
+    [
+     "conduje",
+     "manejé"
+    ],
+    [
+     "condujiste",
+     "manejaste"
+    ],
+    [
+     "condujo",
+     "manejó"
+    ],
+    [
+     "condujimos",
+     "manejamos"
+    ],
+    [
+     "condujeron",
+     "manejaron"
+    ],
+    [
+     "conducía",
+     "manejaba"
+    ],
+    [
+     "conducían",
+     "manejaban"
+    ],
+    [
+     "conduciendo",
+     "manejando"
+    ],
+    [
+     "conducido",
+     "manejado"
+    ],
+    [
+     "conduciré",
+     "manejaré"
+    ],
+    [
+     "conducirá",
+     "manejará"
+    ],
+    [
+     "conduzca",
+     "maneje"
+    ],
+    [
+     "conduzcas",
+     "manejes"
+    ],
+    [
+     "conduzcan",
+     "manejen"
+    ]
+   ],
+   "note": "Correct! Conducir is fine, but in Mexico manejar is what people say."
+  },
+  {
+   "main": "celular",
+   "alt": "móvil",
+   "forms": [
+    [
+     "móvil",
+     "celular"
+    ],
+    [
+     "móviles",
+     "celulares"
+    ]
+   ],
+   "note": "Correct! Móvil is what Spain says; in Mexico it is el celular (or el cel)."
+  },
+  {
+   "main": "recámara",
+   "alt": "dormitorio",
+   "forms": [
+    [
+     "dormitorio",
+     "recámara",
+     "xg"
+    ],
+    [
+     "dormitorios",
+     "recámaras",
+     "xg"
+    ],
+    [
+     "habitación",
+     "recámara"
+    ],
+    [
+     "habitaciones",
+     "recámaras"
+    ]
+   ],
+   "note": "Correct! Dormitorio is understood; in a Mexican house a bedroom is la recámara."
+  },
+  {
+   "main": "platicar",
+   "alt": "conversar",
+   "note": "Correct! Conversar is fine; Mexicans usually say platicar.",
+   "forms": [
+    [
+     "conversar",
+     "platicar"
+    ],
+    [
+     "converso",
+     "platico"
+    ],
+    [
+     "conversas",
+     "platicas"
+    ],
+    [
+     "conversa",
+     "platica"
+    ],
+    [
+     "conversamos",
+     "platicamos"
+    ],
+    [
+     "conversan",
+     "platican"
+    ],
+    [
+     "conversé",
+     "platiqué"
+    ],
+    [
+     "conversaste",
+     "platicaste"
+    ],
+    [
+     "conversó",
+     "platicó"
+    ],
+    [
+     "conversasteis",
+     "platicasteis"
+    ],
+    [
+     "conversaron",
+     "platicaron"
+    ],
+    [
+     "conversaba",
+     "platicaba"
+    ],
+    [
+     "conversabas",
+     "platicabas"
+    ],
+    [
+     "conversábamos",
+     "platicábamos"
+    ],
+    [
+     "conversaban",
+     "platicaban"
+    ],
+    [
+     "conversaré",
+     "platicaré"
+    ],
+    [
+     "conversarás",
+     "platicarás"
+    ],
+    [
+     "conversará",
+     "platicará"
+    ],
+    [
+     "conversaremos",
+     "platicaremos"
+    ],
+    [
+     "conversarán",
+     "platicarán"
+    ],
+    [
+     "conversaría",
+     "platicaría"
+    ],
+    [
+     "conversarías",
+     "platicarías"
+    ],
+    [
+     "conversaríamos",
+     "platicaríamos"
+    ],
+    [
+     "conversarían",
+     "platicarían"
+    ],
+    [
+     "converse",
+     "platique"
+    ],
+    [
+     "converses",
+     "platiques"
+    ],
+    [
+     "conversemos",
+     "platiquemos"
+    ],
+    [
+     "conversen",
+     "platiquen"
+    ],
+    [
+     "conversara",
+     "platicara"
+    ],
+    [
+     "conversaras",
+     "platicaras"
+    ],
+    [
+     "conversáramos",
+     "platicáramos"
+    ],
+    [
+     "conversaran",
+     "platicaran"
+    ],
+    [
+     "conversando",
+     "platicando"
+    ],
+    [
+     "conversado",
+     "platicado"
+    ],
+    [
+     "conversada",
+     "platicada"
+    ],
+    [
+     "conversados",
+     "platicados"
+    ],
+    [
+     "conversadas",
+     "platicadas"
+    ],
+    [
+     "conversarlo",
+     "platicarlo"
+    ],
+    [
+     "conversarla",
+     "platicarla"
+    ],
+    [
+     "conversarlos",
+     "platicarlos"
+    ],
+    [
+     "conversarlas",
+     "platicarlas"
+    ],
+    [
+     "conversarle",
+     "platicarle"
+    ],
+    [
+     "conversarme",
+     "platicarme"
+    ]
+   ]
+  },
+  {
+   "main": "rentar",
+   "alt": "alquilar",
+   "forms": [
+    [
+     "alquiler",
+     "renta"
+    ],
+    [
+     "alquileres",
+     "rentas"
+    ],
+    [
+     "alquilar",
+     "rentar"
+    ],
+    [
+     "alquilo",
+     "rento"
+    ],
+    [
+     "alquilas",
+     "rentas"
+    ],
+    [
+     "alquila",
+     "renta"
+    ],
+    [
+     "alquilamos",
+     "rentamos"
+    ],
+    [
+     "alquilan",
+     "rentan"
+    ],
+    [
+     "alquilé",
+     "renté"
+    ],
+    [
+     "alquilaste",
+     "rentaste"
+    ],
+    [
+     "alquiló",
+     "rentó"
+    ],
+    [
+     "alquilasteis",
+     "rentasteis"
+    ],
+    [
+     "alquilaron",
+     "rentaron"
+    ],
+    [
+     "alquilaba",
+     "rentaba"
+    ],
+    [
+     "alquilabas",
+     "rentabas"
+    ],
+    [
+     "alquilábamos",
+     "rentábamos"
+    ],
+    [
+     "alquilaban",
+     "rentaban"
+    ],
+    [
+     "alquilaré",
+     "rentaré"
+    ],
+    [
+     "alquilarás",
+     "rentarás"
+    ],
+    [
+     "alquilará",
+     "rentará"
+    ],
+    [
+     "alquilaremos",
+     "rentaremos"
+    ],
+    [
+     "alquilarán",
+     "rentarán"
+    ],
+    [
+     "alquilaría",
+     "rentaría"
+    ],
+    [
+     "alquilarías",
+     "rentarías"
+    ],
+    [
+     "alquilaríamos",
+     "rentaríamos"
+    ],
+    [
+     "alquilarían",
+     "rentarían"
+    ],
+    [
+     "alquile",
+     "rente"
+    ],
+    [
+     "alquiles",
+     "rentes"
+    ],
+    [
+     "alquilemos",
+     "rentemos"
+    ],
+    [
+     "alquilen",
+     "renten"
+    ],
+    [
+     "alquilara",
+     "rentara"
+    ],
+    [
+     "alquilaras",
+     "rentaras"
+    ],
+    [
+     "alquiláramos",
+     "rentáramos"
+    ],
+    [
+     "alquilaran",
+     "rentaran"
+    ],
+    [
+     "alquilando",
+     "rentando"
+    ],
+    [
+     "alquilado",
+     "rentado"
+    ],
+    [
+     "alquilada",
+     "rentada"
+    ],
+    [
+     "alquilados",
+     "rentados"
+    ],
+    [
+     "alquiladas",
+     "rentadas"
+    ],
+    [
+     "alquilarlo",
+     "rentarlo"
+    ],
+    [
+     "alquilarla",
+     "rentarla"
+    ],
+    [
+     "alquilarlos",
+     "rentarlos"
+    ],
+    [
+     "alquilarlas",
+     "rentarlas"
+    ],
+    [
+     "alquilarle",
+     "rentarle"
+    ],
+    [
+     "alquilarme",
+     "rentarme"
+    ]
+   ],
+   "note": "Correct! Alquilar is standard Spanish; in Mexico you will hear rentar (and la renta)."
+  },
+  {
+   "main": "departamento",
+   "alt": "piso",
+   "forms": [
+    [
+     "piso",
+     "departamento"
+    ],
+    [
+     "pisos",
+     "departamentos"
+    ]
+   ],
+   "note": "Correct in Spain! In Mexico an apartment is un departamento (el piso is the floor)."
+  },
+  {
+   "main": "jugo",
+   "alt": "zumo",
+   "forms": [
+    [
+     "zumo",
+     "jugo"
+    ],
+    [
+     "zumos",
+     "jugos"
+    ]
+   ],
+   "note": "Correct! Zumo is Spain; in Mexico it is el jugo."
+  },
+  {
+   "main": "computadora",
+   "alt": "ordenador",
+   "forms": [
+    [
+     "ordenador",
+     "computadora",
+     "xg"
+    ],
+    [
+     "ordenadores",
+     "computadoras",
+     "xg"
+    ]
+   ],
+   "note": "Correct! Ordenador is Spain; in Mexico it is la computadora (or la compu)."
+  },
+  {
+   "main": "lentes",
+   "alt": "gafas",
+   "forms": [
+    [
+     "gafas",
+     "lentes",
+     "xg"
+    ],
+    [
+     "anteojos",
+     "lentes"
+    ]
+   ],
+   "note": "Correct! Gafas is Spain; Mexicans say los lentes."
+  },
+  {
+   "main": "cuadra",
+   "alt": "manzana",
+   "forms": [
+    [
+     "manzana",
+     "cuadra"
+    ],
+    [
+     "manzanas",
+     "cuadras"
+    ]
+   ],
+   "note": "Correct in Spain! In Mexico you count streets in cuadras (una manzana is also an apple)."
+  },
+  {
+   "main": "camión",
+   "alt": "autobús",
+   "wordOnly": true,
+   "note": "Correct! Autobús is understood; in Mexico a city bus is el camión."
+  },
+  {
+   "main": "boleto",
+   "alt": "billete",
+   "wordOnly": true,
+   "note": "Correct in Spain! In Mexico a ticket is un boleto; un billete is a banknote."
+  },
+  {
+   "main": "boleto",
+   "alt": "pasaje",
+   "forms": [
+    [
+     "pasaje",
+     "boleto"
+    ],
+    [
+     "pasajes",
+     "boletos"
+    ]
+   ],
+   "note": "Correct! Pasaje is understood; Mexicans usually say el boleto."
+  },
+  {
+   "main": "llanta",
+   "alt": "neumático",
+   "forms": [
+    [
+     "neumático",
+     "llanta",
+     "xg"
+    ],
+    [
+     "neumáticos",
+     "llantas",
+     "xg"
+    ]
+   ],
+   "note": "Correct! Neumático is the technical word; in Mexico everyone says la llanta."
+  },
+  {
+   "main": "ponchado",
+   "alt": "pinchado",
+   "note": "Correct in Spain! In Mexico a flat tire is una llanta ponchada.",
+   "forms": [
+    [
+     "pinchar",
+     "ponchar"
+    ],
+    [
+     "pincho",
+     "poncho"
+    ],
+    [
+     "pinchas",
+     "ponchas"
+    ],
+    [
+     "pincha",
+     "poncha"
+    ],
+    [
+     "pinchamos",
+     "ponchamos"
+    ],
+    [
+     "pinchan",
+     "ponchan"
+    ],
+    [
+     "pinché",
+     "ponché"
+    ],
+    [
+     "pinchaste",
+     "ponchaste"
+    ],
+    [
+     "pinchó",
+     "ponchó"
+    ],
+    [
+     "pinchasteis",
+     "ponchasteis"
+    ],
+    [
+     "pincharon",
+     "poncharon"
+    ],
+    [
+     "pinchaba",
+     "ponchaba"
+    ],
+    [
+     "pinchabas",
+     "ponchabas"
+    ],
+    [
+     "pinchábamos",
+     "ponchábamos"
+    ],
+    [
+     "pinchaban",
+     "ponchaban"
+    ],
+    [
+     "pincharé",
+     "poncharé"
+    ],
+    [
+     "pincharás",
+     "poncharás"
+    ],
+    [
+     "pinchará",
+     "ponchará"
+    ],
+    [
+     "pincharemos",
+     "poncharemos"
+    ],
+    [
+     "pincharán",
+     "poncharán"
+    ],
+    [
+     "pincharía",
+     "poncharía"
+    ],
+    [
+     "pincharías",
+     "poncharías"
+    ],
+    [
+     "pincharíamos",
+     "poncharíamos"
+    ],
+    [
+     "pincharían",
+     "poncharían"
+    ],
+    [
+     "pinche",
+     "ponche"
+    ],
+    [
+     "pinches",
+     "ponches"
+    ],
+    [
+     "pinchemos",
+     "ponchemos"
+    ],
+    [
+     "pinchen",
+     "ponchen"
+    ],
+    [
+     "pinchara",
+     "ponchara"
+    ],
+    [
+     "pincharas",
+     "poncharas"
+    ],
+    [
+     "pincháramos",
+     "poncháramos"
+    ],
+    [
+     "pincharan",
+     "poncharan"
+    ],
+    [
+     "pinchando",
+     "ponchando"
+    ],
+    [
+     "pinchado",
+     "ponchado"
+    ],
+    [
+     "pinchada",
+     "ponchada"
+    ],
+    [
+     "pinchados",
+     "ponchados"
+    ],
+    [
+     "pinchadas",
+     "ponchadas"
+    ],
+    [
+     "pincharlo",
+     "poncharlo"
+    ],
+    [
+     "pincharla",
+     "poncharla"
+    ],
+    [
+     "pincharlos",
+     "poncharlos"
+    ],
+    [
+     "pincharlas",
+     "poncharlas"
+    ],
+    [
+     "pincharle",
+     "poncharle"
+    ],
+    [
+     "pincharme",
+     "poncharme"
+    ]
+   ]
+  },
+  {
+   "main": "revisar",
+   "alt": "checar",
+   "note": "Correct! Checar is very Mexican and casual; revisar is the neutral word.",
+   "forms": [
+    [
+     "checar",
+     "revisar"
+    ],
+    [
+     "checar",
+     "revisar"
+    ],
+    [
+     "checo",
+     "reviso"
+    ],
+    [
+     "checas",
+     "revisas"
+    ],
+    [
+     "checa",
+     "revisa"
+    ],
+    [
+     "checamos",
+     "revisamos"
+    ],
+    [
+     "checan",
+     "revisan"
+    ],
+    [
+     "chequé",
+     "revisé"
+    ],
+    [
+     "checaste",
+     "revisaste"
+    ],
+    [
+     "checó",
+     "revisó"
+    ],
+    [
+     "checasteis",
+     "revisasteis"
+    ],
+    [
+     "checaron",
+     "revisaron"
+    ],
+    [
+     "checaba",
+     "revisaba"
+    ],
+    [
+     "checabas",
+     "revisabas"
+    ],
+    [
+     "checábamos",
+     "revisábamos"
+    ],
+    [
+     "checaban",
+     "revisaban"
+    ],
+    [
+     "checaré",
+     "revisaré"
+    ],
+    [
+     "checarás",
+     "revisarás"
+    ],
+    [
+     "checará",
+     "revisará"
+    ],
+    [
+     "checaremos",
+     "revisaremos"
+    ],
+    [
+     "checarán",
+     "revisarán"
+    ],
+    [
+     "checaría",
+     "revisaría"
+    ],
+    [
+     "checarías",
+     "revisarías"
+    ],
+    [
+     "checaríamos",
+     "revisaríamos"
+    ],
+    [
+     "checarían",
+     "revisarían"
+    ],
+    [
+     "cheque",
+     "revise"
+    ],
+    [
+     "cheques",
+     "revises"
+    ],
+    [
+     "chequemos",
+     "revisemos"
+    ],
+    [
+     "chequen",
+     "revisen"
+    ],
+    [
+     "checara",
+     "revisara"
+    ],
+    [
+     "checaras",
+     "revisaras"
+    ],
+    [
+     "checáramos",
+     "revisáramos"
+    ],
+    [
+     "checaran",
+     "revisaran"
+    ],
+    [
+     "checando",
+     "revisando"
+    ],
+    [
+     "checado",
+     "revisado"
+    ],
+    [
+     "checada",
+     "revisada"
+    ],
+    [
+     "checados",
+     "revisados"
+    ],
+    [
+     "checadas",
+     "revisadas"
+    ],
+    [
+     "checarlo",
+     "revisarlo"
+    ],
+    [
+     "checarla",
+     "revisarla"
+    ],
+    [
+     "checarlos",
+     "revisarlos"
+    ],
+    [
+     "checarlas",
+     "revisarlas"
+    ],
+    [
+     "checarle",
+     "revisarle"
+    ],
+    [
+     "checarme",
+     "revisarme"
+    ]
+   ]
+  },
+  {
+   "main": "plomero",
+   "alt": "fontanero",
+   "forms": [
+    [
+     "fontanero",
+     "plomero"
+    ],
+    [
+     "fontaneros",
+     "plomeros"
+    ]
+   ],
+   "note": "Correct! Fontanero is Spain; in Mexico you call el plomero."
+  },
+  {
+   "main": "llave",
+   "alt": "grifo",
+   "forms": [
+    [
+     "grifo",
+     "llave",
+     "xg"
+    ],
+    [
+     "grifos",
+     "llaves",
+     "xg"
+    ]
+   ],
+   "note": "Correct! Grifo is understood; in Mexico the faucet is la llave."
+  },
+  {
+   "main": "junta",
+   "alt": "reunión",
+   "forms": [
+    [
+     "reunión",
+     "junta"
+    ],
+    [
+     "reuniones",
+     "juntas"
+    ]
+   ],
+   "note": "Correct! Reunión works everywhere; for work meetings Mexicans usually say la junta."
+  },
+  {
+   "main": "retraso",
+   "alt": "demora",
+   "forms": [
+    [
+     "demora",
+     "retraso",
+     "xg"
+    ],
+    [
+     "demoras",
+     "retrasos",
+     "xg"
+    ],
+    [
+     "atraso",
+     "retraso"
+    ],
+    [
+     "atrasos",
+     "retrasos"
+    ]
+   ],
+   "note": "Correct! Demora and atraso are understood; for a delayed flight or bus Mexicans usually say retraso."
+  },
+  {
+   "main": "refri",
+   "alt": "nevera",
+   "forms": [
+    [
+     "nevera",
+     "refri",
+     "xg"
+    ],
+    [
+     "neveras",
+     "refris",
+     "xg"
+    ],
+    [
+     "refrigerador",
+     "refri"
+    ],
+    [
+     "refrigeradores",
+     "refris"
+    ],
+    [
+     "frigorífico",
+     "refri"
+    ],
+    [
+     "frigoríficos",
+     "refris"
+    ]
+   ],
+   "note": "Correct! In Mexico the fridge is el refri (short for refrigerador)."
+  },
+  {
+   "main": "banqueta",
+   "alt": "acera",
+   "forms": [
+    [
+     "acera",
+     "banqueta"
+    ],
+    [
+     "aceras",
+     "banquetas"
+    ]
+   ],
+   "note": "Correct! Acera is standard; in Mexico the sidewalk is la banqueta."
+  },
+  {
+   "main": "elevador",
+   "alt": "ascensor",
+   "forms": [
+    [
+     "ascensor",
+     "elevador"
+    ],
+    [
+     "ascensores",
+     "elevadores"
+    ]
+   ],
+   "note": "Correct! Ascensor is Spain; in Mexico it is el elevador."
+  },
+  {
+   "main": "jitomate",
+   "alt": "tomate",
+   "forms": [
+    [
+     "tomate",
+     "jitomate"
+    ],
+    [
+     "tomates",
+     "jitomates"
+    ]
+   ],
+   "note": "Correct, but in central and southern Mexico the red tomato is el jitomate (tomate often means the green tomatillo)."
+  },
+  {
+   "main": "pastilla",
+   "alt": "píldora",
+   "forms": [
+    [
+     "píldora",
+     "pastilla"
+    ],
+    [
+     "píldoras",
+     "pastillas"
+    ]
+   ],
+   "note": "Correct! Píldora is understood; Mexicans usually say la pastilla."
+  },
+  {
+   "main": "cambio",
+   "alt": "vuelto",
+   "wordOnly": true,
+   "note": "Correct in South America! In Mexico your change is el cambio."
+  },
+  {
+   "main": "cambio",
+   "alt": "feria",
+   "wordOnly": true,
+   "note": "Correct! Feria is Mexican slang for change or cash; el cambio is the neutral word."
+  },
+  {
+   "main": "apartado",
+   "alt": "reservado",
+   "forms": [
+    [
+     "reservado",
+     "apartado"
+    ],
+    [
+     "reservada",
+     "apartada"
+    ],
+    [
+     "reservados",
+     "apartados"
+    ],
+    [
+     "reservadas",
+     "apartadas"
+    ]
+   ],
+   "note": "Correct! Reservado is fine; in Mexican real estate a lot on hold is apartado."
+  },
+  {
+   "main": "descompuesto",
+   "alt": "averiado",
+   "forms": [
+    [
+     "averiado",
+     "descompuesto"
+    ],
+    [
+     "averiada",
+     "descompuesta"
+    ],
+    [
+     "averiados",
+     "descompuestos"
+    ],
+    [
+     "averiadas",
+     "descompuestas"
+    ]
+   ],
+   "note": "Correct! Averiado is understood, but in Mexico something broken is descompuesto."
+  },
+  {
+   "main": "fraccionamiento",
+   "alt": "desarrollo",
+   "wordOnly": true,
+   "note": "Correct! Desarrollo is also used in Mexico; for a lot subdivision the usual word is fraccionamiento."
+  },
+  {
+   "main": "superficie",
+   "alt": "área",
+   "wordOnly": true,
+   "note": "Correct! Área is fine in conversation; Mexican plans and deeds say superficie."
+  },
+  {
+   "main": "colindancias",
+   "alt": "linderos",
+   "forms": [
+    [
+     "linderos",
+     "colindancias",
+     "xg"
+    ],
+    [
+     "límites",
+     "colindancias",
+     "xg"
+    ]
+   ],
+   "note": "Correct! Linderos is understood; Mexican deeds usually list las colindancias."
+  },
+  {
+   "main": "entronque",
+   "alt": "cruce",
+   "wordOnly": true,
+   "note": "Correct! Cruce works; Mexican road signs call a highway junction el entronque."
+  },
+  {
+   "main": "pendiente",
+   "alt": "inclinación",
+   "wordOnly": true,
+   "note": "Correct! Inclinación is understood; for a lot builders usually say la pendiente."
+  },
+  {
+   "main": "prospecto",
+   "alt": "cliente potencial",
+   "wordOnly": true,
+   "note": "Correct! Cliente potencial works; Mexican sales teams usually say prospecto."
+  },
+  {
+   "main": "quedar cerca",
+   "alt": "estar cerca",
+   "wordOnly": true,
+   "note": "Correct! Estar cerca works; Mexicans often say queda cerca for places."
+  },
+  {
+   "main": "con gusto",
+   "alt": "con mucho gusto",
+   "wordOnly": true,
+   "note": "Correct! Con mucho gusto works too; con gusto is the everyday Mexican reply."
+  },
+  {
+   "main": "llanta",
+   "alt": "goma",
+   "wordOnly": true,
+   "note": "Correct in Argentina! In Mexico a tire is una llanta."
+  }
  ]
 }

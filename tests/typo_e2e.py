@@ -22,6 +22,7 @@ async def main():
         b = await (p.webkit if ENGINE == 'webkit' else p.chromium).launch()
         dev = dict(p.devices['iPhone 15']) if ENGINE == 'webkit' else dict(viewport={'width': 390, 'height': 844}, device_scale_factor=3, is_mobile=True, has_touch=True)
         ctx = await b.new_context(**dev, timezone_id='America/Mexico_City')
+        await ctx.add_init_script("delete window.SpeechRecognition; delete window.webkitSpeechRecognition")  # v8: no recogniser; speaking drills are covered by v8_e2e
         raw = {k: v for k, v in V5.items() if k not in ('exportedAt', 'app', 'appVersion')}
         await ctx.add_init_script(f"if (!localStorage.getItem('{KEY}')) localStorage.setItem('{KEY}', {json.dumps(json.dumps(raw))})")
         page = await ctx.new_page(); errors = []; page.on('pageerror', lambda e: errors.append(str(e)))

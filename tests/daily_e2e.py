@@ -52,6 +52,7 @@ async def main():
         if ENGINE == 'webkit': b = await p.webkit.launch(); dev = dict(p.devices['iPhone 15'])
         else: b = await p.chromium.launch(); dev = dict(viewport={'width': 390, 'height': 844}, device_scale_factor=3, is_mobile=True, has_touch=True)
         ctx = await b.new_context(**dev, timezone_id='America/Mexico_City', service_workers='block')
+        await ctx.add_init_script("delete window.SpeechRecognition; delete window.webkitSpeechRecognition")  # v8: no recogniser; speaking drills are covered by v8_e2e
         raw = dict(V4); [raw.pop(k, None) for k in ('exportedAt', 'app', 'appVersion')]
         await ctx.add_init_script(f"if (!localStorage.getItem('{KEY}')) localStorage.setItem('{KEY}', {json.dumps(json.dumps(raw))})")
         page = await ctx.new_page(); errors = []
@@ -59,7 +60,7 @@ async def main():
         page.on('console', lambda m: errors.append(m.text) if m.type == 'error' else None)
         await page.clock.install(time=at(2026, 11, 11, 9)); await page.clock.pause_at(at(2026, 11, 11, 9))
         await page.goto(URL); await page.wait_for_selector('#daybar')
-        check(await page.evaluate("__app.version") == 'v7', 'app version is v7')
+        check(await page.evaluate("__app.version") == 'v8', 'app version is v8')
         # --- migration from v4 progress
         s = await page.evaluate("__app.state"); stored = await page.evaluate(f"JSON.parse(localStorage.getItem('{KEY}'))")
         diff = [k for k, v in raw.items() if k not in ('schema', 'settings', 'path') and s.get(k) != v]
@@ -68,7 +69,7 @@ async def main():
         if not same: print('   differs:', diff, 'path same:', path_same)
         check(same, 'v4 migration: items, pstats, recent, path, tests, parked, placement, sessions all identical')
         check(all(s['settings'].get(k) == v for k, v in raw['settings'].items()) and s['settings']['goalMin'] == 15, 'v4 migration: settings kept, 15-min goal added')
-        check(s['schema'] == 4 and s['streak']['count'] == 1090 and s['streak']['lastDay'] == '2026-11-11' and s['daily'] == {}, f"v4 migration: schema 4, streak seeded 1090 (lastDay {s['streak']['lastDay']})")
+        check(s['schema'] == 5 and s['streak']['count'] == 1090 and s['streak']['lastDay'] == '2026-11-11' and s['daily'] == {}, f"v4 migration: schema 5, streak seeded 1090 (lastDay {s['streak']['lastDay']})")
         check(stored is not None and stored['items'] == raw['items'], 'v4 migration: saved under the same storage key')
         m, n, lit = await bar(page)
         check(m == '0 / 15 min' and n == '1,090' and lit, f'home shows seed: "{m}", streak {n}, flame lit={lit}')

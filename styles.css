@@ -160,3 +160,55 @@ main.card.fx-dim{animation:fx-dim .35s ease-out}
 html,body,button,a,input,textarea,.tile,.opt,.btn{touch-action:manipulation}
 .stile{scroll-margin-bottom:120px}
 .sline.veil .ses span,.sline.veil .sen{filter:blur(6px);-webkit-user-select:none;user-select:none;pointer-events:none}
+/* ---------- v8 ---------- */
+:root{--new:#7c3aed;--newbg:#f3e8ff;--accent-soft:#ccfbf1;--slot:#e9e9e4}
+@media (prefers-color-scheme:dark){:root{--new:#c4b5fd;--newbg:#2e1065;--accent-soft:#134e4a;--slot:#26262b}}
+/* tile bank placeholders: a picked tile leaves a grey slot of the same size, so the bank never reflows */
+.tile.used{visibility:visible;color:transparent;background:var(--slot);border-color:var(--slot);box-shadow:none;pointer-events:none}
+.tile.used *{visibility:hidden}
+/* speech-bubble prompts */
+.bubble-row{display:flex;align-items:flex-end;gap:12px;margin:4px 0 22px}
+.avatar{flex:0 0 56px;height:56px}.avatar svg{width:56px;height:56px;display:block}
+.bubble{position:relative;flex:1;min-width:0;border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;background:var(--card);font-size:20px;line-height:1.5}
+.bubble:before{content:"";position:absolute;left:-9px;bottom:16px;width:14px;height:14px;background:var(--card);border-left:1.5px solid var(--line);border-bottom:1.5px solid var(--line);transform:rotate(45deg)}
+.bubble .bubble-spk{float:left;margin:-4px 6px 0 -4px;color:var(--accent);font-size:22px}
+.bubble.en{font-weight:600}
+.bubble .tok,.story .ses .tok{text-decoration:underline dotted var(--muted);text-decoration-thickness:1.5px;text-underline-offset:5px;cursor:pointer;border-radius:4px}
+.tok.new{color:var(--new);text-decoration-color:var(--new);font-weight:600}
+.tok.hinted{background:var(--accent-soft)}
+.newlabel{font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--new);margin-bottom:6px}
+.badge.new{background:var(--newbg);color:var(--new)}
+.hint-pop{position:absolute;z-index:60;pointer-events:none;max-width:260px;background:var(--fg);color:var(--bg);border-radius:10px;padding:8px 12px;font-size:16px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+.hint-pop .hint-es{color:inherit;opacity:.7}
+.hint-pop:after{content:"";position:absolute;left:50%;bottom:-6px;width:12px;height:12px;margin-left:-6px;background:inherit;transform:rotate(45deg)}
+.hint-pop.below:after{bottom:auto;top:-6px}
+/* 3-choice word picker */
+.options.stack{gap:12px}
+.opt.big-opt{font-size:21px;padding:18px 16px;text-align:center;border-width:2px;border-radius:14px;box-shadow:0 3px 0 var(--line)}
+/* repeat-after-me */
+.mic-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;margin:10px 0 8px}
+.mic{width:100%;max-width:360px;height:76px;border-radius:18px;border:0;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;gap:12px;font-size:18px;font-weight:600;box-shadow:0 4px 0 rgba(0,0,0,.18);cursor:pointer}
+.mic svg{width:30px;height:30px}
+.mic.on{animation:micpulse 1.1s ease-in-out infinite}
+.mic:disabled{opacity:.55}
+@keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(15,118,110,.45)}50%{box-shadow:0 0 0 14px rgba(15,118,110,0)}}
+.heard{min-height:24px;text-align:center;font-size:15px}
+.sp-ind{margin-left:4px}
+/* flip card */
+.flipstack{position:relative;height:170px;margin:6px 4px 26px;perspective:900px}
+.flipstack:before,.flipstack:after{content:"";position:absolute;left:10px;right:10px;height:100%;border:1.5px solid var(--line);border-radius:16px;background:var(--card)}
+.flipstack:before{top:12px;left:20px;right:20px;opacity:.55}.flipstack:after{top:6px;opacity:.85}
+.flip{position:absolute;inset:0;z-index:1;transform-style:preserve-3d;transition:transform .45s ease}
+.flip.flipped{transform:rotateY(180deg)}
+.no-anim .flip{transition:none}
+.face{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:8px;border:2px solid var(--line);border-radius:16px;background:var(--card);backface-visibility:hidden;-webkit-backface-visibility:hidden;padding:12px;text-align:center}
+.face.back{transform:rotateY(180deg);border-color:var(--accent)}
+.flip-en{font-size:26px;font-weight:600}.flip-es{font-size:26px;font-weight:700;color:var(--accent)}
+.alt-note{margin:6px 0 0;font-size:15px;color:var(--fg);background:var(--accent-soft);border-radius:10px;padding:8px 10px}
+.voice-set select{max-width:210px;font-size:15px;padding:6px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--fg)}
+/* WebKit can flatten 3D inside animated cards, so faces are also swapped with visibility halfway through the turn */
+.face.back{visibility:hidden;transition:visibility 0s .22s}
+.flip.flipped .face.back{visibility:visible}
+.face.front{transition:visibility 0s .22s}
+.flip.flipped .face.front{visibility:hidden}
+.no-anim .face{transition:none}

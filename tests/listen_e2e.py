@@ -49,6 +49,7 @@ async def main():
         b = await (p.webkit if ENGINE == 'webkit' else p.chromium).launch()
         dev = dict(p.devices['iPhone 15']) if ENGINE == 'webkit' else dict(viewport={'width': 390, 'height': 844}, device_scale_factor=3, is_mobile=True, has_touch=True)
         ctx = await b.new_context(**dev, timezone_id='America/Mexico_City', service_workers='block')
+        await ctx.add_init_script("delete window.SpeechRecognition; delete window.webkitSpeechRecognition")  # v8: no recogniser; speaking drills are covered by v8_e2e
         raw = {k: v for k, v in V5.items() if k not in ('exportedAt', 'app', 'appVersion')}
         await ctx.add_init_script(f"if (!localStorage.getItem('{KEY}')) localStorage.setItem('{KEY}', {json.dumps(json.dumps(raw))})")
         # count speech calls (auto-play vs taps)
@@ -57,9 +58,9 @@ async def main():
         page.on('pageerror', lambda e: errors.append(str(e)))
         await page.clock.install(time=T0); await page.clock.pause_at(T0)
         await page.goto(URL); await page.wait_for_selector('.stone')
-        check(await page.evaluate("__app.version") == 'v7', 'app version is v7')
+        check(await page.evaluate("__app.version") == 'v8', 'app version is v8')
         s = await page.evaluate("__app.state")
-        check(s['listenPauseUntil'] == 0 and s['items'] == raw['items'] and s['streak'] == raw['streak'] and s['daily'] == raw['daily'] and s['schema'] == 4, 'v6 data loads losslessly, listening on by default')
+        check(s['listenPauseUntil'] == 0 and s['items'] == raw['items'] and s['streak'] == raw['streak'] and s['daily'] == raw['daily'] and s['schema'] == 5 and s['speakPauseUntil'] == 0, 'v6 data loads losslessly, listening on by default')
         flags = await page.evaluate("['es2en','en2es','cloze','listen','listenS','build'].map(t => [t, !!__app.makeExercise({id: 'w:fuga', ex: t}).audio])")
         check([t for t, a in flags if a] == ['listen', 'listenS'], f'only listen/listenS exercises are marked audio-only: {flags}')
         # ---- unit test of unit 1: walk to the first audio card

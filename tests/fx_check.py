@@ -8,9 +8,11 @@ async def main():
     async with async_playwright() as p:
         if ENGINE == 'webkit':
             b = await p.webkit.launch(); dev = dict(p.devices['iPhone 15']); ctx = await b.new_context(**dev)
+            await ctx.add_init_script("delete window.SpeechRecognition; delete window.webkitSpeechRecognition")  # v8: no recogniser; speaking drills are covered by v8_e2e
         else:
             b = await p.chromium.launch(args=['--autoplay-policy=no-user-gesture-required'])
             ctx = await b.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=3, is_mobile=True, has_touch=True)
+            await ctx.add_init_script("delete window.SpeechRecognition; delete window.webkitSpeechRecognition")  # v8: no recogniser; speaking drills are covered by v8_e2e
         print('engine:', ENGINE, b.version)
         page = await ctx.new_page(); errors = []
         page.on('console', lambda m: errors.append(m.text) if m.type == 'error' else None)

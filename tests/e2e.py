@@ -3,7 +3,7 @@ from playwright.async_api import async_playwright
 URL = sys.argv[1] if len(sys.argv) > 1 else 'http://127.0.0.1:8787/'
 async def main():
     async with async_playwright() as p:
-        b = await p.chromium.launch(); ctx = await b.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True)
+        b = await p.chromium.launch(); ctx = await b.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True); await ctx.add_init_script("delete window.SpeechRecognition; delete window.webkitSpeechRecognition")
         page = await ctx.new_page(); errors = []
         page.on('console', lambda m: errors.append(m.text) if m.type == 'error' else None)
         page.on('pageerror', lambda e: errors.append(str(e)))

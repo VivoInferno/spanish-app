@@ -96,6 +96,36 @@
     }
     return best;
   }
+  // ---- v8: synonym credit (reparar for arreglar, coche for carro, ...) with a note on what Mexicans say ----
+  let SWAPS = new Map(); // accent-free alternate form -> {main form, note}; from content.json synonyms (sentence-safe rules only)
+  function setSynonyms(list) {
+    SWAPS = new Map();
+    (list || []).forEach(d => {
+      // every synonym form is a real Spanish form: a one-letter slip that lands on one (repara for reparar) is a different word
+      [d.alt, d.main].concat((d.forms || []).flat()).forEach(f => { if (f && f !== 'xg' && !f.includes(' ')) KNOWN.add(stripAcc(clean(f))); });
+      if (d.wordOnly) return;
+      (d.forms || []).forEach(([a, m, xg]) => { if (!xg && !a.includes(' ')) { const k = stripAcc(clean(a)); if (!SWAPS.has(k)) SWAPS.set(k, { main: m, note: d.note }); } });
+    });
+    return SWAPS.size;
+  }
+  /**
+   * checkAlt(input, answers, opts, alts) -> check() result, or {result:'alt', answer, used, note, sub} when the input is a real
+   * synonym: one of the item's own alternates (alts: [{w|f, note}]) or the main answer with synonym swaps inside it.
+   * Typo / accent tolerance applies to the alternate too. Drills that target a form (dictation, repeat-after-me, tiles) don't call this.
+   */
+  function checkAlt(input, answers, opts, alts) {
+    opts = opts || {};
+    const r = check(input, answers, opts);
+    if (r.result !== 'wrong') return r;
+    for (const a of alts || []) {
+      const t = a.w || a.f; const ra = check(input, [t], opts);
+      if (ra.result !== 'wrong') return { result: 'alt', answer: answers[0], used: t, note: a.note, sub: ra.result };
+    }
+    const words = clean(input).split(' '); let note = null, used = [];
+    const sw = words.map(w => { const m = SWAPS.get(stripAcc(w)); if (m) { note = note || m.note; used.push(w); return m.main; } return w; });
+    if (used.length) { const rs = check(sw.join(' '), answers, opts); if (rs.result !== 'wrong') return { result: 'alt', answer: rs.answer, used: used.join(' '), note, sub: rs.result }; }
+    return r;
+  }
   function forms(s, lang) { const c = clean(s); const out = [c]; const a = c.replace(ART[lang] || /^$/, ''); if (a !== c) out.push(a); return out; }
   // HTML for the correct answer with the fixed letter(s) highlighted
   function markFixes(answer, r) {
@@ -109,6 +139,6 @@
       return esc(w.slice(0, p)) + '<mark>' + esc(w.slice(p, p + len)) + '</mark>' + esc(w.slice(p + len));
     }).join(' ');
   }
-  const api = { check, clean, stripAcc, lev, oneEdit, setKnown, knownFromContent, markFixes };
+  const api = { check, checkAlt, setSynonyms, clean, stripAcc, lev, oneEdit, setKnown, knownFromContent, markFixes };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.Check = api;
 })(this);

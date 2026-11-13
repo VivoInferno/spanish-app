@@ -49,13 +49,13 @@ async def solve_story_tile(page):
 
 async def main():
     async with async_playwright() as p:
-        if ENGINE == 'webkit': b = await p.webkit.launch(); ctx = await b.new_context(**dict(p.devices['iPhone 15']))
-        else: b = await p.chromium.launch(); ctx = await b.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=3, is_mobile=True, has_touch=True)
+        if ENGINE == 'webkit': b = await p.webkit.launch(); ctx = await b.new_context(**dict(p.devices['iPhone 15'])); await ctx.add_init_script("delete window.SpeechRecognition; delete window.webkitSpeechRecognition")
+        else: b = await p.chromium.launch(); ctx = await b.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=3, is_mobile=True, has_touch=True); await ctx.add_init_script("delete window.SpeechRecognition; delete window.webkitSpeechRecognition")
         page = await ctx.new_page(); errors = []
         page.on('console', lambda m: errors.append(m.text) if m.type == 'error' else None)
         page.on('pageerror', lambda e: errors.append(str(e)))
         await page.goto(URL); await page.wait_for_selector('#go')
-        check(await page.evaluate("__app.version") == 'v7', 'app version is v7')
+        check(await page.evaluate("__app.version") == 'v8', 'app version is v8')
         # --- placement
         await page.click('#go'); k = 0
         while not await page.query_selector('h1:has-text("Placement results")'):
@@ -147,7 +147,7 @@ async def main():
             s2 = await pg.evaluate("__app.state")
             same = all(s2['items'].get(k) == v for k, v in V3['items'].items()) and len(s2['items']) == len(V3['items'])
             check(same, f'migration ({mode}): all {len(V3["items"])} SRS item states preserved exactly')
-            check(s2['settings'].get('sound') is not None and s2['schema'] == 4 and 'path' in s2 and 'parked' in s2, f'migration ({mode}): new fields added, schema 4')
+            check(s2['settings'].get('sound') is not None and s2['schema'] == 5 and 'path' in s2 and 'parked' in s2, f'migration ({mode}): new fields added, schema 5 (v8)')
             u1 = s2['path']['done'].get('u1')
             print(f'   derived path ({mode}): u1={u1}, current={await pg.evaluate("__app.currentPos()")}, testedOut={list(s2["path"]["testedOut"].keys())}')
             stored = await pg.evaluate("JSON.parse(localStorage.getItem('spanish-app-state-v1'))")
