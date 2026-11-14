@@ -52,7 +52,7 @@ async def main():
         pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto(URL); await pg.wait_for_selector('.stone'); await pg.wait_for_timeout(600)
         s = await pg.evaluate("__app.state")
-        check(await pg.evaluate("__app.version") == 'v9.1' and s['items'] == V9['items'] and s['path'] == V9['path'] and s['daily'] == V9['daily'] and s['streak'] == V9['streak'] and s['settings']['voiceMode'] == 'recorded',
+        check(await pg.evaluate("__app.version") == 'v9.2' and s['items'] == V9['items'] and s['path'] == V9['path'] and s['daily'] == V9['daily'] and s['streak'] == V9['streak'] and s['settings']['voiceMode'] == 'recorded',
               'v9 data → v9.1 losslessly')
         await pg.evaluate("window.__rel = 0; const o = Rec.release; Rec.release = () => { __rel++; o(); }; window.__cancels = 0; const f = () => { __cancels++; }; for (const o of [speechSynthesis, Object.getPrototypeOf(speechSynthesis)]) try { Object.defineProperty(o, 'cancel', { value: f, configurable: true, writable: true }); } catch (e) {}")
         await pg.evaluate("__app.openStone('u9', 0)"); await pg.wait_for_selector('#go'); await pg.click('#go'); await pg.wait_for_timeout(150)

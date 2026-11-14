@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const APP_VERSION = 'v9.1'; // keep in sync with CACHE in sw.js (espanol-v9-1)
+  const APP_VERSION = 'v9.2'; // keep in sync with CACHE in sw.js (espanol-v9-2)
   const KEY = 'spanish-app-state-v1'; // unchanged since v1 — never rename
   const DAY = SRS.DAY;
   const STONES = [
@@ -58,6 +58,11 @@
       S.parkedDefaults[w] = true; changed = true;
       if (!S.items[wid(w)] && !S.parked[w]) S.parked[w] = { at: Date.now(), auto: true };
     });
+    // v9.2: words parked by long-press before they were course words ('g:' keys) park the course word once it exists
+    C.units.forEach(u => u.words.forEach(w => {
+      const base = strip(w.es.replace(/^(el|la|los|las) /, '').toLowerCase()), g = S.parked['g:' + base];
+      if (g && !S.parked[w.id] && !g.applied) { S.parked[w.id] = { at: g.at, from: 'g:' + base }; g.applied = true; changed = true; }
+    }));
     if (changed) save();
   }
   function migratePath() { // runs once content is loaded; derives path progress from existing SRS items
@@ -157,9 +162,18 @@
     const low = String(core).toLowerCase(), g = (C.glosses || {})[low] || IDX.glossFold[strip(low)];
     return g ? { es: low, en: g } : null;
   }
+  // v9.2 fallback when no gloss: plural / gender endings, then the containing sentence's English (story lines, examples, feedback)
+  function glossOrFallback(el) {
+    const core = el.dataset.g; let g = gloss(core); if (g) return g;
+    const low = String(core).toLowerCase();
+    for (const f of [low.replace(/es$/, ''), low.replace(/s$/, ''), low.replace(/a$/, 'o'), low.replace(/as$/, 'os')]) if (f !== low && f.length > 1) { g = gloss(f); if (g) return { es: g.es, en: g.en }; }
+    const host = el.closest('[data-en]'); if (host && host.dataset.en) return { es: low, en: 'Whole line: ' + host.dataset.en };
+    return { es: low, en: '(no hint for this word yet)' };
+  }
+  const hintsOff = () => !!(run && run.mode === 'test'); // v9.2: no tap-to-translate in the unit test (4th stone)
   function showHint(el) {
     closeHint();
-    const g = gloss(el.dataset.g); if (!g) return;
+    const g = glossOrFallback(el); if (!g) return;
     const box = document.createElement('div'); box.className = 'hint-pop'; box.setAttribute('role', 'tooltip');
     box.innerHTML = `<div class="hint-en">${esc(g.en)}</div>${strip(g.es) !== strip(el.dataset.g) ? `<div class="hint-es muted small">${esc(g.es)}</div>` : ''}`;
     document.body.appendChild(box);
@@ -176,6 +190,7 @@
       const t = e.target.closest && e.target.closest('.tok[data-g]');
       if (!t) { if (!(e.target.closest && e.target.closest('.hint-pop'))) closeHint(); return; }
       if (lp.fired) return;
+      if (hintsOff() || t.closest('.tile, .opt, .nohint')) return; // tiles / answer buttons keep their own tap
       e.stopPropagation();
       if (hintEl === t) return closeHint();
       showHint(t); speak(t.dataset.g);
@@ -494,14 +509,57 @@
   function mountTiles(ex, isLocked) {
     const line = document.getElementById('line'), tiles = document.getElementById('tiles'); ex.order = [];
     // reserve at least as many rows as the bank itself needs (the answer can't take more), so long sentences don't shift it either
+    // (+1 spare row once the bank wraps to 3+ rows, since an answer in another order can pack worse than the bank does,
+    // but only while the bank still fits above the footer; otherwise the bank would start out hidden on small phones)
     const bankRows = new Set([...tiles.children].map(t => t.offsetTop)).size;
-    if (bankRows > 3) line.style.minHeight = `calc(${bankRows} * var(--tile-h) + ${bankRows - 1} * var(--tile-gap) + 16px)`;
-    const draw = () => { line.innerHTML = ex.order.map(k => `<button class="tile in" data-k="${k}">${esc(ex.tiles[k])}</button>`).join(''); tiles.querySelectorAll('.tile').forEach(t => t.classList.toggle('used', ex.order.includes(+t.dataset.k))); };
-    tiles.onclick = e => { const t = e.target.closest('.tile'); if (!t || isLocked() || ex.order.includes(+t.dataset.k)) return; ex.order.push(+t.dataset.k); draw(); };
-    line.onclick = e => { const t = e.target.closest('.tile'); if (!t || isLocked()) return; ex.order = ex.order.filter(k => k !== +t.dataset.k); draw(); };
+    const reserve = n => { line.style.minHeight = n > 3 ? `calc(${n} * var(--tile-h) + ${n - 1} * var(--tile-gap) + 16px)` : ''; };
+    reserve(bankRows);
+    if (bankRows >= 3) {
+      const ft = document.querySelector('footer'), limit = ft ? ft.getBoundingClientRect().top : innerHeight;
+      const room = limit - tiles.getBoundingClientRect().bottom, rowH = tiles.firstElementChild ? tiles.firstElementChild.offsetHeight + 8 : 60;
+      if (room >= rowH) reserve(bankRows + 1);
+    }
+    // v9.2: Duolingo-style glide (FLIP, transform only, ~240 ms ease-out). ex.order is the only state and is updated before any
+    // animation, so rapid taps mid-flight can't lose or duplicate tiles; the DOM is re-synced from it on every tap. Bank tiles
+    // never move or leave the bank (a tile out of it is a grey placeholder), so the bank never reflows.
+    const bankEl = k => tiles.querySelector(`.tile[data-k="${k}"]`);
+    const lineEls = new Map(), ghosts = new Map(); // k → tile in the answer line; k → copy flying back to its placeholder
+    const D = 240, EASE = 'cubic-bezier(.2,.8,.3,1)';
+    const motion = () => S.settings.anim !== false && !!Element.prototype.animate && !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+    const glide = (el, from) => {
+      if (el.getAnimations) el.getAnimations().forEach(a => a.cancel());
+      const to = el.getBoundingClientRect(), dx = from.left - to.left, dy = from.top - to.top;
+      if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) el.animate([{ transform: `translate(${dx}px,${dy}px)` }, { transform: 'none' }], { duration: D, easing: EASE });
+    };
+    const sync = (k, adding) => {
+      const anim = motion(), first = new Map();
+      if (anim) lineEls.forEach((el, j) => first.set(j, el.getBoundingClientRect())); // FIRST (mid-flight positions included)
+      let src = null;
+      if (anim && k != null) src = adding ? (ghosts.has(k) ? ghosts.get(k).getBoundingClientRect() : bankEl(k).getBoundingClientRect()) : lineEls.has(k) ? lineEls.get(k).getBoundingClientRect() : null;
+      if (ghosts.has(k)) { ghosts.get(k).remove(); ghosts.delete(k); } // tapped again while flying home
+      [...lineEls.keys()].forEach(j => { if (!ex.order.includes(j)) { lineEls.get(j).remove(); lineEls.delete(j); } });
+      ex.order.forEach(j => {
+        let el = lineEls.get(j);
+        if (!el) { el = document.createElement('button'); el.className = 'tile in'; el.type = 'button'; el.dataset.k = j; el.textContent = ex.tiles[j]; const b = bankEl(j); if (b && b.dataset.lp != null) el.dataset.lp = b.dataset.lp; lineEls.set(j, el); }
+        if (line.lastElementChild !== el || el.parentNode !== line) line.appendChild(el);
+      });
+      tiles.querySelectorAll('.tile').forEach(t => { const j = +t.dataset.k; t.classList.toggle('used', ex.order.includes(j)); t.classList.toggle('landing', ghosts.has(j)); });
+      if (!anim) return;
+      lineEls.forEach((el, j) => { const f = j === k && adding ? src : first.get(j); if (f) glide(el, f); }); // LAST → INVERT → PLAY
+      if (!adding && src) { // a copy flies from the answer line back to its exact placeholder
+        const home = bankEl(k), to = home.getBoundingClientRect(), gh = home.cloneNode(true);
+        gh.className = 'tile tile-ghost'; gh.removeAttribute('data-lp'); gh.removeAttribute('data-k'); gh.setAttribute('aria-hidden', 'true'); gh.tabIndex = -1;
+        Object.assign(gh.style, { left: to.left + 'px', top: to.top + 'px', width: to.width + 'px', height: to.height + 'px' });
+        document.body.appendChild(gh); ghosts.set(k, gh); home.classList.add('landing');
+        const a = gh.animate([{ transform: `translate(${src.left - to.left}px,${src.top - to.top}px)` }, { transform: 'none' }], { duration: D, easing: EASE });
+        a.onfinish = () => { if (ghosts.get(k) === gh) { ghosts.delete(k); home.classList.remove('landing'); } gh.remove(); };
+      }
+    };
+    tiles.onclick = e => { const t = e.target.closest('.tile'); if (!t || isLocked() || ex.order.includes(+t.dataset.k)) return; ex.order.push(+t.dataset.k); sync(+t.dataset.k, true); };
+    line.onclick = e => { const t = e.target.closest('.tile'); if (!t || isLocked() || !ex.order.includes(+t.dataset.k)) return; ex.order = ex.order.filter(k => k !== +t.dataset.k); sync(+t.dataset.k, false); };
     return () => { if (!ex.order.length) return null; const v = ex.order.map(k => ex.tiles[k]).join(' '); return { v, ok: Check.check(v, ex.answers, { lang: ex.opts.lang, typo: false }).result === 'exact' }; };
   }
-  const tilesHtml = ex => `<div class="answer-line" id="line"></div><div class="tiles" id="tiles">${ex.tiles.map((t, k) => `<button class="tile" data-k="${k}">${esc(t)}</button>`).join('')}</div>`;
+  const tilesHtml = ex => `<div class="answer-line" id="line"></div><div class="tiles" id="tiles">${ex.tiles.map((t, k) => `<button class="tile" data-k="${k}"${ex.opts.lang === 'es' ? ` data-lp="${esc(t)}"` : ''}>${esc(t)}</button>`).join('')}</div>`;
 
   // ---------- fast double-tap guard (Continue / Check / Next never fire twice for one double tap) ----------
   let lastStep = 0;
@@ -561,7 +619,7 @@
       body = `<div class="label"><span class="badge new">NEW</span> New word · ${esc(C.units[w.unitIdx].title)}</div>
         <div class="big">${wordSpan(w.id, w.es)} <button class="icon speak" data-say="${esc(w.es)}">🔊</button></div>
         <div class="en">${esc(w.en)}</div>${w.note ? `<p class="note">${esc(w.note)}</p>` : ''}
-        ${ex ? `<div class="example"><div>${tokenize(ex.es)} <button class="icon speak" data-say="${esc(ex.es)}">🔊</button></div><div class="muted">${esc(ex.en)}</div></div>` : ''}
+        ${ex ? `<div class="example" data-en="${esc(ex.en)}"><div>${tokenize(ex.es)} <button class="icon speak" data-say="${esc(ex.es)}">🔊</button></div><div class="muted">${esc(ex.en)}</div></div>` : ''}
         <div class="row"><button class="btn secondary" id="known">I already know this</button></div>`;
     } else {
       const p = IDX.patterns[entry.id.slice(2)];
@@ -579,28 +637,30 @@
   }
 
   function renderExercise(entry, ex) {
-    closeHint();
+    closeHint(); document.querySelectorAll('.tile-ghost').forEach(n => n.remove());
     let prompt = '';
     if (ex.kind === 'mc' && ex.pick) prompt = ex.bubbleEs ? bubble(ex.bubbleEs, 'es', ex.speakNow) : bubble(ex.bubbleEn, 'en');
-    else if (ex.kind === 'mc') prompt = `<div class="prompt">${esc(ex.prompt).replace('___', '<span class="blank">___</span>')}</div>`;
+    else if (ex.kind === 'mc') prompt = `<div class="prompt">${tokenize(ex.prompt).replace('___', '<span class="blank">___</span>')}</div>`;
     else if (ex.kind === 'speak') prompt = bubble(ex.sayEs, 'es', ex.sayEs);
     else if (ex.kind === 'build') prompt = ex.bigEs ? bubble(ex.bigEs, 'es', ex.bigEs) : bubble(ex.big, 'en');
     else if (ex.listen) prompt = `<div class="listen"><button class="btn play" id="play">🔊 Play</button><button class="btn secondary" id="slow">🐢 Slow</button></div>`;
     else if (ex.clozeEs) prompt = `<div class="prompt">${tokenize(ex.clozeEs).replace('_____', '<span class="blank">_____</span>')}</div><div class="muted sub">${esc(ex.sub)}</div>`;
-    else if (ex.flip) prompt = `<div class="flipstack"><div class="flip" id="flipCard"><div class="face front"><div class="flip-en">${esc(ex.big)}</div></div><div class="face back"><div class="flip-es">${esc(ex.back)}</div><button class="icon speak" data-say="${esc(ex.back)}" aria-label="Play">🔊</button></div></div></div>`;
+    else if (ex.flip) prompt = `<div class="flipstack"><div class="flip" id="flipCard"><div class="face front"><div class="flip-en">${esc(ex.big)}</div></div><div class="face back"><div class="flip-es">${tokenize(ex.back)}</div><button class="icon speak" data-say="${esc(ex.back)}" aria-label="Play">🔊</button></div></div></div>`;
     else if (ex.bubbleEs) prompt = bubble(ex.bubbleEs, 'es', ex.speakNow);
     else prompt = `<div class="big">${ex.bigW ? wordSpan(ex.bigW, ex.big) : esc(ex.big)}${ex.speakNow ? ` <button class="icon speak" data-say="${esc(ex.speakNow)}">🔊</button>` : ''}</div>`;
     let input;
-    if (ex.kind === 'mc') input = `<div class="options${ex.pick ? ' stack' : ''}">${ex.options.map((o, k) => `<button class="opt${ex.pick ? ' big-opt' : ''}" data-k="${k}">${esc(o)}</button>`).join('')}</div>`;
+    const optEs = ex.kind === 'mc' && (!ex.pick || !!ex.bubbleEn); // grammar options and "select the translation" options are Spanish
+    if (ex.kind === 'mc') input = `<div class="options${ex.pick ? ' stack' : ''}">${ex.options.map((o, k) => `<button class="opt${ex.pick ? ' big-opt' : ''}" data-k="${k}"${optEs ? ` data-lp="${esc(o)}"` : ''}>${esc(o)}</button>`).join('')}</div>`;
     else if (ex.kind === 'build') input = tilesHtml(ex);
     else if (ex.kind === 'speak') input = `<div class="mic-wrap"><button class="mic" id="mic" type="button" aria-label="Tap and say the sentence"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-2.1A7 7 0 0 0 19 12z" fill="currentColor"/></svg><span class="mic-label">Tap to speak</span></button><div class="heard muted" id="heard" aria-live="polite"></div></div>`;
-    else input = `<form id="f" autocomplete="off"><input id="ans" type="text" lang="${ex.opts.lang}" placeholder="${esc(ex.placeholder)}" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done"></form>`;
+    // v9.2: a wrapping, self-growing textarea (2 → ~6 lines, then scrolls) instead of a one-line input; Return still checks
+    else input = `<form id="f" autocomplete="off"><textarea id="ans" class="ans" rows="2" lang="${ex.opts.lang}" placeholder="${esc(ex.placeholder)}" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" enterkeyhint="done"></textarea></form>`;
     const cant = ex.audio ? '<button class="cant-listen" id="cantListen" type="button">🔇 No puedo escuchar ahora <span class="muted">· Can’t listen now</span></button>'
       : ex.kind === 'speak' ? '<button class="cant-listen" id="cantSpeak" type="button">🤐 No puedo hablar ahora <span class="muted">· Can’t speak now</span></button>' : '';
     const label = `<div class="label">${run.mode === 'test' ? 'Test · ' : ''}${esc(ex.label)}</div>`;
     const foot = ex.kind === 'mc' ? '' : ex.flip ? '<button class="btn secondary" id="skip" aria-label="Flip the card to see the answer">↻ Flip</button><button class="btn primary" id="check">Check</button>'
       : ex.kind === 'speak' ? '<button class="btn secondary" id="skip">I don\'t know</button>' : '<button class="btn secondary" id="skip">I don\'t know</button><button class="btn primary" id="check">Check</button>';
-    app.innerHTML = progressBar() + `<main class="card ex-${ex.kind}${ex.flip ? ' ex-flip' : ''}">${newLabel(prompt)}${label}${prompt}${input}${cant}<div id="fb"></div></main><footer>${foot}</footer>`;
+    app.innerHTML = progressBar() + `<main class="card ex-${ex.kind}${ex.flip ? ' ex-flip' : ''}${hintsOff() ? ' hints-off' : ''}">${newLabel(prompt)}${label}${prompt}${input}${cant}<div id="fb"></div></main><footer>${foot}</footer>`;
     bindQuit(); bindSpeak(); setBar(run.i / run.queue.length);
     if (ex.audio) document.getElementById('cantListen').onclick = e => cantListen(entry, e.currentTarget);
     if (ex.listen) {
@@ -640,7 +700,8 @@
       return;
     }
     const inp = document.getElementById('ans'); setTimeout(() => inp.focus(), 50);
-    const doCheck = () => { const v = inp.value; if (!v.trim()) return; const r = ex.alts ? Check.checkAlt(v, ex.answers, ex.opts, ex.alts) : Check.check(v, ex.answers, ex.opts); ex.matched = r.result === 'alt' ? null : r.answer; ex.res = r; answer(entry, ex, r.result, v); };
+    mountAnswerBox(inp, () => { if (run.answered) return advance(); doCheck(); });
+    const doCheck = () => { const v = inp.value.replace(/[\r\n]+/g, ' '); if (!v.trim()) return; const r = ex.alts ? Check.checkAlt(v, ex.answers, ex.opts, ex.alts) : Check.check(v, ex.answers, ex.opts); ex.matched = r.result === 'alt' ? null : r.answer; ex.res = r; answer(entry, ex, r.result, v); };
     document.getElementById('f').onsubmit = e => { e.preventDefault(); if (run.answered) return advance(); doCheck(); };
     document.getElementById('check').onclick = () => run.answered ? advance() : doCheck();
     document.getElementById('skip').onclick = () => {
@@ -649,6 +710,34 @@
       answer(entry, ex, 'wrong', '');
     };
   }
+  // v9.2: answer textarea: no newlines (Return submits, pasted line breaks become spaces), grows with its content
+  const oneLine = v => v.replace(/[ \t]*[\r\n]+[ \t]*/g, ' ');
+  function growBox(inp) {
+    const cs = getComputedStyle(inp), max = parseFloat(cs.maxHeight) || 220, bd = parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth);
+    inp.style.height = 'auto'; const h = inp.scrollHeight + bd;
+    inp.style.height = Math.min(h, max) + 'px'; inp.style.overflowY = h > max + 1 ? 'auto' : 'hidden';
+  }
+  function mountAnswerBox(inp, submit) {
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing && e.keyCode !== 229) { e.preventDefault(); submit(); } });
+    inp.addEventListener('input', () => {
+      if (/[\r\n]/.test(inp.value)) { const p = inp.selectionStart, before = oneLine(inp.value.slice(0, p)).length; inp.value = oneLine(inp.value); try { inp.setSelectionRange(before, before); } catch (e) { /* ignore */ } }
+      growBox(inp);
+    });
+    inp.addEventListener('focus', () => setTimeout(keepFooterVisible, 350));
+    growBox(inp);
+  }
+  // iOS: the keyboard covers the bottom of the layout viewport. Lift the footer (Check) by exactly the part the visible area
+  // (visualViewport) doesn't show, and keep the answer box above it.
+  function keepFooterVisible() {
+    const vv = window.visualViewport, f = app.querySelector('footer'); if (!vv || !f) return;
+    f.style.transform = '';
+    const visBottom = vv.offsetTop + vv.height, over = Math.round(f.getBoundingClientRect().bottom - visBottom);
+    if (over > 1 && window.innerHeight - visBottom > 80) { // keyboard is up
+      f.style.transform = `translateY(${-over}px)`;
+      const a = document.getElementById('ans'); if (a) { const top = f.getBoundingClientRect().top, ar = a.getBoundingClientRect(); if (ar.bottom > top - 8) window.scrollBy(0, ar.bottom - top + 16); }
+    }
+  }
+  if (window.visualViewport) { window.visualViewport.addEventListener('resize', keepFooterVisible); window.visualViewport.addEventListener('scroll', keepFooterVisible); }
   function flipCard(on) { const c = document.getElementById('flipCard'); if (c) c.classList.toggle('flipped', on); }
 
   // ---------- v8 repeat-after-me: microphone + SpeechRecognition (es-MX) ----------
@@ -746,20 +835,22 @@
     }
     const fb = document.getElementById('fb');
     const correctForm = ex.kind === 'mc' ? ex.answer : (ex.matched || ex.answers[0]);
+    const ansEs = ex.kind === 'mc' ? (!ex.pick || !!ex.bubbleEn) : !!(ex.opts && ex.opts.lang === 'es'); // v9.2: Spanish answers get tap hints + long-press
+    const cf = ansEs ? tokenize(correctForm) : esc(correctForm);
     const head = result === 'alt' ? `<div class="ok">✓ Correct</div><p class="alt-note"><span aria-hidden="true">ℹ️</span> ${esc((ex.res.note || '').replace(/^Correct! /, ''))}${strip(ex.res.answer) !== strip(given) ? ` <span class="muted">Course word: <b>${esc(ex.res.answer)}</b></span>` : ''}</p>`
       : result === 'close' ? `<div class="ok warn">✓ Close. Full line: <b>${esc(ex.answers[0])}</b>${ex.heard ? `<div class="muted small">Heard: “${esc(ex.heard)}”</div>` : ''}</div>`
       : result === 'exact' ? '<div class="ok">✓ Correct</div>'
-      : result === 'accent' ? `<div class="ok warn">✓ Watch the accents: <b>${esc(correctForm)}</b></div>`
+      : result === 'accent' ? `<div class="ok warn">✓ Watch the accents: <b>${cf}</b></div>`
       : result === 'typo' ? `<div class="ok typo">✓ Correct, watch the spelling: <b class="fixed">${Check.markFixes(correctForm, ex.res)}</b></div>`
-      : ex.flipped ? `<div class="bad">↻ Flipped: <b>${esc(correctForm)}</b></div>`
-      : `<div class="bad">✗ ${ex.kind === 'mc' ? 'Answer' : 'Correct answer'}: <b>${esc(correctForm)}</b>${ex.kind === 'speak' && ex.heard ? `<div class="muted small">Heard: “${esc(ex.heard)}”</div>` : ''}</div>`;
+      : ex.flipped ? `<div class="bad">↻ Flipped: <b>${cf}</b></div>`
+      : `<div class="bad">✗ ${ex.kind === 'mc' ? 'Answer' : 'Correct answer'}: <b>${cf}</b>${ex.kind === 'speak' && ex.heard ? `<div class="muted small">Heard: “${esc(ex.heard)}”</div>` : ''}</div>`;
     const rv = ex.reveal || {};
     let more = '';
-    if (rv.es && rv.es !== correctForm) more += `<div class="rv-es">${tokenize(rv.es)} <button class="icon speak" data-say="${esc(ex.speakAfter || rv.es)}">🔊</button></div>`;
+    if (rv.es && rv.es !== correctForm) more += `<div class="rv-es"${rv.en ? ` data-en="${esc(rv.en)}"` : ''}>${tokenize(rv.es)} <button class="icon speak" data-say="${esc(ex.speakAfter || rv.es)}">🔊</button></div>`;
     else if (ex.speakAfter || rv.es) more += `<div><button class="icon speak" data-say="${esc(ex.speakAfter || rv.es)}">🔊</button></div>`;
     if (rv.en) more += `<div class="muted">${esc(rv.en)}</div>`;
     if (rv.note && (!ok || isPattern)) more += `<p class="note">${esc(rv.note)}</p>`;
-    if (rv.ex && !ok) more += `<div class="example"><div>${tokenize(rv.ex.es)}</div><div class="muted">${esc(rv.ex.en)}</div></div>`;
+    if (rv.ex && !ok) more += `<div class="example" data-en="${esc(rv.ex.en)}"><div>${tokenize(rv.ex.es)}</div><div class="muted">${esc(rv.ex.en)}</div></div>`;
     fb.innerHTML = `<div class="feedback ${ok ? 'good' : 'miss'}">${head}${more}</div>`;
     bindSpeak();
     const inp = document.getElementById('ans'); if (inp) inp.readOnly = true;
@@ -921,6 +1012,7 @@
     document.getElementById('skip').onclick = step(() => { if (!story.tile.checked) grade(null); });
   }
   function renderStory(speakLast) {
+    document.querySelectorAll(".tile-ghost").forEach(n => n.remove());
     const { u } = story, st = u.story, lines = st.lines.slice(0, story.shown);
     const pendingQ = st.qs.find(q => q.after === story.shown - 1 && story.answered[st.qs.indexOf(q)] == null); // == null: a wrong answer (false) is answered too
     const tileDue = !pendingQ && story.tile && !story.tile.done && story.tile.after === story.shown - 1;
@@ -929,7 +1021,7 @@
     const frac = (story.shown + Object.keys(story.answered).length + (story.tile && story.tile.done ? 1 : 0)) / (st.lines.length + st.qs.length + (story.tile ? 1 : 0));
     app.innerHTML = `<div class="topbar"><button class="icon" id="quit" aria-label="Close">✕</button><div class="bar"><span style="width:${story.bar || 0}%"></span></div>${lpHtml()}<button class="icon small-btn" id="en" aria-pressed="${story.showEn}">EN</button></div>
       <main class="card story ${story.entered ? 'no-enter' : ''}"><div class="label">Story · ${esc(u.title)}</div><h1>${esc(st.title)}</h1>
-      ${lines.map((l, k) => `<div class="sline ${k === lines.length - 1 ? 'fresh' : ''} ${tileDue && k === story.tile.after ? 'veil' : ''}" data-k="${k}">${l.s ? `<div class="speaker">${esc(l.s)}</div>` : ''}<div class="ses"><button class="icon speak" data-say="${esc(l.es)}" data-spk="${esc(l.s || '')}">🔊</button> <span>${tokenize(l.es)}</span></div><div class="sen muted ${story.showEn ? '' : 'hidden'}">${esc(l.en)}</div></div>`).join('')}
+      ${lines.map((l, k) => `<div class="sline ${k === lines.length - 1 ? 'fresh' : ''} ${tileDue && k === story.tile.after ? 'veil' : ''}" data-k="${k}">${l.s ? `<div class="speaker">${esc(l.s)}</div>` : ''}<div class="ses" data-en="${esc(l.en)}"><button class="icon speak" data-say="${esc(l.es)}" data-spk="${esc(l.s || '')}">🔊</button> <span>${tokenize(l.es)}</span></div><div class="sen muted ${story.showEn ? '' : 'hidden'}">${esc(l.en)}</div></div>`).join('')}
       ${pendingQ ? `<div class="squestion"><div class="prompt">${esc(pendingQ.q)}</div><div class="options">${shuffle(pendingQ.o).map(o => `<button class="opt" data-o="${esc(o)}">${esc(o)}</button>`).join('')}</div><div id="fb"></div></div>` : ''}
       ${tileDue ? '<div class="squestion stile" id="stile"></div>' : ''}
       ${sayDue ? '<div class="squestion ssay" id="ssay"></div>' : ''}
@@ -1095,7 +1187,7 @@
       return `<li><span>${esc(C.patterns[p].name)}</span><span class="muted">${c ? (ps && ps.seen ? Math.round(100 * ps.correct / ps.seen) + '% · ' : '') + fmtDue(c) : 'not started'}</span></li>`;
     }).join('');
     const weak = st.weak.map(w => `<li><span>${esc(C.patterns[w.p].name)}</span><span class="muted">${w.acc != null ? Math.round(w.acc * 100) + '%' : ''}</span></li>`).join('') || '<li class="muted">None right now</li>';
-    const parked = Object.keys(S.parked).filter(w => IDX.words[w]).map(w => `<li><span>${wordSpan(w, IDX.words[w].es)} <span class="muted">· ${esc(IDX.words[w].en)}</span></span><button class="btn secondary slim unpark" data-id="${w}">Unpark</button></li>`).join('') || '<li class="muted">None. Press and hold any word to park it.</li>';
+    const parked = Object.keys(S.parked).filter(w => IDX.words[w] || (w.startsWith('g:') && !S.parked[w].applied)).map(w => { const i = wordInfo(w); return `<li><span>${IDX.words[w] ? wordSpan(w, i.es) : `<span class="w" data-lp="${esc(i.es)}">${esc(i.es)}</span>`} <span class="muted">· ${esc(i.en)}</span></span><button class="btn secondary slim unpark" data-id="${esc(w)}">Unpark</button></li>`; }).join('') || '<li class="muted">None. Press and hold any word to park it.</li>';
     app.innerHTML = `<div class="topbar"><button class="icon" id="back" aria-label="Back">←</button><div class="title">Progress</div></div>
       <main class="card">
       <div class="today"><div><b>${st.words}</b><span>words learned</span></div><div><b>${st.mastered}</b><span>long-term</span></div><div><b>${st.due}</b><span>due today</span></div></div>
@@ -1198,14 +1290,20 @@
   }
   function unpark(w) { delete S.parked[w]; save(); }
   const lp = { timer: null, fired: false, x: 0, y: 0 };
-  function openWordMenu(id, x, y) {
+  // v9.2: a word that isn't a course word yet is parked as 'g:<word>' (same parked list; if a later unit teaches it, it starts parked)
+  function wordInfo(id, word) {
+    if (IDX.words[id]) return IDX.words[id];
+    const k = id.slice(2), p = S.parked[id], es = (p && p.word) || word || k, g = gloss(es);
+    return { id, es, en: g ? g.en : '', loose: true };
+  }
+  function openWordMenu(id, x, y, word) {
     closeWordMenu();
-    const w = IDX.words[id]; if (!w) return;
+    const w = wordInfo(id, word); if (!w || !w.es) return;
     const parked = !!S.parked[id];
     const m = document.createElement('div'); m.className = 'wmenu-backdrop';
     m.innerHTML = `<div class="wmenu" role="menu"><div class="wmenu-word">${esc(w.es)}</div><div class="muted small">${esc(w.en)}</div>
       <button class="btn ${parked ? 'secondary' : 'primary'}" id="wm-act">${parked ? 'Unpark (bring back)' : 'Not a priority'}</button>
-      ${parked ? '' : '<div class="muted small">Skips this word in lessons, practice, tests and reviews until C2.</div>'}
+      ${parked ? '' : w.loose ? '<div class="muted small">Not a course word yet. If a later unit teaches it, it starts out parked.</div>' : '<div class="muted small">Skips this word in lessons, practice, tests and reviews until C2.</div>'}
       <button class="btn secondary" id="wm-cancel">Cancel</button></div>`;
     document.body.appendChild(m);
     const box = m.querySelector('.wmenu'); const r = box.getBoundingClientRect();
@@ -1215,27 +1313,54 @@
     m.querySelector('#wm-cancel').onclick = closeWordMenu;
     m.querySelector('#wm-act').onclick = () => {
       closeWordMenu();
-      if (parked) unpark(id); else park(id);
+      if (parked) unpark(id); else if (w.loose) { S.parked[id] = { at: Date.now(), word: w.es }; save(); } else park(id);
       if (app.querySelector('#parked')) renderProgress();
       else if (!run && !story) renderHome();
       else if (story) renderStory(false);
       else if (run && run.queue[run.i] && run.queue[run.i].theme) renderTheme(run.queue[run.i]);
-      setTimeout(() => toast(parked ? `${w.es} is back in rotation` : `${w.es} parked until C2`), 30);
+      setTimeout(() => toast(parked ? `${w.es} is back in rotation` : w.loose ? `${w.es} marked not a priority` : `${w.es} parked until C2`), 30);
     };
   }
   function closeWordMenu() { document.querySelectorAll('.wmenu-backdrop').forEach(n => n.remove()); }
+  // v9.2: long-press works on ANY Spanish word: tokenized text (course words carry data-w, every other word data-g), tiles and
+  // Spanish answer buttons (data-lp; the word under the finger is found with caretRangeFromPoint). A long-press never also
+  // picks the tile / answer or shows the tap hint, and iOS text selection + the callout are suppressed on those words.
+  const LP_SEL = '[data-w], .tok[data-g], [data-lp]';
+  function wordAt(t, x, y) {
+    if (t.dataset.w) return { id: t.dataset.w };
+    let word = t.dataset.g || '';
+    if (!word && t.dataset.lp != null) {
+      word = t.dataset.lp;
+      try {
+        const r = document.caretRangeFromPoint ? document.caretRangeFromPoint(x, y) : null;
+        if (r && t.contains(r.startContainer) && r.startContainer.nodeType === 3) {
+          const txt = r.startContainer.textContent, i = r.startOffset; let a = i, b = i;
+          while (a > 0 && /[\p{L}\p{M}]/u.test(txt[a - 1])) a--; while (b < txt.length && /[\p{L}\p{M}]/u.test(txt[b])) b++;
+          if (b > a) word = txt.slice(a, b);
+        }
+      } catch (e) { /* whole text */ }
+      const ws = word.split(/\s+/).filter(Boolean); // several words and no point hit: the first course word, else the first word
+      if (ws.length > 1) word = ws.find(w => IDX.forms[strip(w.replace(/[^\p{L}\p{M}]/gu, ''))]) || ws[ws.length - 1];
+    }
+    word = word.replace(/^[^\p{L}\p{M}]+|[^\p{L}\p{M}]+$/gu, '');
+    if (!word) return null;
+    const id = IDX.forms[strip(word)];
+    return id ? { id } : { id: 'g:' + strip(word.toLowerCase()), word: word.toLowerCase() };
+  }
   function initLongPress() {
     const cancel = () => { clearTimeout(lp.timer); lp.timer = null; };
     document.addEventListener('pointerdown', e => {
-      const t = e.target.closest && e.target.closest('[data-w]'); lp.fired = false; if (!t) return;
+      const t = e.target.closest && e.target.closest(LP_SEL); lp.fired = false; if (!t || t.closest('.wmenu-backdrop')) return;
       lp.x = e.clientX; lp.y = e.clientY; cancel();
-      lp.timer = setTimeout(() => { lp.fired = true; lp.timer = null; try { navigator.vibrate && navigator.vibrate(10); } catch (err) { /* ignore */ } openWordMenu(t.dataset.w, lp.x, lp.y); }, 500);
+      lp.timer = setTimeout(() => { lp.timer = null; const w = wordAt(t, lp.x, lp.y); if (!w) return; lp.fired = true; closeHint(); try { navigator.vibrate && navigator.vibrate(10); } catch (err) { /* ignore */ } openWordMenu(w.id, lp.x, lp.y, w.word); }, 500);
     }, { passive: true });
     document.addEventListener('pointermove', e => { if (lp.timer && Math.hypot(e.clientX - lp.x, e.clientY - lp.y) > 10) cancel(); }, { passive: true });
     ['pointerup', 'pointercancel', 'scroll'].forEach(ev => document.addEventListener(ev, cancel, { passive: true, capture: true }));
-    document.addEventListener('click', e => { if (lp.fired && !e.target.closest('.wmenu-backdrop')) { e.preventDefault(); e.stopPropagation(); lp.fired = false; } }, true);
-    document.addEventListener('contextmenu', e => { const t = e.target.closest && e.target.closest('[data-w]'); if (t) { e.preventDefault(); if (!document.querySelector('.wmenu-backdrop')) openWordMenu(t.dataset.w, e.clientX, e.clientY); } });
-    document.addEventListener('selectstart', e => { if (e.target.closest && e.target.closest('[data-w]')) e.preventDefault(); });
+    // the click that ends a long-press is swallowed before anything else sees it (tile pick, answer, tap hint)
+    const swallow = e => { if (lp.fired && !(e.target.closest && e.target.closest('.wmenu-backdrop'))) { e.preventDefault(); e.stopImmediatePropagation(); if (e.type === 'click') lp.fired = false; } };
+    window.addEventListener('click', swallow, true);
+    document.addEventListener('contextmenu', e => { const t = e.target.closest && e.target.closest(LP_SEL); if (t) { e.preventDefault(); if (!document.querySelector('.wmenu-backdrop')) { const w = wordAt(t, e.clientX, e.clientY); if (w) openWordMenu(w.id, e.clientX, e.clientY, w.word); } } });
+    document.addEventListener('selectstart', e => { if (e.target.closest && (e.target.nodeType === 1 ? e.target : e.target.parentElement).closest(LP_SEL)) e.preventDefault(); });
   }
 
   // ---------- updates ----------
@@ -1308,7 +1433,7 @@
     makeExercise: e => makeExercise(e), get content() { return C; }, importBackup: (t) => importBackup(t, true), openStone: (u, i) => openStone(u, i), testQueue: u => testQueue(C.units[IDX.unitIdx[u]]), practiceQueue: u => practiceQueue(C.units[IDX.unitIdx[u]]), dueIds: () => dueIds(Date.now()), currentPos: () => currentPos(),
     introQueue: u => introQueue(C.units[IDX.unitIdx[u]]), withTiles: (w, t) => withTiles(w, t), pickStoryTile: u => pickStoryTile(C.units[IDX.unitIdx[u]].story),
     forceEx: (type, sent) => { if (!run || run.answered) return; const e = run.queue[run.i] = Object.assign({}, run.queue[run.i], { ex: type }, sent ? { sent } : {}); run.ex = makeExercise(e); renderExercise(e, run.ex); },
-    speakPaused: () => speakPaused(), speakOk: () => speakOk(), cantSpeak: () => { const b = document.getElementById('cantSpeak'); if (b) b.click(); }, get voice() { return voice; }, get voice2() { return voice2; }, storyVoice: s => { const v = storyVoice(s); return v && { voice: v.voice && v.voice.name, pitch: v.pitch }; }, pickVoice: () => pickVoice(), gloss: w => gloss(w), pickExercise: (id, rev) => pickExercise(IDX.words[id], rev), unblockSpeech: () => unblockSpeech(), get micFails() { return micFails; }, get recActive() { return !!rec; }, get speechBlocked() { return speechBlocked; }, normalize: raw => normalize(raw), speakables: () => speakables(), speak: (t, slow, spk) => speak(t, slow, spk != null ? storyVoice(spk) : null), unitAudio: u => unitAudio(C.units[IDX.unitIdx[u]]), get recorded() { return useRecorded(); }, recStory: s => storyVoice(s) && storyVoice(s).rec, offlineAudio: () => offlineAudio(),
+    speakPaused: () => speakPaused(), speakOk: () => speakOk(), cantSpeak: () => { const b = document.getElementById('cantSpeak'); if (b) b.click(); }, get voice() { return voice; }, get voice2() { return voice2; }, storyVoice: s => { const v = storyVoice(s); return v && { voice: v.voice && v.voice.name, pitch: v.pitch }; }, pickVoice: () => pickVoice(), gloss: w => gloss(w), pickExercise: (id, rev) => pickExercise(IDX.words[id], rev), unblockSpeech: () => unblockSpeech(), get micFails() { return micFails; }, get recActive() { return !!rec; }, get speechBlocked() { return speechBlocked; }, normalize: raw => normalize(raw), keepFooterVisible: () => keepFooterVisible(), speakables: () => speakables(), speak: (t, slow, spk) => speak(t, slow, spk != null ? storyVoice(spk) : null), unitAudio: u => unitAudio(C.units[IDX.unitIdx[u]]), get recorded() { return useRecorded(); }, recStory: s => storyVoice(s) && storyVoice(s).rec, offlineAudio: () => offlineAudio(),
     tick: () => tick(), listenPaused: () => listenPaused(), cantListen: () => { const b = document.getElementById('cantListen'); if (b) b.click(); }, todayMinutes: () => Daily.minutesOn(S.daily, todayKey()), streakNow: () => Daily.current(S.streak, todayKey()) };
   boot();
 })();

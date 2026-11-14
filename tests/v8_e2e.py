@@ -83,7 +83,7 @@ async def main():
         V7 = strip_meta(json.load(open(FIX + 'v7-export.json')))
         ctx = await new_ctx(b, p, V7); page = await ctx.new_page(); page.on('pageerror', lambda e: errors.append(str(e)))
         await page.goto(URL); await page.wait_for_selector('.stone')
-        check(await page.evaluate("__app.version") == 'v9.1', 'app version is v9.1')
+        check(await page.evaluate("__app.version") == 'v9.2', 'app version is v9.2')
         await page.wait_for_timeout(700)
 
         # ---- voice choice ----

@@ -36,7 +36,7 @@ async def main():
         IPHONE = [['Mónica', 'es-ES'], ['Paulina', 'es-MX'], ['Samantha', 'en-US']]
         ctx, pg, errs = await ctx_with(b, p, IPHONE, V8)
         s = await pg.evaluate("__app.state")
-        check(await pg.evaluate("__app.version") == 'v9.1' and s['items'] == V8['items'] and s['daily'] == V8['daily'] and s['streak'] == V8['streak'] and s['settings']['voice2'] == '' and s['settings']['anim'] is False and s['schema'] == 5,
+        check(await pg.evaluate("__app.version") == 'v9.2' and s['items'] == V8['items'] and s['daily'] == V8['daily'] and s['streak'] == V8['streak'] and s['settings']['voice2'] == '' and s['settings']['anim'] is False and s['schema'] == 5,
               'v8 data → v8.1 losslessly (items, daily, streak, settings kept; voice2 added)')
         check(await pg.evaluate("[__app.voice && __app.voice.name, __app.voice2 && __app.voice2.name]") == ['Mónica', 'Paulina'], 'iPhone list: main voice Mónica, second voice Paulina')
         cast = await pg.evaluate("(() => { __app.openStone('u10', 1); const r = {}; [null, 'Mark', 'Don Rafa', 'Doña Chela'].forEach(s => r[s || '(narrator)'] = __app.storyVoice(s)); return r; })()")
