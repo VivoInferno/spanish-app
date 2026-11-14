@@ -4,7 +4,7 @@
 //  - v9 recorded audio (audio/*.mp3, content-hashed names): cache-first in a separate 'espanol-audio' cache that survives
 //    app updates; the page fills it per unit (audio.js Rec.prefetch). audio/manifest.json is part of the app shell.
 //  - new versions activate immediately (skipWaiting + clients.claim); the page reloads once on controllerchange
-const CACHE = 'espanol-v9-2', AUDIO_CACHE = 'espanol-audio';
+const CACHE = 'espanol-v9-3', AUDIO_CACHE = 'espanol-audio';
 const ASSETS = ['./', 'index.html', 'styles.css', 'app.js', 'srs.js', 'check.js', 'fx.js', 'daily.js', 'listen.js', 'speech.js', 'voice.js', 'audio.js', 'audio/manifest.json', 'content.json', 'manifest.json',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 const NET_TIMEOUT = 3500;

@@ -6,7 +6,7 @@ WK="LD_LIBRARY_PATH=/workspace/tools/wkdeps/root/usr/lib/x86_64-linux-gnu"
 fail=0
 node tests/unit.test.js > /tmp/t-unit.log 2>&1 && echo "unit: $(tail -1 /tmp/t-unit.log)" || { echo "unit: FAIL"; fail=1; }
 for eng in chromium webkit; do
-  for t in path_e2e daily_e2e batch1_e2e listen_e2e typo_e2e tiles_e2e v8_e2e v81_e2e v9_e2e v91_mic_e2e v92_e2e; do
+  for t in path_e2e daily_e2e batch1_e2e listen_e2e typo_e2e tiles_e2e v8_e2e v81_e2e v9_e2e v91_mic_e2e v92_e2e v93_e2e; do
     if [ $eng = webkit ]; then env $WK timeout 600 python3 tests/$t.py http://127.0.0.1:8787/ webkit > /tmp/t-$t-$eng.log 2>&1; else timeout 600 python3 tests/$t.py http://127.0.0.1:8787/ chromium > /tmp/t-$t-$eng.log 2>&1; fi
     p=$(grep -c '^PASS' /tmp/t-$t-$eng.log); f=$(grep -c '^FAIL' /tmp/t-$t-$eng.log); tb=$(grep -c Traceback /tmp/t-$t-$eng.log)
     echo "$eng $t: $p pass, $f fail$([ $tb -gt 0 ] && echo ', CRASH')"; [ $f -gt 0 -o $tb -gt 0 ] && fail=1

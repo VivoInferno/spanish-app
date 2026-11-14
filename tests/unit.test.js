@@ -246,7 +246,7 @@ t('each word in a multi-word answer gets its own allowance', () => {
   assert.equal(R('el comprbnte de domicilio', 'el comprobante de domicilio'), 'wrong', 'two edits in one word');
   assert.equal(R('comprobante domicilio', 'el comprobante de domicilio'), 'wrong', 'missing word');
 });
-t('accent-only slips keep the old "watch the accents" result', () => assert.equal(R('hablo', 'habló'), 'accent'));
+t('accent-only slips return "accent" (graded as fully correct since v9.3)', () => assert.equal(R('hablo', 'habló'), 'accent'));
 t('English: one-letter typo passes, plural / past -s/-d endings do not', () => { assert.equal(R('prescripton', 'prescription', { lang: 'en' }), 'typo'); assert.equal(R('tires', 'tire', { lang: 'en' }), 'wrong'); });
 t('typo feedback highlights the fixed letter in the correct answer', () => {
   const r = Check.check('cotizaciom', ['la cotización']); assert.equal(Check.markFixes('la cotización', r), 'la cotizació<mark>n</mark>');
@@ -385,5 +385,41 @@ t('v9 content: every story speaker has a gender for voice casting', () => {
 t('v9 sw: audio.js + manifest precached, audio cache kept across updates, mp3 cache-first', () => {
   const sw = require('fs').readFileSync(require('path').join(__dirname, '../sw.js'), 'utf8');
   assert.ok(/'audio\.js', 'audio\/manifest\.json'/.test(sw)); assert.ok(sw.includes("k !== AUDIO_CACHE")); assert.ok(sw.includes('audioFirst(req)'));
+});
+
+// ---- v9.3: accents are never graded; no item is a spelling quiz ----
+t('v9.3 accent / ñ / ü-only differences are a full pass (the app grades "accent" like "exact")', () => {
+  [['hablo', 'habló'], ['envie', 'envié'], ['mandarmela', 'mandármela'], ['se los enviare', 'se los enviaré'], ['manana', 'mañana'], ['pinguino', 'pingüino'], ['esta', 'está'], ['tu', 'tú'], ['explicamelo', 'explícamelo']]
+    .forEach(([a, b]) => assert.ok(['exact', 'accent'].includes(R(a, b)), `${a} for ${b}`));
+  assert.equal(R('Cuánto cuesta el trámite', 'cuanto cuesta el tramite'), 'accent', 'extra accents are fine too');
+  const app = require('fs').readFileSync(require('path').join(__dirname, '../app.js'), 'utf8');
+  assert.ok(app.includes("result === 'exact' || result === 'accent' || result === 'typo' || result === 'alt' ? 3"), 'accent answers grade Good (3), not Hard');
+  assert.ok(app.includes('Spelled: ') && !app.includes('Watch the accents'), 'quiet "Spelled:" note, no accent warning');
+});
+t('v9.3 accents never use up the one-letter typo allowance; meaning changes still fail', () => {
+  assert.equal(R('comprobánte de domicillio', 'el comprobante de domicilio'), 'typo', 'accent + one slip in another word');
+  assert.equal(R('cotizacíom', 'la cotización'), 'typo', 'accent moved + one slip in the same word');
+  assert.equal(R('se los mando', 'se las mando'), 'wrong', 'se las vs se los');
+  assert.equal(R('te lo mando', 'se lo mando'), 'wrong', 'te vs se');
+  assert.equal(R('envie', 'envió'), 'wrong', 'envíe vs envió is a different verb form even without accents');
+});
+const fold = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[¿?¡!.,;:"'()\-\s]/g, '');
+const sounds = s => fold(s.toLowerCase().replace(/\bde el\b/g, 'del').replace(/\ba el\b/g, 'al')).replace(/z/g, 's').replace(/c([ei])/g, 's$1').replace(/v/g, 'b').replace(/ll/g, 'y').replace(/h/g, '');
+const optionSets = () => [].concat(
+  ...Object.entries(C.patterns).map(([k, p]) => p.items.map((it, i) => [`${k}#${i}`, it.o])),
+  ...C.units.map(u => u.story.qs.map((q, i) => [`${u.id} story q${i}`, q.o])));
+t('v9.3 no grammar or story option differs from another only by accents, ñ/ü, spacing or a silent spelling (has/haz, del/de el)', () => {
+  const bad = [];
+  optionSets().forEach(([id, o]) => o.forEach((a, i) => o.slice(i + 1).forEach(b => { if (fold(a) === fold(b) || sounds(a) === sounds(b)) bad.push(`${id}: ${a} / ${b}`); })));
+  assert.deepEqual(bad, []);
+});
+t('v9.3 no explanation or note asks about written accents', () => {
+  const txt = JSON.stringify(Object.values(C.patterns).map(p => [p.explain, p.items.map(it => it.n)]));
+  assert.ok(!/written accent|accent on|with an accent|the accent keeps/i.test(txt), txt.match(/.{40}accent.{40}/i));
+});
+t('v9.3 client clitic combos stay a core focus (te lo mando, se lo mando, se las)', () => {
+  const all = Object.values(C.patterns).flatMap(p => p.items.map(it => it.q.replace('___', it.o[0])));
+  ['Sí, te lo mando hoy.', 'Sí, ahorita se lo mando.', 'Claro, se la mando ahorita.'].forEach(x => assert.ok(all.some(f => f.includes(x)), x));
+  assert.ok(C.patterns.clitic_usted.items.length >= 11 && C.patterns.clitic_future.items.length >= 8);
 });
 console.log(`\n${n} tests passed`);

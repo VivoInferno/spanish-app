@@ -224,3 +224,7 @@ textarea.ans:focus{border-color:var(--accent)}
 /* v9.2: tile glide (FLIP); the flying copy sits above everything and never takes taps */
 .tile-ghost{position:fixed;margin:0;z-index:80;pointer-events:none;will-change:transform}
 .tile.landing{color:transparent;background:var(--slot);border-color:var(--slot);box-shadow:none}
+/* v9.3: English cue under spoken-style grammar drills; quiet spelling note when only accents differ */
+.pat-en{margin:8px 0 0;font-size:15px}
+.spelled{margin-top:4px}
+.spelled .tok,.spelled [data-w]{color:inherit;font-weight:600}

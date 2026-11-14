@@ -1,5 +1,5 @@
 {
- "version": 4,
+ "version": 5,
  "dialect": "es-MX",
  "patterns": {
   "clitic_future": {
@@ -71,6 +71,28 @@
      ],
      "en": "Will you send me the location? — Yes, I'll send it to you as soon as I leave.",
      "n": "La = la ubicación (feminine)."
+    },
+    {
+     "q": "¿Me mandas el contrato? — Sí, ___ hoy.",
+     "o": [
+      "te lo mando",
+      "se lo mando",
+      "te la mando",
+      "me lo mandas"
+     ],
+     "en": "Will you send me the contract? — Yes, I'll send it to you today.",
+     "n": "Someone you call tú: te + lo. The present (te lo mando) is the everyday way to promise something soon."
+    },
+    {
+     "q": "¿Le vas a dar las llaves al comprador? — Sí, ___ en la firma.",
+     "o": [
+      "se las voy a dar",
+      "le las voy a dar",
+      "se los voy a dar",
+      "se la voy a dar"
+     ],
+     "en": "Are you going to give the keys to the buyer? — Yes, I'm going to give them to him at the signing.",
+     "n": "le + las → se las, before ir a + infinitive. Las = las llaves."
     }
    ]
   },
@@ -148,7 +170,7 @@
   },
   "clitic_imperative": {
    "name": "Pronouns with commands (dámelo / no se lo digas)",
-   "explain": "Affirmative commands: pronouns attach to the end (dáselas, envíemela) and the verb usually gains a written accent. Negative commands: pronouns go before the verb (no se lo digas).",
+   "explain": "Affirmative commands: pronouns attach to the end and you say it as one word (dáselas, envíemela). Negative commands: pronouns go before the verb (no se lo digas).",
    "items": [
     {
      "q": "Necesito el contrato. ___, por favor. (tú)",
@@ -159,7 +181,7 @@
       "Mándamele"
      ],
      "en": "I need the contract. Send it to me, please.",
-     "n": "Affirmative: verb + me + lo, all attached, accent on the stressed syllable."
+     "n": "Affirmative: verb + me + lo, all said together as one word."
     },
     {
      "q": "Las llaves son de Ana. ___ hoy. (tú)",
@@ -932,15 +954,15 @@
      "n": "An earlier past action → pluperfect (habían cerrado)."
     },
     {
-     "q": "¿Alguna vez ___ mole poblano?",
+     "q": "¿Ya ___ el terreno en persona? — Todavía no, pero voy el sábado.",
      "o": [
-      "has probado",
-      "has probaste",
-      "has probando",
-      "haz probado"
+      "has visto",
+      "hayas visto",
+      "haber visto",
+      "he visto"
      ],
-     "en": "Have you ever tried mole poblano?",
-     "n": "Has + participle (probado). Haz is the command of hacer."
+     "en": "Have you seen the land in person yet? — Not yet, but I'm going on Saturday.",
+     "n": "Ya + present perfect for 'have you … yet?' (in Mexico ¿ya viste…? is just as common). Hayas visto needs a trigger like ojalá que; he visto is 'I have seen'."
     },
     {
      "q": "Se me olvidó que ya te lo ___.",
@@ -976,15 +998,15 @@
      "n": "Había + vivido (regular -ido participle)."
     },
     {
-     "q": "¿Ya ___ el estado de cuenta?",
+     "q": "¿Ya ___ el estado de cuenta? (usted)",
      "o": [
-      "has visto",
-      "has vido",
-      "has veído",
-      "haz visto"
+      "ha revisado",
+      "has revisado",
+      "haya revisado",
+      "he revisado"
      ],
-     "en": "Have you seen the statement yet?",
-     "n": "Ver → visto (irregular)."
+     "en": "Have you checked the account statement yet? (formal)",
+     "n": "With usted the helper is ha: ¿ya ha revisado…? Has is for tú, he is 'I have'."
     }
    ]
   },
@@ -1087,15 +1109,15 @@
      "n": "le + la (la cotización) → se la."
     },
     {
-     "q": "¿Le mando las fotos del terreno? Sí, ___, por favor.",
+     "q": "¿Le mando las fotos del terreno? — Sí, ___, por favor.",
      "o": [
       "mándemelas",
       "mándemelos",
-      "mándeme las",
-      "me las mande"
+      "mándeselas",
+      "me las manda"
      ],
-     "en": "Shall I send you the photos of the land? Yes, send them to me, please.",
-     "n": "Usted command: mande + me + las in one word, with an accent. Las = las fotos."
+     "en": "Shall I send you the photos of the land? — Yes, send them to me, please.",
+     "n": "Usted command + me + las. Las = las fotos. Mándeselas would mean 'send them to him/her'."
     },
     {
      "q": "No tengo el contrato aquí, pero mañana ___ llevo a su oficina.",
@@ -1120,15 +1142,15 @@
      "n": "me + los (los recibos). Only le/les change to se."
     },
     {
-     "q": "Si quiere la información, puedo ___ ahorita.",
+     "q": "¿Me puede mandar la información? — Claro, ___ ahorita.",
      "o": [
-      "mandársela",
-      "mandarle la",
-      "mandarsela",
-      "se mandarla"
+      "se la mando",
+      "se lo mando",
+      "te la mando",
+      "le la mando"
      ],
-     "en": "If you want the information, I can send it to you right now.",
-     "n": "Attach both to the infinitive: mandar + se + la → mandársela (the accent keeps the stress)."
+     "en": "Can you send me the information? — Sure, I'll send it to you right now.",
+     "n": "Talking to a client (usted): le + la → se la. La = la información. Te la is for someone you call tú."
     },
     {
      "q": "Señores, ¿las cotizaciones? Ya ___ envié a los dos.",
@@ -1153,15 +1175,48 @@
      "n": "Only one pronoun (“to you”) → le. It becomes se only before lo/la/los/las."
     },
     {
-     "q": "¿Le explico cómo llegar? Sí, ___, por favor.",
+     "q": "¿Le explico cómo llegar? — Sí, ___, por favor.",
      "o": [
       "explíquemelo",
-      "explíqueme lo",
-      "me lo explique",
+      "explíqueselo",
+      "me lo explica",
       "explíquemela"
      ],
-     "en": "Shall I explain how to get there? Yes, explain it to me, please.",
-     "n": "Usted command + me + lo, one word with an accent. Lo stands for the whole idea (cómo llegar)."
+     "en": "Shall I explain how to get there? — Yes, explain it to me, please.",
+     "n": "Usted command + me + lo. Lo stands for the whole idea (cómo llegar). Explíqueselo would be 'explain it to him/her'."
+    },
+    {
+     "q": "¿Me manda el contrato? — Sí, ahorita ___ mando.",
+     "o": [
+      "se lo",
+      "te lo",
+      "se la",
+      "le lo"
+     ],
+     "en": "Will you send me the contract? — Yes, I'll send it to you right now.",
+     "n": "A client (usted) asks: le + lo → se lo. Lo = el contrato."
+    },
+    {
+     "q": "Las escrituras están en la notaría. ¿Quiere que ___ traiga?",
+     "o": [
+      "se las",
+      "se los",
+      "le las",
+      "me las"
+     ],
+     "en": "The deeds are at the notary's office. Do you want me to bring them to you?",
+     "n": "le + las → se las. Las = las escrituras."
+    },
+    {
+     "q": "¿Les enseño los lotes a sus papás? — Sí, ___ el sábado, por favor.",
+     "o": [
+      "enséñeselos",
+      "enséñeselas",
+      "enséñemelos",
+      "se los enseña"
+     ],
+     "en": "Shall I show the lots to your parents? — Yes, show them to them on Saturday, please.",
+     "n": "Usted command + se (les → se) + los. Los = los lotes."
     }
    ]
   },
@@ -1181,15 +1236,15 @@
      "n": "Distance or time away → a: queda a 15 minutos de…"
     },
     {
-     "q": "La playa queda a cinco minutos ___ fraccionamiento.",
+     "q": "¿La playa queda lejos? — No, queda a cinco minutos ___ fraccionamiento.",
      "o": [
       "del",
-      "de el",
+      "de la",
       "al",
       "en el"
      ],
-     "en": "The beach is five minutes from the development.",
-     "n": "de + el always contracts → del."
+     "en": "Is the beach far? — No, it's five minutes from the development.",
+     "n": "A cinco minutos de + el fraccionamiento → del. Fraccionamiento is masculine, so not de la."
     },
     {
      "q": "¿Dónde ___ la oficina de ventas?",
@@ -6500,7 +6555,17 @@
   "zapatos": "shoes",
   "ándele": "come on / go ahead",
   "áreas": "areas",
-  "éramos": "we were"
+  "éramos": "we were",
+  "mandas": "you send",
+  "comprador": "buyer",
+  "firma": "signing; signature",
+  "persona": "person (en persona = in person)",
+  "revisado": "checked, reviewed",
+  "escrituras": "deeds (property title)",
+  "notaría": "notary's office",
+  "traiga": "bring (que le traiga = that I bring you)",
+  "sus": "your (usted); their",
+  "enséñeselos": "show them to him / her / them (usted)"
  },
  "synonyms": [
   {

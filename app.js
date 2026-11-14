@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const APP_VERSION = 'v9.2'; // keep in sync with CACHE in sw.js (espanol-v9-2)
+  const APP_VERSION = 'v9.3'; // keep in sync with CACHE in sw.js (espanol-v9-3)
   const KEY = 'spanish-app-state-v1'; // unchanged since v1 — never rename
   const DAY = SRS.DAY;
   const STONES = [
@@ -151,7 +151,8 @@
       u.sentences.forEach(x => { add(x.es); toks(x.es); });
       u.story.lines.forEach(l => { story.push([u.id, l.s || '', l.es.trim()]); toks(l.es); });
     });
-    Object.values(C.patterns).forEach(p => p.items.forEach(it => { const full = it.q.replace('___', it.o[0]); add(full); add(full.replace(/\s*\([^)]*\)\s*$/, '')); toks(it.q); toks(full); }));
+    Object.values(C.patterns).forEach(p => p.items.forEach(it => { const full = it.q.replace('___', it.o[0]); add(full); add(full.replace(/\s*\([^)]*\)\s*$/, '')); toks(it.q); toks(full);
+      const t = patternTarget(it); if (t) { add(t.es); if (t.ctxEs) add(t.ctxEs); } })); // v9.3: grammar tiles / say-it lines
     [VOICE_TEST, RATE_TEST].forEach(add);
     return { main: [...main], story, second: [VOICE2_TEST] };
   }
@@ -426,8 +427,21 @@
     if (entry.id.startsWith('p:')) {
       const p = entry.id.slice(2), pat = IDX.patterns[p];
       const i = entry.itemIdx != null ? entry.itemIdx : patternItem(p); const it = pat.items[i];
-      const full = it.q.replace('___', it.o[0]);
-      return { kind: 'mc', label: run && run.mode === 'placement' ? 'Grammar' : 'Grammar · ' + pat.name.replace(/\s*\(.*\)\s*$/, ''), prompt: it.q, options: shuffle(it.o), answer: it.o[0], reveal: { es: full, en: it.en, note: it.n }, speakAfter: full.replace(/\s*\([^)]*\)\s*$/, '') };
+      const full = it.q.replace('___', it.o[0]), name = 'Grammar · ' + pat.name.replace(/\s*\(.*\)\s*$/, '');
+      const reveal = { es: full, en: it.en, note: it.n }, speakAfter = full.replace(/\s*\([^)]*\)\s*$/, '');
+      // v9.3: practice and review mix in spoken-style drills for grammar: build the reply from tiles or say it out loud.
+      // Placement and the unit test stay choose-the-right-form so their scores mean the same thing as before.
+      const t = patternTarget(it), plain = !run || run.mode === 'placement' || run.mode === 'test';
+      let kind = entry.ex || (plain || !t ? 'mc' : (r => r < 0.3 ? 'ptiles' : r < 0.45 ? 'pspeak' : 'mc')(Math.random()));
+      if (kind === 'pspeak' && (!t || !speakOk())) kind = t ? 'ptiles' : 'mc';
+      if (kind === 'ptiles' && t) {
+        const have = new Set(tileTokens(t.es).map(strip)); // distractors come from the wrong options: different pronouns / forms, never accent-only twins
+        const ds = shuffle([...new Set(it.o.slice(1).flatMap(tileTokens).filter(x => !have.has(strip(x))))]).slice(0, 2);
+        return Object.assign({ kind: 'build', label: name + ' · build it', tiles: shuffle(tileTokens(t.es).concat(ds)), answers: [t.es], opts: { lang: 'es' }, reveal, speakAfter, pattern: true },
+          t.ctxEs ? { bigEs: t.ctxEs, hintEn: 'Reply: ' + t.en } : { big: t.en });
+      }
+      if (kind === 'pspeak' && t) return { kind: 'speak', label: name + ' · say it', sayEs: t.es, hintEn: t.en, answers: [t.es], opts: { lang: 'es', sentence: true }, reveal, speakAfter, tries: 0, pattern: true };
+      return { kind: 'mc', label: run && run.mode === 'placement' ? 'Grammar' : name, prompt: it.q, options: shuffle(it.o), answer: it.o[0], reveal, speakAfter };
     }
     const w = IDX.words[entry.id.slice(2)], card = S.items[entry.id];
     const sents = IDX.sentByWord[w.id] || [];
@@ -476,6 +490,13 @@
     }
   }
 
+  // v9.3: the spoken part of a grammar item: the reply after " — " (with the question as context) or the whole short line
+  function patternTarget(it) {
+    const paren = (it.q.match(/\(([^)]*)\)\s*$/) || [])[1];
+    const full = it.q.replace('___', it.o[0]).replace(/\s*\([^)]*\)\s*$/, ''), es = full.split(' — '), en = it.en.split(' — ');
+    const t = es.length === 2 ? { es: es[1], ctxEs: es[0], en: en[1] || it.en } : { es: full, en: it.en + (paren ? ` (${paren})` : '') };
+    return tileTokens(t.es).length <= 10 ? t : null;
+  }
   // ---------- v8 word picker: one word, three big stacked choices; distractors from this section's vocabulary ----------
   function pickExercise(w, reverse) {
     const core = x => strip(x.es.replace(/^(el|la|los|las) /, ''));
@@ -494,9 +515,9 @@
   // ---------- tile-order drills (word bank with 2 distractors) ----------
   const tileTokens = text => text.replace(/[¿?¡!.,;:“”"]/g, '').split(/\s+/).filter(Boolean);
   function tileExercise(target, lang, otherTexts, extra) {
-    const tokens = tileTokens(target), lower = new Set(tokens.map(t => t.toLowerCase()));
+    const tokens = tileTokens(target), lower = new Set(tokens.map(strip)); // v9.3: accent-insensitive, so no está/esta twins
     const others = shuffle(otherTexts).slice(0, 4).flatMap(tileTokens);
-    const distract = shuffle([...new Set(others.filter(t => t.length > 2 && !lower.has(t.toLowerCase())))]).slice(0, 2);
+    const distract = shuffle([...new Set(others.filter(t => t.length > 2 && !lower.has(strip(t))))]).slice(0, 2);
     return Object.assign({ kind: 'build', tiles: shuffle(tokens.concat(distract)), answers: [target], opts: { lang } }, extra);
   }
   const TILE_SHARE = 0.25; // about 1 in 4 word items with a short example sentence becomes a tile drill
@@ -557,7 +578,7 @@
     };
     tiles.onclick = e => { const t = e.target.closest('.tile'); if (!t || isLocked() || ex.order.includes(+t.dataset.k)) return; ex.order.push(+t.dataset.k); sync(+t.dataset.k, true); };
     line.onclick = e => { const t = e.target.closest('.tile'); if (!t || isLocked() || !ex.order.includes(+t.dataset.k)) return; ex.order = ex.order.filter(k => k !== +t.dataset.k); sync(+t.dataset.k, false); };
-    return () => { if (!ex.order.length) return null; const v = ex.order.map(k => ex.tiles[k]).join(' '); return { v, ok: Check.check(v, ex.answers, { lang: ex.opts.lang, typo: false }).result === 'exact' }; };
+    return () => { if (!ex.order.length) return null; const v = ex.order.map(k => ex.tiles[k]).join(' '); return { v, ok: (r => r === 'exact' || r === 'accent')(Check.check(v, ex.answers, { lang: ex.opts.lang, typo: false }).result) }; };
   }
   const tilesHtml = ex => `<div class="answer-line" id="line"></div><div class="tiles" id="tiles">${ex.tiles.map((t, k) => `<button class="tile" data-k="${k}"${ex.opts.lang === 'es' ? ` data-lp="${esc(t)}"` : ''}>${esc(t)}</button>`).join('')}</div>`;
 
@@ -648,6 +669,7 @@
     else if (ex.flip) prompt = `<div class="flipstack"><div class="flip" id="flipCard"><div class="face front"><div class="flip-en">${esc(ex.big)}</div></div><div class="face back"><div class="flip-es">${tokenize(ex.back)}</div><button class="icon speak" data-say="${esc(ex.back)}" aria-label="Play">🔊</button></div></div></div>`;
     else if (ex.bubbleEs) prompt = bubble(ex.bubbleEs, 'es', ex.speakNow);
     else prompt = `<div class="big">${ex.bigW ? wordSpan(ex.bigW, ex.big) : esc(ex.big)}${ex.speakNow ? ` <button class="icon speak" data-say="${esc(ex.speakNow)}">🔊</button>` : ''}</div>`;
+    if (ex.hintEn && (ex.kind === 'build' || ex.kind === 'speak')) prompt += `<p class="muted sub pat-en">${esc(ex.hintEn)}</p>`;
     let input;
     const optEs = ex.kind === 'mc' && (!ex.pick || !!ex.bubbleEn); // grammar options and "select the translation" options are Spanish
     if (ex.kind === 'mc') input = `<div class="options${ex.pick ? ' stack' : ''}">${ex.options.map((o, k) => `<button class="opt${ex.pick ? ' big-opt' : ''}" data-k="${k}"${optEs ? ` data-lp="${esc(o)}"` : ''}>${esc(o)}</button>`).join('')}</div>`;
@@ -821,8 +843,9 @@
   function answer(entry, ex, result, given) {
     run.answered = true; lastStep = performance.now();
     const ok = result !== 'wrong';
-    // a one-letter slip and a real synonym (v8 'alt') count as a normal correct answer; accents and "close" speech are Hard
-    const g = result === 'exact' || result === 'typo' || result === 'alt' ? 3 : ok ? 2 : 1;
+    // a one-letter slip, a real synonym (v8 'alt') and (v9.3) any accent / ñ / ü difference count as a normal correct answer;
+    // only "close" speech is Hard
+    const g = result === 'exact' || result === 'accent' || result === 'typo' || result === 'alt' ? 3 : ok ? 2 : 1;
     const isPattern = entry.id.startsWith('p:');
     const graded = run.mode !== 'placement' && !entry.practice && !run.firstDone[entry.id];
     if (run.mode === 'placement') run.results.push({ id: entry.id, ok });
@@ -840,7 +863,7 @@
     const head = result === 'alt' ? `<div class="ok">✓ Correct</div><p class="alt-note"><span aria-hidden="true">ℹ️</span> ${esc((ex.res.note || '').replace(/^Correct! /, ''))}${strip(ex.res.answer) !== strip(given) ? ` <span class="muted">Course word: <b>${esc(ex.res.answer)}</b></span>` : ''}</p>`
       : result === 'close' ? `<div class="ok warn">✓ Close. Full line: <b>${esc(ex.answers[0])}</b>${ex.heard ? `<div class="muted small">Heard: “${esc(ex.heard)}”</div>` : ''}</div>`
       : result === 'exact' ? '<div class="ok">✓ Correct</div>'
-      : result === 'accent' ? `<div class="ok warn">✓ Watch the accents: <b>${cf}</b></div>`
+      : result === 'accent' ? `<div class="ok">✓ Correct</div><div class="muted small spelled">Spelled: ${cf}</div>`
       : result === 'typo' ? `<div class="ok typo">✓ Correct, watch the spelling: <b class="fixed">${Check.markFixes(correctForm, ex.res)}</b></div>`
       : ex.flipped ? `<div class="bad">↻ Flipped: <b>${cf}</b></div>`
       : `<div class="bad">✗ ${ex.kind === 'mc' ? 'Answer' : 'Correct answer'}: <b>${cf}</b>${ex.kind === 'speak' && ex.heard ? `<div class="muted small">Heard: “${esc(ex.heard)}”</div>` : ''}</div>`;
@@ -873,7 +896,7 @@
     };
     const ez = document.getElementById('easy');
     if (ez) ez.onclick = () => { S.items[entry.id] = SRS.markKnown(S.items[entry.id], Date.now(), 120); save(); advance(); };
-    if (ok && result === 'exact' && S.settings.autoAdvance && run.mode !== 'placement') run.timer = setTimeout(advance, 900);
+    if (ok && (result === 'exact' || result === 'accent') && S.settings.autoAdvance && run.mode !== 'placement') run.timer = setTimeout(advance, 900);
     else setTimeout(() => document.getElementById('next') && document.getElementById('next').focus(), 30);
   }
   function advance() { if (!run || !stepOk()) return; clearTimeout(run.timer); stopRec(); closeHint(); run.i++; nextCard(); }
