@@ -20,7 +20,7 @@ def shot(name): return f'{OUT}/{name}.png' if ENGINE == 'webkit' else f'{OUT}/{n
 async def answer(page):
     e = await page.evaluate("__app.run && __app.entry")
     if not e: return False
-    if e.get('theme') or e.get('intro'): await page.click('#go'); return True
+    if e.get('theme') or e.get('intro') or e.get('rule'): await page.click('#go'); return True
     ex = await page.evaluate("({kind: __app.ex.kind, answer: __app.ex.answer, answers: __app.ex.answers, tiles: __app.ex.tiles})")
     if ex['kind'] == 'mc':
         opts = await page.query_selector_all('.opt'); texts = [await o.inner_text() for o in opts]; await opts[texts.index(ex['answer'])].click()
@@ -38,7 +38,7 @@ async def run_all(page, label):
     cards = audio = btn = wrongbtn = 0
     while await page.evaluate("!!__app.run"):
         e = await page.evaluate("__app.entry")
-        if not (e.get('theme') or e.get('intro')):
+        if not (e.get('theme') or e.get('intro') or e.get('rule')):
             cards += 1
             a = await page.evaluate("!!__app.ex.audio"); b = await page.query_selector('#cantListen') is not None
             audio += a; btn += b; wrongbtn += (b and not a)
@@ -60,7 +60,7 @@ async def main():
         page.on('pageerror', lambda e: errors.append(str(e)))
         await page.clock.install(time=T0); await page.clock.pause_at(T0)
         await page.goto(URL); await page.wait_for_selector('.stone')
-        check(await page.evaluate("__app.version") == 'v9.3', 'app version is v9.3')
+        check(await page.evaluate("__app.version") == 'v9.4', 'app version is v9.4')
         s = await page.evaluate("__app.state")
         check(s['listenPauseUntil'] == 0 and s['items'] == raw['items'] and s['streak'] == raw['streak'] and s['daily'] == raw['daily'] and s['schema'] == 5 and s['speakPauseUntil'] == 0, 'v6 data loads losslessly, listening on by default')
         flags = await page.evaluate("['es2en','en2es','cloze','listen','listenS','build'].map(t => [t, !!__app.makeExercise({id: 'w:fuga', ex: t}).audio])")

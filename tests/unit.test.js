@@ -422,4 +422,34 @@ t('v9.3 client clitic combos stay a core focus (te lo mando, se lo mando, se las
   ['Sí, te lo mando hoy.', 'Sí, ahorita se lo mando.', 'Claro, se la mando ahorita.'].forEach(x => assert.ok(all.some(f => f.includes(x)), x));
   assert.ok(C.patterns.clitic_usted.items.length >= 11 && C.patterns.clitic_future.items.length >= 8);
 });
+
+// ---- v9.4: grammar teaching layer ----
+t('v9.4 every grammar pattern has a rule card: title, 1-2 sentence rule, formula, 2-3 examples with English', () => {
+  Object.entries(C.patterns).forEach(([k, p]) => {
+    const r = p.rule; assert.ok(r && r.title && r.rule && r.rule.length < 420, k);
+    assert.ok((r.rule.match(/[.!?](\s|$)/g) || []).length <= 3, `${k}: rule is short`);
+    assert.ok(Array.isArray(r.formula) && r.formula.length >= 1, k);
+    assert.ok(r.ex.length >= 2 && r.ex.length <= 3 && r.ex.every(([es, en]) => es && en), k);
+  });
+  const units = new Set(C.units.flatMap(u => u.focus)); units.forEach(f => assert.ok(C.patterns[f].rule, f));
+});
+t('v9.4 se vs le and está vs esté are spelled out', () => {
+  const se = C.patterns.clitic_future.rule, sub = C.patterns.subj.rule;
+  assert.ok(/se lo/.test(se.formula.join(' ')) && /le/.test(se.rule) && /RID/.test(se.formula.join(' ')));
+  assert.ok(/WEIRDO/.test(sub.formula.join(' ')) && /cuando/.test(sub.formula.join(' ')) && /esté/.test(sub.ex.map(e => e[0]).join(' ')));
+});
+t('v9.4 every grammar item (patterns + story grammar questions) has a why and a reason for each wrong option', () => {
+  const items = Object.entries(C.patterns).flatMap(([k, p]) => p.items.map((it, i) => [`${k}#${i}`, it]))
+    .concat(C.units.flatMap(u => u.story.qs.filter(q => q.p).map((q, i) => [`${u.id} story`, q])));
+  const bad = [];
+  items.forEach(([id, it]) => {
+    if (!it.n || it.n.length < 25) bad.push(id + ' why');
+    if (!it.w || it.o.slice(1).some(o => !it.w[o] || it.w[o].length < 12)) bad.push(id + ' wrong-pick reasons');
+    if (it.w && Object.keys(it.w).some(o => !it.o.slice(1).includes(o))) bad.push(id + ' stray reason');
+  });
+  assert.deepEqual(bad, []); assert.ok(items.length >= 150, items.length);
+});
+t('v9.4 every pattern has easy one-contrast items for pacing after its rule card', () => {
+  Object.entries(C.patterns).forEach(([k, p]) => { const e = p.items.filter(it => it.easy); assert.ok(e.length >= 3, k); e.forEach(it => assert.ok(it.o.length >= 2 && it.w[it.o[1]], k)); });
+});
 console.log(`\n${n} tests passed`);

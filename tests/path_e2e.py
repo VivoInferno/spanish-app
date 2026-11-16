@@ -16,7 +16,7 @@ async def answer(page, right=True):
     """Answer whatever card is on screen. Returns False when the run is over."""
     e = await page.evaluate("__app.run && __app.entry")
     if not e: return False
-    if e.get('theme') or e.get('intro'):
+    if e.get('theme') or e.get('intro') or e.get('rule'):
         await page.click('#go'); return True
     ex = await page.evaluate("({kind: __app.ex.kind, answer: __app.ex.answer, answers: __app.ex.answers, tiles: __app.ex.tiles})")
     if ex['kind'] == 'mc':
@@ -56,7 +56,7 @@ async def main():
         page.on('console', lambda m: errors.append(m.text) if m.type == 'error' else None)
         page.on('pageerror', lambda e: errors.append(str(e)))
         await page.goto(URL); await page.wait_for_selector('#go')
-        check(await page.evaluate("__app.version") == 'v9.3', 'app version is v9.3')
+        check(await page.evaluate("__app.version") == 'v9.4', 'app version is v9.4')
         # --- placement
         await page.click('#go'); k = 0
         while not await page.query_selector('h1:has-text("Placement results")'):

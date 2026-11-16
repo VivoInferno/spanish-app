@@ -33,7 +33,7 @@ async def main():
         for i in range(300):
             if await page.query_selector('h1:has-text("Done for now")'): break
             e = await page.evaluate("__app.entry")
-            if e and e.get('intro'): await page.click('#go'); continue
+            if e and (e.get('intro') or e.get('rule')): await page.click('#go'); continue
             ex = await page.evaluate("({kind: __app.ex.kind, answer: __app.ex.answer, answers: __app.ex.answers})")
             right = (k % 4 != 1); k += 1
             if ex['kind'] == 'mc':

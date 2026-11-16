@@ -57,7 +57,7 @@ async def main():
                 await pg.goto(URL); await pg.wait_for_selector('.stone')
             else:
                 await pg.goto(URL); await pg.wait_for_selector('#go'); await pg.evaluate("s => __app.importBackup(s)", json.dumps(V5)); await pg.reload(); await pg.wait_for_selector('.stone')
-            check(await pg.evaluate("__app.version") == 'v9.3', f'[{mode}] app version is v9.3')
+            check(await pg.evaluate("__app.version") == 'v9.4', f'[{mode}] app version is v9.4')
             s = await pg.evaluate("__app.state"); stored = await pg.evaluate(f"JSON.parse(localStorage.getItem('{KEY}'))")
             keep = ['items', 'pstats', 'recent', 'parked', 'daily', 'streak', 'placementDone', 'placementSummary', 'sessions', 'created']
             check(all(s.get(k) == raw.get(k) for k in keep), f'[{mode}] SRS items ({len(raw["items"])}), stats, parked, daily history, streak unchanged')
@@ -102,7 +102,7 @@ async def main():
                 await pg.click('#go')
                 while await pg.evaluate("!!__app.run"):
                     e = await pg.evaluate("__app.entry")
-                    if e.get('theme') or e.get('intro'): await pg.click('#go'); continue
+                    if e.get('theme') or e.get('intro') or e.get('rule'): await pg.click('#go'); continue
                     ex = await pg.evaluate("({kind: __app.ex.kind, answer: __app.ex.answer, answers: __app.ex.answers, tiles: __app.ex.tiles})")
                     if ex['kind'] == 'mc':
                         opts = await pg.query_selector_all('.opt'); texts = [await o.inner_text() for o in opts]; await opts[texts.index(ex['answer'])].click()

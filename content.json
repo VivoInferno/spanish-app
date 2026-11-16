@@ -1,5 +1,5 @@
 {
- "version": 5,
+ "version": 6,
  "dialect": "es-MX",
  "patterns": {
   "clitic_future": {
@@ -15,7 +15,13 @@
       "los se enviaré"
      ],
      "en": "Are you going to send the documents to the notary? — Yes, I'll send them to him tomorrow.",
-     "n": "le + los → se los. Los = los documentos."
+     "n": "Se los enviaré: le (to the notary) became se because los follows it. Los = los documentos.",
+     "w": {
+      "le los enviaré": "Le lo / le la never happen: le turns into se before lo, la, los or las.",
+      "se lo enviaré": "Lo is one thing; los documentos is plural, so los.",
+      "los se enviaré": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las)."
+     },
+     "easy": true
     },
     {
      "q": "¿Quién le va a dar la llave a la señora? — Yo ___ cuando llegue.",
@@ -26,7 +32,13 @@
       "la le daré"
      ],
      "en": "Who's going to give the key to the lady? — I'll give it to her when I get there.",
-     "n": "le + la → se la. La = la llave."
+     "n": "Se la daré: le (to the lady) became se because la follows it. La = la llave.",
+     "w": {
+      "le la daré": "Le lo / le la never happen: le turns into se before lo, la, los or las.",
+      "se lo daré": "Lo would be a masculine thing; la llave is feminine, so la.",
+      "la le daré": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las)."
+     },
+     "easy": true
     },
     {
      "q": "¿Me vas a prestar tu carro el sábado? — Sí, ___.",
@@ -37,7 +49,12 @@
       "lo te prestaré"
      ],
      "en": "Are you going to lend me your car on Saturday? — Yes, I'll lend it to you.",
-     "n": "Indirect (te) always comes before direct (lo)."
+     "n": "Te lo prestaré: te (to you, a friend) + lo (el carro). Te doesn't change.",
+     "w": {
+      "te le prestaré": "Le is 'to him/her', not 'it'. The car is the thing, so lo.",
+      "se lo prestaré": "Se is only for le/les. He asked with me (to me), so you answer with te.",
+      "lo te prestaré": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las)."
+     }
     },
     {
      "q": "¿Nos traerán las facturas hoy? — Sí, ___ esta tarde.",
@@ -48,7 +65,12 @@
       "las nos traerán"
      ],
      "en": "Will they bring us the invoices today? — Yes, they'll bring them to us this afternoon.",
-     "n": "Nos + las (las facturas). Only le/les change to se."
+     "n": "Nos las traerán: nos (to us) + las (las facturas). Only le/les turn into se.",
+     "w": {
+      "se las traerán": "Nos never changes to se; only le and les do.",
+      "nos los traerán": "Las facturas is feminine plural, so las.",
+      "las nos traerán": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las)."
+     }
     },
     {
      "q": "¿Les vas a explicar el problema a tus clientes? — Sí, ___ en la junta.",
@@ -59,7 +81,13 @@
       "lo les explicaré"
      ],
      "en": "Are you going to explain the problem to your clients? — Yes, I'll explain it to them in the meeting.",
-     "n": "les + lo → se lo. Lo = el problema (masculine singular)."
+     "n": "Se lo explicaré: les (to your clients) became se because lo follows it. Lo = el problema.",
+     "w": {
+      "les lo explicaré": "Les lo never happens: les turns into se before lo.",
+      "se la explicaré": "El problema is masculine (even though it ends in -a), so lo.",
+      "lo les explicaré": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las)."
+     },
+     "easy": true
     },
     {
      "q": "¿Me mandarás la ubicación? — Sí, ___ en cuanto salga.",
@@ -70,7 +98,12 @@
       "la te mandaré"
      ],
      "en": "Will you send me the location? — Yes, I'll send it to you as soon as I leave.",
-     "n": "La = la ubicación (feminine)."
+     "n": "Te la mandaré: te (to you, a friend) + la (la ubicación).",
+     "w": {
+      "te lo mandaré": "La ubicación is feminine, so la.",
+      "se la mandaré": "He asked with me (to me), so the answer is te (to you), not se.",
+      "la te mandaré": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las)."
+     }
     },
     {
      "q": "¿Me mandas el contrato? — Sí, ___ hoy.",
@@ -81,7 +114,12 @@
       "me lo mandas"
      ],
      "en": "Will you send me the contract? — Yes, I'll send it to you today.",
-     "n": "Someone you call tú: te + lo. The present (te lo mando) is the everyday way to promise something soon."
+     "n": "Te lo mando: a friend asks with me, you answer with te. Lo = el contrato.",
+     "w": {
+      "se lo mando": "Se lo is for a client (usted) or him/her. A friend who says ¿me mandas? gets te lo.",
+      "te la mando": "El contrato is masculine, so lo.",
+      "me lo mandas": "That means 'you send it to me', the opposite of what you're promising."
+     }
     },
     {
      "q": "¿Le vas a dar las llaves al comprador? — Sí, ___ en la firma.",
@@ -92,9 +130,39 @@
       "se la voy a dar"
      ],
      "en": "Are you going to give the keys to the buyer? — Yes, I'm going to give them to him at the signing.",
-     "n": "le + las → se las, before ir a + infinitive. Las = las llaves."
+     "n": "Se las voy a dar: le (to the buyer) became se because las follows it. Las = las llaves.",
+     "w": {
+      "le las voy a dar": "Le lo / le la never happen: le turns into se before lo, la, los or las.",
+      "se los voy a dar": "Las llaves is feminine plural, so las.",
+      "se la voy a dar": "Las llaves is plural, so las, not la."
+     },
+     "easy": true
     }
-   ]
+   ],
+   "rule": {
+    "title": "Se vs le: two pronouns together",
+    "rule": "Use le/les for 'to him, to her, to you (usted), to them'. When it's followed by lo/la/los/las it changes to se (le + lo → se lo), and 'to whom' always comes before 'what', both in front of the verb.",
+    "formula": [
+     "le / les + lo / la / los / las → se lo · se la · se los · se las",
+     "Order (RID): Reflexive se → Indirect (to whom) → Direct (what) → verb",
+     "me / te / nos never change: te lo mando, nos la dieron"
+    ],
+    "ex": [
+     [
+      "¿Le mando el contrato al notario? — Sí, se lo mando hoy.",
+      "Shall I send the contract to the notary? — Yes, I'll send it to him today."
+     ],
+     [
+      "¿Le vas a dar las llaves al comprador? — Sí, se las voy a dar en la firma.",
+      "Are you giving the keys to the buyer? — Yes, I'll give them to him at the signing."
+     ],
+     [
+      "¿Me mandas la ubicación? — Sí, te la mando.",
+      "Will you send me the location? — Yes, I'll send it to you."
+     ]
+    ],
+    "trap": "Only le and les turn into se. And se lo doesn't say who it's for; the conversation does (add a él / a usted if you need to be clear)."
+   }
   },
   "clitic_preterite": {
    "name": "Double pronouns + preterite (se la pagué)",
@@ -109,7 +177,13 @@
       "la le pagué"
      ],
      "en": "Did you already pay the landlord the rent? — Yes, I already paid it to him.",
-     "n": "le + la → se la. La = la renta."
+     "n": "Se la pagué: le (to the owner) became se because la follows it. La = la renta.",
+     "w": {
+      "le la pagué": "Le lo / le la never happen: le turns into se before lo, la, los or las.",
+      "se lo pagué": "La renta is feminine, so la.",
+      "la le pagué": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las)."
+     },
+     "easy": true
     },
     {
      "q": "¿Quién te dio esas flores? — Mi hermana ___.",
@@ -120,7 +194,12 @@
       "las me dio"
      ],
      "en": "Who gave you those flowers? — My sister gave them to me.",
-     "n": "Las = las flores (feminine plural)."
+     "n": "Me las dio: me (to me) + las (las flores). Me doesn't change.",
+     "w": {
+      "me los dio": "Las flores is feminine plural, so las.",
+      "se las dio": "Se las would mean she gave them to someone else; the flowers were given to you, so me.",
+      "las me dio": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las)."
+     }
     },
     {
      "q": "¿Le devolviste los libros a la biblioteca? — No, todavía no ___.",
@@ -131,7 +210,13 @@
       "los le devolví"
      ],
      "en": "Did you return the books to the library? — No, I haven't returned them yet.",
-     "n": "le + los → se los. Los = los libros."
+     "n": "Se los devolví: le (to the library) became se because los follows it. Los = los libros.",
+     "w": {
+      "le los devolví": "Le lo / le la never happen: le turns into se before lo, la, los or las.",
+      "se las devolví": "Los libros is masculine plural, so los.",
+      "los le devolví": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las)."
+     },
+     "easy": true
     },
     {
      "q": "¿Les mandaste las fotos a tus papás? — Sí, ___ anoche.",
@@ -142,7 +227,12 @@
       "las les mandé"
      ],
      "en": "Did you send the photos to your parents? — Yes, I sent them to them last night.",
-     "n": "les + las → se las. Mandé = I sent."
+     "n": "Se las mandé: les (to your parents) became se because las follows it. Mandé = I sent.",
+     "w": {
+      "les las mandé": "Les las never happens: les turns into se before las.",
+      "se las mandó": "Mandó is 'he/she sent'. You're answering about yourself: mandé.",
+      "las les mandé": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las)."
+     }
     },
     {
      "q": "¿Te explicaron las reglas? — Sí, ___ ayer.",
@@ -153,7 +243,12 @@
       "las me explicaron"
      ],
      "en": "Did they explain the rules to you? — Yes, they explained them to me yesterday.",
-     "n": "Me + las (las reglas)."
+     "n": "Me las explicaron: me (to me) + las (las reglas).",
+     "w": {
+      "me los explicaron": "Las reglas is feminine plural, so las.",
+      "se las explicaron": "They explained them to you, so me, not se.",
+      "las me explicaron": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las)."
+     }
     },
     {
      "q": "¿Le dijiste la verdad a Carlos? — Sí, ya ___.",
@@ -164,9 +259,38 @@
       "se le dije"
      ],
      "en": "Did you tell Carlos the truth? — Yes, I already told him.",
-     "n": "le + la → se la. La = la verdad."
+     "n": "Se la dije: le (to Carlos) became se because la follows it. La = la verdad.",
+     "w": {
+      "le la dije": "Le lo / le la never happen: le turns into se before lo, la, los or las.",
+      "la le dije": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
+      "se le dije": "Le can't be the thing; la verdad is 'it', so se la."
+     },
+     "easy": true
     }
-   ]
+   ],
+   "rule": {
+    "title": "Two pronouns in the past (se la pagué)",
+    "rule": "Exactly the same rule in the past: 'to whom' + 'what' go before the verb, and le/les become se in front of lo/la/los/las. Pick lo/la/los/las to match the thing: la renta → la, los papeles → los.",
+    "formula": [
+     "le + la → se la pagué",
+     "me/te/nos + lo/la/los/las stay as they are: me las dio"
+    ],
+    "ex": [
+     [
+      "¿Ya le pagaste el apartado? — Sí, ya se lo pagué.",
+      "Did you pay him the deposit? — Yes, I already paid it to him."
+     ],
+     [
+      "¿Le mandaste las fotos al cliente? — Sí, se las mandé anoche.",
+      "Did you send the photos to the client? — Yes, I sent them to him last night."
+     ],
+     [
+      "¿Quién te dio los planos? — Me los dio el arquitecto.",
+      "Who gave you the plans? — The architect gave them to me."
+     ]
+    ],
+    "trap": "Lo/la/los/las follow the thing, not the person: las fotos → se las, even if the client is a man."
+   }
   },
   "clitic_imperative": {
    "name": "Pronouns with commands (dámelo / no se lo digas)",
@@ -181,7 +305,13 @@
       "Mándamele"
      ],
      "en": "I need the contract. Send it to me, please.",
-     "n": "Affirmative: verb + me + lo, all said together as one word."
+     "n": "Mándamelo: a 'do it' command, so me (to me) + lo (el contrato) go on the end as one word.",
+     "w": {
+      "Mándalome": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
+      "Mándamela": "El contrato is masculine, so lo.",
+      "Mándamele": "Le isn't 'it'. The contract is the thing, so lo."
+     },
+     "easy": true
     },
     {
      "q": "Las llaves son de Ana. ___ hoy. (tú)",
@@ -192,7 +322,13 @@
       "Se las da"
      ],
      "en": "The keys are Ana's. Give them to her today.",
-     "n": "Da + le + las → dáselas (le → se)."
+     "n": "Dáselas: da + le (to Ana) + las (las llaves); le turns into se before las.",
+     "w": {
+      "Dálelas": "Le lo / le la never happen: le turns into se before lo, la, los or las.",
+      "Dáselos": "Las llaves is feminine plural, so las.",
+      "Se las da": "That's 'he gives them to her', a statement, not a command."
+     },
+     "easy": true
     },
     {
      "q": "No ___ a nadie; es un secreto. (tú)",
@@ -203,7 +339,13 @@
       "lo se digas"
      ],
      "en": "Don't tell anyone; it's a secret.",
-     "n": "Negative tú command = no + pronouns + subjunctive (digas)."
+     "n": "No se lo digas: a 'don't' command, so the pronouns go in front and the verb uses the switched form (digas).",
+     "w": {
+      "díselo": "Díselo means 'tell it to him': the opposite of 'don't tell anyone'.",
+      "se lo dices": "Dices is the normal form; 'don't' commands always use the switched form: digas.",
+      "lo se digas": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las)."
+     },
+     "easy": true
     },
     {
      "q": "Señor, si tiene la factura, ___ por correo, por favor. (usted)",
@@ -214,7 +356,12 @@
       "envíemelo"
      ],
      "en": "Sir, if you have the invoice, send it to me by email, please.",
-     "n": "Usted command: envíe + me + la. Envíamela is the tú form."
+     "n": "Envíemela: usted command (envíe) + me + la (la factura) on the end.",
+     "w": {
+      "envíamela": "Envía is the tú form. You called him señor, so usted: envíe.",
+      "envíelame": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
+      "envíemelo": "La factura is feminine, so la."
+     }
     },
     {
      "q": "Los niños quieren ver las fotos. ___, por favor. (ustedes)",
@@ -225,7 +372,12 @@
       "Enséñenselos"
      ],
      "en": "The kids want to see the photos. Show them to them, please.",
-     "n": "Enseñen + les + las → enséñenselas."
+     "n": "Enséñenselas: ustedes command (enseñen) + se (les → se) + las (las fotos).",
+     "w": {
+      "Enséñenlesas": "Les turns into se before las.",
+      "Enséñaselas": "Enseña is for one person (tú); you're talking to ustedes: enseñen.",
+      "Enséñenselos": "Las fotos is feminine plural, so las."
+     }
     },
     {
      "q": "Si te pide el dinero, no ___ todavía. (tú)",
@@ -236,9 +388,38 @@
       "le lo des"
      ],
      "en": "If he asks you for the money, don't give it to him yet.",
-     "n": "Negative: no + se lo + subjunctive (des)."
+     "n": "No se lo des: 'don't' command, pronouns in front, switched form (des).",
+     "w": {
+      "dáselo": "Dáselo means 'give it to him': the opposite.",
+      "se lo das": "Das is the normal form; after no in a command use des.",
+      "le lo des": "Le lo / le la never happen: le turns into se before lo, la, los or las."
+     }
     }
-   ]
+   ],
+   "rule": {
+    "title": "Pronouns with commands (mándamelo / no se lo digas)",
+    "rule": "When you tell someone to do something, the pronouns go on the end of the verb as one word (mándamelo), and le still turns into se (dáselo). When you tell them NOT to, they move back in front: no me lo mandes.",
+    "formula": [
+     "Do it: verb + to whom + what → mándamelo, envíemela (usted)",
+     "Don't: no + to whom + what + verb → no se lo digas",
+     "tú: manda / no mandes · usted: mande / no mande"
+    ],
+    "ex": [
+     [
+      "Mándame la ubicación, por favor. → Mándamela.",
+      "Send me the location, please. → Send it to me."
+     ],
+     [
+      "Señor, envíeme la factura. → Envíemela por correo.",
+      "Sir, send me the invoice. → Send it to me by email."
+     ],
+     [
+      "No se lo digas al cliente todavía.",
+      "Don't tell the client yet."
+     ]
+    ],
+    "trap": "Mándalome is backwards: 'to whom' (me) always comes before 'what' (lo). And the negative uses the other form: no se lo das ✗ → no se lo des ✓."
+   }
   },
   "pret_imp": {
    "name": "Preterite vs. imperfect",
@@ -253,7 +434,13 @@
       "fue"
      ],
      "en": "When I was a kid, I lived in Monterrey.",
-     "n": "Age/background description → imperfect (era)."
+     "n": "Era: describing what you were like back then (being a kid) is background, so imperfect.",
+     "w": {
+      "fui": "Fui is a finished event; being a kid is a long background state.",
+      "estuve": "Age or identity uses ser, not estar, and as background: era.",
+      "fue": "Fue is 'he/she was'; the sentence is about you: era."
+     },
+     "easy": true
     },
     {
      "q": "Ayer ___ al banco y abrí una cuenta.",
@@ -264,7 +451,13 @@
       "fue"
      ],
      "en": "Yesterday I went to the bank and opened an account.",
-     "n": "A completed event in sequence → preterite."
+     "n": "Fui: ayer + one finished trip, followed by another completed step (abrí), so preterite.",
+     "w": {
+      "iba": "Iba is 'I was going / used to go'; this is one finished trip yesterday.",
+      "era": "Era is from ser (to be); you need ir (to go): fui.",
+      "fue": "Fue is 'he/she went'; you're talking about yourself (abrí): fui."
+     },
+     "easy": true
     },
     {
      "q": "Estaba manejando cuando me ___ mi jefe.",
@@ -275,7 +468,12 @@
       "llamaría"
      ],
      "en": "I was driving when my boss called me.",
-     "n": "Ongoing background (estaba manejando) interrupted by a completed event (llamó)."
+     "n": "Llamó: estaba manejando is the background; the call interrupted it, so preterite.",
+     "w": {
+      "llamaba": "Llamaba makes the call background too; it's the interruption, so llamó.",
+      "llama": "The story is in the past (estaba), so not the present.",
+      "llamaría": "Llamaría means 'would call'; it actually happened."
+     }
     },
     {
      "q": "De niño, ___ al fútbol todos los sábados.",
@@ -286,7 +484,13 @@
       "jugaré"
      ],
      "en": "As a kid, I played soccer every Saturday.",
-     "n": "Habit in the past → imperfect."
+     "n": "Jugaba: de niño + todos los sábados is a past habit, so imperfect.",
+     "w": {
+      "jugué": "Jugué is one finished time; every Saturday is a habit.",
+      "jugara": "Jugara is subjunctive; nothing here triggers it.",
+      "jugaré": "Jugaré is future; de niño is the past."
+     },
+     "easy": true
     },
     {
      "q": "No ___ que tenías hermanos.",
@@ -297,7 +501,12 @@
       "sabré"
      ],
      "en": "I didn't know you had siblings.",
-     "n": "State of knowledge → imperfect. (Supe = I found out.)"
+     "n": "Sabía: not knowing was an ongoing state until now, so imperfect.",
+     "w": {
+      "supe": "Supe means 'I found out'; here you simply didn't know.",
+      "sé": "The sentence is about the past (tenías), so not the present.",
+      "sabré": "Sabré is future."
+     }
     },
     {
      "q": "El año pasado ___ tres veces a Oaxaca.",
@@ -308,7 +517,12 @@
       "iríamos"
      ],
      "en": "Last year we went to Oaxaca three times.",
-     "n": "A counted number of times → preterite."
+     "n": "Fuimos: el año pasado + a counted number of times (tres veces), so preterite.",
+     "w": {
+      "íbamos": "Counted, finished trips use preterite: fuimos.",
+      "vamos": "El año pasado is the past.",
+      "iríamos": "Iríamos means 'we would go'."
+     }
     },
     {
      "q": "Eran las diez y ___ mucho tráfico cuando salimos.",
@@ -319,9 +533,38 @@
       "habrá"
      ],
      "en": "It was ten o'clock and there was a lot of traffic when we left.",
-     "n": "Scene-setting description → imperfect (había)."
+     "n": "Había: eran las diez sets the scene; heavy traffic is background, so imperfect.",
+     "w": {
+      "hubo": "Hubo is a one-off event; the traffic is the scene when you left.",
+      "hay": "The story is in the past.",
+      "habrá": "Habrá is future."
+     }
     }
-   ]
+   ],
+   "rule": {
+    "title": "Preterite vs imperfect (fui vs iba)",
+    "rule": "Preterite is for things that happened and finished: one event, a set number of times, a completed step. Imperfect is the background: what was going on, how things used to be, age, time and descriptions in the past.",
+    "formula": [
+     "Finished event / counted times → preterite: fui, llamó, fuimos tres veces",
+     "Background / habit / description → imperfect: era, vivía, había tráfico",
+     "Background + interruption: estaba manejando cuando me llamó"
+    ],
+    "ex": [
+     [
+      "Ayer fui a la notaría y firmé el contrato.",
+      "Yesterday I went to the notary and signed the contract."
+     ],
+     [
+      "Cuando era niño, vivía en Monterrey.",
+      "When I was a kid, I lived in Monterrey."
+     ],
+     [
+      "Estaba en una junta cuando llamó el cliente.",
+      "I was in a meeting when the client called."
+     ]
+    ],
+    "trap": "Time words help: ayer, el año pasado, tres veces → preterite. De niño, siempre, todos los sábados, cuando era… → imperfect."
+   }
   },
   "subj": {
    "name": "Subjunctive triggers",
@@ -336,7 +579,13 @@
       "mandarme"
      ],
      "en": "I want you to send me the budget before Friday.",
-     "n": "Querer que + different subject → subjunctive."
+     "n": "Me mandes: quiero que (a wish about someone else) takes the subjunctive.",
+     "w": {
+      "me mandas": "After quiero que + another person, use the subjunctive: mandes.",
+      "me mandarás": "Future doesn't go after quiero que; use the subjunctive.",
+      "mandarme": "Quiero que needs a conjugated verb; the infinitive only works for yourself (quiero mandarte)."
+     },
+     "easy": true
     },
     {
      "q": "Es importante que todos ___ a tiempo a la junta.",
@@ -347,7 +596,12 @@
       "llegaron"
      ],
      "en": "It's important that everyone arrive at the meeting on time.",
-     "n": "Es importante que → subjunctive."
+     "n": "Lleguen: es importante que is an impersonal opinion (WEIRDO), so subjunctive.",
+     "w": {
+      "llegan": "After es importante que use the subjunctive: lleguen.",
+      "llegarán": "No future after es importante que.",
+      "llegaron": "Llegaron is the past; for an upcoming meeting after es importante que use lleguen."
+     }
     },
     {
      "q": "Ojalá que no ___ mañana; vamos a la playa.",
@@ -358,7 +612,13 @@
       "llovió"
      ],
      "en": "I hope it doesn't rain tomorrow; we're going to the beach.",
-     "n": "Ojalá (que) → subjunctive."
+     "n": "Llueva: ojalá always takes the subjunctive.",
+     "w": {
+      "llueve": "Ojalá (que) always takes the subjunctive: llueva.",
+      "lloverá": "No future after ojalá.",
+      "llovió": "Llovió is the past; you're hoping about tomorrow."
+     },
+     "easy": true
     },
     {
      "q": "Te llamo cuando ___ al aeropuerto.",
@@ -369,7 +629,12 @@
       "llegaba"
      ],
      "en": "I'll call you when I get to the airport.",
-     "n": "Cuando + a future event → subjunctive."
+     "n": "Llegue: cuando about a future moment takes the subjunctive.",
+     "w": {
+      "llego": "Llego after cuando is for habits (whenever I arrive). This is a one-time future moment: llegue.",
+      "llegaré": "Never use the future right after cuando; use the subjunctive.",
+      "llegaba": "Llegaba is the past."
+     }
     },
     {
      "q": "Dudo que el plomero ___ hoy.",
@@ -380,7 +645,13 @@
       "venir"
      ],
      "en": "I doubt the plumber will come today.",
-     "n": "Dudar que → subjunctive."
+     "n": "Venga: dudo que (doubt) takes the subjunctive.",
+     "w": {
+      "viene": "Doubt triggers the subjunctive: venga.",
+      "vino": "Vino is the past, and dudo que needs the subjunctive: venga.",
+      "venir": "You need a conjugated verb after que."
+     },
+     "easy": true
     },
     {
      "q": "Creo que el banco ___ a las nueve.",
@@ -391,7 +662,12 @@
       "abrir"
      ],
      "en": "I think the bank opens at nine.",
-     "n": "Creo que (belief) → indicative. No creo que → subjunctive."
+     "n": "Abre: creo que states what you believe as fact, so the normal form.",
+     "w": {
+      "abra": "Creo que takes the normal form. Only no creo que would switch to abra.",
+      "abriera": "Abriera is a past subjunctive; nothing triggers it.",
+      "abrir": "You need a conjugated verb after que."
+     }
     },
     {
      "q": "Te lo explico para que lo ___.",
@@ -402,7 +678,12 @@
       "entender"
      ],
      "en": "I'll explain it to you so that you understand it.",
-     "n": "Para que → always subjunctive."
+     "n": "Entiendas: para que (so that) always takes the subjunctive.",
+     "w": {
+      "entiendes": "Para que always takes the subjunctive: entiendas.",
+      "entenderás": "No future after para que.",
+      "entender": "Para + infinitive is only for the same person (para entender); here it's you, not me."
+     }
     },
     {
      "q": "Busco un departamento que ___ cerca del metro.",
@@ -413,9 +694,44 @@
       "es"
      ],
      "en": "I'm looking for an apartment that's close to the metro.",
-     "n": "Describing something not yet known to exist → subjunctive."
+     "n": "Esté: you're looking for an apartment that may not exist yet, so subjunctive.",
+     "w": {
+      "está": "Está would mean a specific apartment you already know. You're searching for any one: esté.",
+      "estará": "No future here; use the subjunctive.",
+      "es": "Location uses estar, and here in the subjunctive: esté."
+     }
     }
-   ]
+   ],
+   "rule": {
+    "title": "Está vs esté: when the subjunctive kicks in",
+    "rule": "Está (indicative) states a fact; esté (subjunctive) is for things that aren't facts yet: what you want or hope, what you doubt, how you feel about something, and future moments after cuando. The switch almost always happens after que, with a different person on each side.",
+    "formula": [
+     "WEIRDO + que + subjunctive:",
+     "W · wishes: quiero que, espero que, necesito que",
+     "E · emotions: me preocupa que, me alegra que",
+     "I · impersonal opinions: es importante que, es mejor que",
+     "R · requests: le pido que, le recomiendo que",
+     "D · doubt: dudo que, no creo que",
+     "O · ojalá (que)",
+     "cuando + a future moment → cuando llegue · para que → subjunctive",
+     "creo que / sé que / es cierto que → normal form: está"
+    ],
+    "ex": [
+     [
+      "Espero que el contrato esté listo el viernes.",
+      "I hope the contract is ready on Friday."
+     ],
+     [
+      "El contrato ya está listo.",
+      "The contract is ready now. (a fact)"
+     ],
+     [
+      "Le marco cuando llegue a la oficina.",
+      "I'll call you when I get to the office."
+     ]
+    ],
+    "trap": "Creo que takes the normal form (creo que está listo), but no creo que flips to the subjunctive (no creo que esté listo). Cuando about habits or the past is normal too: cuando llego, cuando llegué."
+   }
   },
   "por_para": {
    "name": "Por vs. para",
@@ -428,7 +744,11 @@
       "por"
      ],
      "en": "I'm leaving for Guadalajara early tomorrow.",
-     "n": "Destination → para."
+     "n": "Para: Guadalajara is where you're heading (a destination).",
+     "w": {
+      "por": "Por Guadalajara would mean passing through it."
+     },
+     "easy": true
     },
     {
      "q": "Pagué 500 pesos ___ la consulta.",
@@ -437,7 +757,10 @@
       "para"
      ],
      "en": "I paid 500 pesos for the consultation.",
-     "n": "Exchange / price → por."
+     "n": "Por: paying 500 in exchange for the consultation.",
+     "w": {
+      "para": "Para la consulta would mean 'in order to get' it; payment in exchange uses por."
+     }
     },
     {
      "q": "Este regalo es ___ mi mamá.",
@@ -446,7 +769,11 @@
       "por"
      ],
      "en": "This gift is for my mom.",
-     "n": "Recipient → para."
+     "n": "Para: the gift is for (going to) your mom.",
+     "w": {
+      "por": "Por mi mamá would mean 'because of / on behalf of' her."
+     },
+     "easy": true
     },
     {
      "q": "Caminamos ___ el centro toda la tarde.",
@@ -455,7 +782,10 @@
       "para"
      ],
      "en": "We walked around downtown all afternoon.",
-     "n": "Through / around a place → por."
+     "n": "Por: walking through/around the center.",
+     "w": {
+      "para": "Para el centro would mean heading toward it, not walking around it."
+     }
     },
     {
      "q": "Necesito el reporte ___ el lunes.",
@@ -464,7 +794,10 @@
       "por"
      ],
      "en": "I need the report by Monday.",
-     "n": "Deadline → para."
+     "n": "Para: el lunes is a deadline.",
+     "w": {
+      "por": "Deadlines use para: para el lunes."
+     }
     },
     {
      "q": "Gracias ___ tu ayuda.",
@@ -473,7 +806,11 @@
       "para"
      ],
      "en": "Thanks for your help.",
-     "n": "Gracias por — reason / cause."
+     "n": "Por: gracias por = thanks because of/for something.",
+     "w": {
+      "para": "Gracias is always followed by por."
+     },
+     "easy": true
     },
     {
      "q": "Te llamo ___ teléfono más tarde.",
@@ -482,7 +819,10 @@
       "para"
      ],
      "en": "I'll call you on the phone later.",
-     "n": "Means of communication → por."
+     "n": "Por: by means of the phone.",
+     "w": {
+      "para": "Means of communication use por: por teléfono, por correo."
+     }
     },
     {
      "q": "___ ser extranjero, hablas muy bien.",
@@ -491,9 +831,36 @@
       "Por"
      ],
      "en": "For a foreigner, you speak very well.",
-     "n": "Comparison against expectation → para."
+     "n": "Para: para ser extranjero = 'for a foreigner' (considering you're one), the usual way to frame a compliment.",
+     "w": {
+      "Por": "Por ser extranjero means 'because you're a foreigner', which turns the compliment into a reason."
+     }
     }
-   ]
+   ],
+   "rule": {
+    "title": "Por vs para",
+    "rule": "Para points to a goal: a destination, a deadline, who something is for, a purpose. Por is about the path or the reason: through, along, by phone, in exchange for, because of.",
+    "formula": [
+     "para → where to, by when, for whom, in order to",
+     "por → through/around, by means of, in exchange for, because of",
+     "Gracias por… (because of) · Pagué 500 por… (in exchange)"
+    ],
+    "ex": [
+     [
+      "La cotización es para el señor Ortega.",
+      "The quote is for Mr. Ortega."
+     ],
+     [
+      "Necesito los papeles para el lunes.",
+      "I need the papers by Monday."
+     ],
+     [
+      "Gracias por su paciencia; le marco por teléfono más tarde.",
+      "Thanks for your patience; I'll call you later by phone."
+     ]
+    ],
+    "trap": "Salgo para Guadalajara = heading there. Paso por Guadalajara = going through it. Por ser extranjero = because you're a foreigner."
+   }
   },
   "ser_estar": {
    "name": "Ser vs. estar",
@@ -506,7 +873,10 @@
       "está"
      ],
      "en": "The meeting is in Laura's office.",
-     "n": "Where an event takes place → ser."
+     "n": "Es: the meeting is an event, and where an event takes place uses ser.",
+     "w": {
+      "está": "Events (juntas, fiestas, firmas) use ser for location: la junta es en…"
+     }
     },
     {
      "q": "El café ___ frío; pide otro.",
@@ -515,7 +885,11 @@
       "es"
      ],
      "en": "The coffee is cold; order another one.",
-     "n": "Current state → estar."
+     "n": "Está: the coffee's temperature right now is a condition.",
+     "w": {
+      "es": "Es frío would mean coffee is a cold drink by nature."
+     },
+     "easy": true
     },
     {
      "q": "Mi hermano ___ ingeniero.",
@@ -524,7 +898,11 @@
       "está"
      ],
      "en": "My brother is an engineer.",
-     "n": "Profession → ser."
+     "n": "Es: a job or profession is what someone is.",
+     "w": {
+      "está": "Professions use ser: es ingeniero."
+     },
+     "easy": true
     },
     {
      "q": "¿Dónde ___ las llaves?",
@@ -533,7 +911,11 @@
       "son"
      ],
      "en": "Where are the keys?",
-     "n": "Location of things → estar."
+     "n": "Están: where things are uses estar.",
+     "w": {
+      "son": "Location of things uses estar: ¿dónde están las llaves?"
+     },
+     "easy": true
     },
     {
      "q": "Ya ___ las ocho; vámonos.",
@@ -542,7 +924,10 @@
       "están"
      ],
      "en": "It's already eight; let's go.",
-     "n": "Time → ser."
+     "n": "Son: time always uses ser.",
+     "w": {
+      "están": "Telling time always uses ser: son las ocho."
+     }
     },
     {
      "q": "Esta casa ___ de mi abuelo.",
@@ -551,7 +936,10 @@
       "está"
      ],
      "en": "This house is my grandfather's.",
-     "n": "Possession → ser."
+     "n": "Es: ownership (de mi abuelo) uses ser.",
+     "w": {
+      "está": "Who owns something uses ser: es de mi abuelo."
+     }
     },
     {
      "q": "La tienda ___ cerrada los domingos.",
@@ -560,7 +948,10 @@
       "es"
      ],
      "en": "The store is closed on Sundays.",
-     "n": "Resulting state → estar."
+     "n": "Está: closed is the store's state (a result).",
+     "w": {
+      "es": "States and results use estar: está cerrada."
+     }
     },
     {
      "q": "El pescado ___ muy rico hoy.",
@@ -569,9 +960,36 @@
       "es"
      ],
      "en": "The fish is really tasty today.",
-     "n": "How food tastes right now → estar."
+     "n": "Está: how the fish tastes today is a condition right now.",
+     "w": {
+      "es": "Es rico describes the dish in general; how it tastes today uses estar: está rico."
+     }
     }
-   ]
+   ],
+   "rule": {
+    "title": "Ser vs estar",
+    "rule": "Ser says what something is: identity, job, origin, owner, time, and where an event takes place. Estar says how or where something is right now: location of people and things, condition, mood, results.",
+    "formula": [
+     "ser → what / who / whose / what time / where an event happens",
+     "estar → where a thing is · how it is now · está cerrado, está listo",
+     "La junta es en la oficina (event) · Las llaves están en la oficina (thing)"
+    ],
+    "ex": [
+     [
+      "El terreno es de mi socio.",
+      "The land belongs to my partner."
+     ],
+     [
+      "La oficina de ventas está en la entrada.",
+      "The sales office is at the entrance."
+     ],
+     [
+      "La firma es a las diez en la notaría.",
+      "The signing is at ten at the notary."
+     ]
+    ],
+    "trap": "Location uses estar, except for events (juntas, fiestas, firmas), which use ser. Time always uses ser: son las ocho."
+   }
   },
   "se_constructions": {
    "name": "Se constructions (se me olvidó, se vende)",
@@ -586,7 +1004,13 @@
       "me se olvidaron"
      ],
      "en": "Oh, I forgot the keys in the car.",
-     "n": "Verb agrees with las llaves (plural) → olvidaron. Order: se + me."
+     "n": "Se me olvidaron: the keys 'got forgotten' on me, and the verb matches las llaves (plural).",
+     "w": {
+      "me olvidaron": "Without se it means 'they forgot me'.",
+      "se me olvidó": "The verb matches the thing: las llaves is plural, so olvidaron.",
+      "me se olvidaron": "Se always goes first: se me, never me se."
+     },
+     "easy": true
     },
     {
      "q": "A Pedro ___ el celular y se rompió la pantalla.",
@@ -597,7 +1021,12 @@
       "se le cayeron"
      ],
      "en": "Pedro dropped his phone and the screen broke.",
-     "n": "Accidental se: se + le (to Pedro) + cayó (el celular)."
+     "n": "Se le cayó: the phone fell on Pedro (accidental se), singular to match el celular.",
+     "w": {
+      "se lo cayó": "Lo isn't the person; Pedro is affected, so le.",
+      "le se cayó": "Se always goes first: se le.",
+      "se le cayeron": "El celular is one thing, so cayó."
+     }
     },
     {
      "q": "Aquí ___ inglés.",
@@ -608,7 +1037,12 @@
       "es hablado"
      ],
      "en": "English is spoken here.",
-     "n": "Impersonal se + singular noun."
+     "n": "Se habla: people in general speak English here (impersonal se + singular).",
+     "w": {
+      "se hablan": "Inglés is one language, so singular: se habla.",
+      "habla se": "Se goes before the verb: se habla.",
+      "es hablado": "Grammatical in textbooks, but nobody says it; Mexicans say se habla."
+     }
     },
     {
      "q": "___ casas en esta colonia.",
@@ -619,7 +1053,12 @@
       "Se vendan"
      ],
      "en": "Houses are for sale in this neighborhood.",
-     "n": "Passive se agrees with the noun: casas → venden."
+     "n": "Se venden: houses are for sale, and the verb matches casas (plural).",
+     "w": {
+      "Se vende": "Casas is plural, so se venden.",
+      "Venden se": "Se goes before the verb.",
+      "Se vendan": "Vendan is subjunctive; a sign just states it: se venden."
+     }
     },
     {
      "q": "¿Cómo ___ “receipt” en español?",
@@ -630,7 +1069,13 @@
       "se diga"
      ],
      "en": "How do you say “receipt” in Spanish?",
-     "n": "Impersonal se: se dice."
+     "n": "Se dice: 'how do you say' uses impersonal se + singular.",
+     "w": {
+      "se dicen": "You're asking about one word, so singular.",
+      "dice se": "Se goes before the verb.",
+      "se diga": "No trigger for the subjunctive in a direct question."
+     },
+     "easy": true
     },
     {
      "q": "___ la gasolina en la carretera.",
@@ -641,7 +1086,12 @@
       "Nos acabamos"
      ],
      "en": "We ran out of gas on the highway.",
-     "n": "Se + nos + acabó (la gasolina, singular)."
+     "n": "Se nos acabó: the gas ran out on us, singular to match la gasolina.",
+     "w": {
+      "Nos se acabó": "Se always goes first: se nos.",
+      "Se nos acabaron": "La gasolina is one thing, so acabó.",
+      "Nos acabamos": "That means 'we finished (it)' on purpose, not that it ran out on us."
+     }
     },
     {
      "q": "En México ___ mucho maíz.",
@@ -652,7 +1102,13 @@
       "es comido"
      ],
      "en": "In Mexico people eat a lot of corn.",
-     "n": "Impersonal se + singular noun."
+     "n": "Se come: people in general eat a lot of corn (impersonal se + singular for maíz).",
+     "w": {
+      "se comen": "Maíz is singular, so se come.",
+      "come se": "Se goes before the verb.",
+      "es comido": "Textbook passive; people say se come."
+     },
+     "easy": true
     },
     {
      "q": "___ los papeles en el taxi.",
@@ -663,9 +1119,38 @@
       "Se los perdieron"
      ],
      "en": "They lost the papers in the taxi.",
-     "n": "Se + les + perdieron (los papeles, plural)."
+     "n": "Se les perdieron: the papers got lost on them, plural to match los papeles.",
+     "w": {
+      "Se les perdió": "Los papeles is plural, so perdieron.",
+      "Les se perdieron": "Se always goes first: se les.",
+      "Se los perdieron": "The people affected are les (to them), not los."
+     }
     }
-   ]
+   ],
+   "rule": {
+    "title": "Se constructions (se me olvidó, se vende)",
+    "rule": "Se + me/te/le + verb makes an accident sound like it 'happened to you' (se me olvidaron las llaves), and the verb matches the thing, not the person. Se + verb with no person means 'people in general' or 'is done': aquí se habla inglés, se venden lotes.",
+    "formula": [
+     "se + me/te/le/nos/les + verb (matches the thing) → se me olvidaron las llaves",
+     "se + verb (singular or plural to match the thing) → se vende casa, se venden lotes",
+     "Order (RID): se always first → se me, never me se"
+    ],
+    "ex": [
+     [
+      "Perdón, se me olvidó mandarle la cotización.",
+      "Sorry, I forgot to send you the quote."
+     ],
+     [
+      "Se venden lotes con vista al mar.",
+      "Lots with an ocean view for sale."
+     ],
+     [
+      "¿Cómo se dice \"deed\" en español?",
+      "How do you say \"deed\" in Spanish?"
+     ]
+    ],
+    "trap": "The verb follows the thing: se me olvidó el contrato, se me olvidaron los papeles. And it's always se me / se le, never me se."
+   }
   },
   "conditional": {
    "name": "Conditional and si-clauses",
@@ -680,7 +1165,13 @@
       "fuera"
      ],
      "en": "If I had more time, I'd go to the gym more often.",
-     "n": "Si + imperfect subjunctive → conditional."
+     "n": "Iría: si + tuviera (unreal) pairs with the -ría form.",
+     "w": {
+      "iré": "Iré is future; an unreal si tuviera needs iría.",
+      "voy": "The present doesn't match si tuviera.",
+      "fuera": "Fuera belongs in the si part, not the result."
+     },
+     "easy": true
     },
     {
      "q": "¿___ ayudarme con esta maleta? (usted)",
@@ -691,7 +1182,13 @@
       "Poder"
      ],
      "en": "Could you help me with this suitcase?",
-     "n": "Polite request → conditional."
+     "n": "Podría: the conditional makes a polite request to usted.",
+     "w": {
+      "Podré": "Podré is 'I will be able'.",
+      "Pude": "Pude is 'I could (in the past)'.",
+      "Poder": "You need a conjugated verb: ¿podría…?"
+     },
+     "easy": true
     },
     {
      "q": "Si ganara la lotería, ___ una casa en la playa.",
@@ -702,7 +1199,12 @@
       "comprara"
      ],
      "en": "If I won the lottery, I'd buy a house at the beach.",
-     "n": "Si + ganara → compraría."
+     "n": "Compraría: si ganara (unreal) pairs with the -ría form.",
+     "w": {
+      "compraré": "Future goes with real si (si gano), not si ganara.",
+      "compro": "The present doesn't match si ganara.",
+      "comprara": "Comprara belongs in the si part, not the result."
+     }
     },
     {
      "q": "Me ___ reservar una mesa para cuatro.",
@@ -713,7 +1215,13 @@
       "gustaba"
      ],
      "en": "I'd like to reserve a table for four.",
-     "n": "Me gustaría = I would like."
+     "n": "Gustaría: me gustaría is the polite 'I would like'.",
+     "w": {
+      "gustará": "Gustará is 'will like'.",
+      "gusto": "Me gusto means 'I like myself'.",
+      "gustaba": "Gustaba is 'used to like'."
+     },
+     "easy": true
     },
     {
      "q": "Si ___ tú, hablaría con el dueño.",
@@ -724,7 +1232,12 @@
       "seré"
      ],
      "en": "If I were you, I'd talk to the owner.",
-     "n": "Si + imperfect subjunctive (fuera)."
+     "n": "Fuera: si + unreal situation (if I were you) takes the -ra form.",
+     "w": {
+      "sería": "Never -ría right after si: si fuera, not si sería.",
+      "era": "Si era is for real past situations, not 'if I were you'.",
+      "seré": "Future doesn't go after si here."
+     }
     },
     {
      "q": "Dijo que ___ a las cinco, pero no llegó.",
@@ -735,7 +1248,12 @@
       "venga"
      ],
      "en": "He said he would come at five, but he didn't show up.",
-     "n": "Future in the past → conditional."
+     "n": "Vendría: reporting what someone said about their future (dijo que…) uses the conditional.",
+     "w": {
+      "vendrá": "After dijo que (past), the future shifts to vendría.",
+      "viene": "The present doesn't fit a past report.",
+      "venga": "Nothing triggers the subjunctive here."
+     }
     },
     {
      "q": "Si hubiera sabido, te ___ avisado.",
@@ -746,9 +1264,38 @@
       "haya"
      ],
      "en": "If I had known, I would have told you.",
-     "n": "Si hubiera + participle → habría + participle (hubiera avisado is also common)."
+     "n": "Habría: si hubiera sabido pairs with habría + participle.",
+     "w": {
+      "había": "Había avisado is 'had warned'; the result of an unreal past si is habría.",
+      "habrá": "Habrá is future.",
+      "haya": "Haya is subjunctive; the result part uses habría."
+     }
     }
-   ]
+   ],
+   "rule": {
+    "title": "Conditional and si-clauses (podría, si tuviera…)",
+    "rule": "The conditional (-ría) means 'would': it makes requests polite and talks about what would happen. For 'if' situations that aren't real, use si + the -ra form, then the -ría form.",
+    "formula": [
+     "Polite: ¿podría…? · me gustaría…",
+     "Unreal if: si + -ra (tuviera, fuera) → -ría (iría, compraría)",
+     "Past: si hubiera… → habría…"
+    ],
+    "ex": [
+     [
+      "¿Podría mandarme la cotización hoy?",
+      "Could you send me the quote today?"
+     ],
+     [
+      "Me gustaría ver el lote el sábado.",
+      "I'd like to see the lot on Saturday."
+     ],
+     [
+      "Si tuviera más presupuesto, compraría el de la esquina.",
+      "If I had more budget, I would buy the corner one."
+     ]
+    ],
+    "trap": "Never put -ría right after si: si tendría ✗ → si tuviera ✓."
+   }
   },
   "commands": {
    "name": "Commands (tú / usted / ustedes)",
@@ -763,7 +1310,13 @@
       "Siéntase"
      ],
      "en": "Sit here, please.",
-     "n": "Usted command of sentarse: siente + se → siéntese."
+     "n": "Siéntese: usted command of sentarse (siente + se).",
+     "w": {
+      "Siéntate": "Siéntate is the tú form; the hint says usted.",
+      "Se sienta": "That's a statement ('he sits down'), not a request.",
+      "Siéntase": "Siéntase comes from sentirse: 'feel (welcome)', not 'sit down'."
+     },
+     "easy": true
     },
     {
      "q": "No ___ tarde mañana. (tú)",
@@ -774,7 +1327,13 @@
       "llegue"
      ],
      "en": "Don't be late tomorrow.",
-     "n": "Negative tú → subjunctive (llegues)."
+     "n": "Llegues: 'don't' commands use the switched form, even for tú.",
+     "w": {
+      "llegas": "Llegas is the normal form; after no in a command: no llegues.",
+      "llega": "Llega is the 'do it' tú form; with no it becomes no llegues.",
+      "llegue": "Llegue is the usted form; the hint says tú."
+     },
+     "easy": true
     },
     {
      "q": "___ la puerta cuando salgas. (tú)",
@@ -785,7 +1344,12 @@
       "Cerra"
      ],
      "en": "Close the door when you leave.",
-     "n": "Affirmative tú = él form of the present (cierra). Cierre is usted."
+     "n": "Cierra: 'do it' tú command looks like the él form.",
+     "w": {
+      "Cierre": "Cierre is the usted form; the hint says tú.",
+      "Cierras": "Cierras is a statement ('you close'), not a command.",
+      "Cerra": "Cerrar changes e → ie when stressed: cierra."
+     }
     },
     {
      "q": "___ paciencia, señora; ya casi está. (usted)",
@@ -796,7 +1360,13 @@
       "Tenía"
      ],
      "en": "Be patient, ma'am; it's almost ready.",
-     "n": "Usted command → subjunctive (tenga). Ten is tú."
+     "n": "Tenga: usted command of tener (tengo → tenga).",
+     "w": {
+      "Ten": "Ten is the tú form; with a señora use usted: tenga.",
+      "Tiene": "Tiene is a statement ('she has').",
+      "Tenía": "Tenía is the past."
+     },
+     "easy": true
     },
     {
      "q": "___ la tarea antes de salir. (tú)",
@@ -807,7 +1377,12 @@
       "Hagas"
      ],
      "en": "Do your homework before going out.",
-     "n": "Irregular tú command: hacer → haz."
+     "n": "Haz: the short irregular tú command of hacer.",
+     "w": {
+      "Hace": "Hace is a statement ('he does').",
+      "Haga": "Haga is the usted form; the hint says tú.",
+      "Hagas": "Hagas only goes with no: no hagas."
+     }
     },
     {
      "q": "No ___ eso, por favor. (ustedes)",
@@ -818,7 +1393,12 @@
       "toque"
      ],
      "en": "Don't touch that, please.",
-     "n": "Ustedes command → subjunctive (toquen). Toquéis is Spain's vosotros."
+     "n": "Toquen: ustedes 'don't' command uses the switched form.",
+     "w": {
+      "tocan": "Tocan is a statement; after no in a command: no toquen.",
+      "toquéis": "Toquéis is the vosotros form from Spain; Mexico uses ustedes: toquen.",
+      "toque": "Toque is for one person (usted); you said ustedes."
+     }
     },
     {
      "q": "___ a la derecha en el semáforo. (usted)",
@@ -829,7 +1409,12 @@
       "Dio vuelta"
      ],
      "en": "Turn right at the traffic light.",
-     "n": "Usted command of dar → dé. Dar vuelta = to turn (Mexico)."
+     "n": "Dé vuelta: usted command of dar (dé), the Mexican way to say 'turn'.",
+     "w": {
+      "Da vuelta": "Da vuelta is the tú form; the hint says usted.",
+      "Dar vuelta": "You need a conjugated command, not the infinitive.",
+      "Dio vuelta": "Dio vuelta is the past ('he turned')."
+     }
     },
     {
      "q": "___ conmigo, te quiero enseñar algo. (tú)",
@@ -840,9 +1425,38 @@
       "Veni"
      ],
      "en": "Come with me, I want to show you something.",
-     "n": "Irregular tú command: venir → ven."
+     "n": "Ven: the short irregular tú command of venir.",
+     "w": {
+      "Venga": "Venga is the usted form; the hint says tú.",
+      "Vienes": "Vienes is a statement ('you come').",
+      "Veni": "Vení is Argentine (vos); in Mexico it is ven."
+     }
     }
-   ]
+   ],
+   "rule": {
+    "title": "Commands: tú, usted, ustedes",
+    "rule": "To a friend (tú), the 'do it' command looks like the él form: cierra, llega. To a client (usted), for ustedes, and in any 'don't' command, switch the ending vowel: cierre, llegue, no llegues.",
+    "formula": [
+     "tú do: habla, cierra · tú don't: no hables, no llegues",
+     "usted: hable, tenga, siéntese · ustedes: hablen, no toquen",
+     "Short irregular tú forms: ven, haz, ten, pon, sal, di, ve"
+    ],
+    "ex": [
+     [
+      "Pase, por favor; siéntese.",
+      "Come in, please; have a seat."
+     ],
+     [
+      "Tenga paciencia, ya casi está su contrato.",
+      "Please be patient, your contract is almost ready."
+     ],
+     [
+      "Dé vuelta a la derecha en el semáforo.",
+      "Turn right at the light."
+     ]
+    ],
+    "trap": "With clients always use the usted form (tenga, no ten). No llegas ✗ → no llegues ✓: 'don't' never uses the normal form."
+   }
   },
   "gustar_like": {
    "name": "Verbs like gustar (me falta, me queda)",
@@ -857,7 +1471,13 @@
       "encanto"
      ],
      "en": "My dad loves tacos al pastor.",
-     "n": "The subject is los tacos (plural) → encantan."
+     "n": "Encantan: the verb matches los tacos (plural), not your dad.",
+     "w": {
+      "encanta": "Los tacos is plural, so encantan.",
+      "encantamos": "Encantamos is 'we delight'; the tacos are the subject.",
+      "encanto": "Encanto is 'I delight'."
+     },
+     "easy": true
     },
     {
      "q": "Nos ___ solo cien pesos para completar la renta.",
@@ -868,7 +1488,12 @@
       "faltáis"
      ],
      "en": "We're only a hundred pesos short of the rent.",
-     "n": "Cien pesos (plural) is the subject → faltan."
+     "n": "Faltan: the verb matches cien pesos (plural).",
+     "w": {
+      "falta": "Cien pesos is plural, so faltan.",
+      "faltamos": "Faltamos means 'we are missing (absent)'.",
+      "faltáis": "Vosotros form from Spain."
+     }
     },
     {
      "q": "¿Cuánto dinero te ___?",
@@ -879,7 +1504,12 @@
       "quedo"
      ],
      "en": "How much money do you have left?",
-     "n": "Quedar = to have left. Dinero (singular) → queda."
+     "n": "Queda: ¿cuánto dinero? is one amount (singular).",
+     "w": {
+      "quedas": "The money is the subject, not you: queda.",
+      "quedan": "Dinero is singular, so queda.",
+      "quedo": "Quedo is 'I stay'."
+     }
     },
     {
      "q": "Me ___ la cabeza desde ayer.",
@@ -890,7 +1520,13 @@
       "duelo"
      ],
      "en": "I've had a headache since yesterday.",
-     "n": "La cabeza (singular) → duele."
+     "n": "Duele: la cabeza (one thing) hurts, so singular.",
+     "w": {
+      "duelen": "La cabeza is singular, so duele.",
+      "dolo": "Dolo isn't a form of doler.",
+      "duelo": "Duelo is 'I hurt (someone)' or 'grief'."
+     },
+     "easy": true
     },
     {
      "q": "A los vecinos no les ___ el ruido.",
@@ -901,7 +1537,12 @@
       "importo"
      ],
      "en": "The neighbors don't care about the noise.",
-     "n": "El ruido (singular) → importa."
+     "n": "Importa: el ruido (one thing) is the subject.",
+     "w": {
+      "importan": "El ruido is singular, so importa.",
+      "importamos": "That's 'we matter'.",
+      "importo": "That's 'I matter'."
+     }
     },
     {
      "q": "Esos zapatos no te ___; están muy grandes.",
@@ -912,7 +1553,12 @@
       "quedo"
      ],
      "en": "Those shoes don't fit you; they're too big.",
-     "n": "Quedar = to fit. Los zapatos (plural) → quedan."
+     "n": "Quedan: los zapatos (plural) fit or don't fit you.",
+     "w": {
+      "queda": "Esos zapatos is plural, so quedan.",
+      "quedas": "The shoes are the subject, not you.",
+      "quedo": "Quedo is 'I stay'."
+     }
     },
     {
      "q": "¿Les ___ la idea de ir a Puebla el sábado?",
@@ -923,9 +1569,38 @@
       "gustamos"
      ],
      "en": "Do you all like the idea of going to Puebla on Saturday?",
-     "n": "La idea (singular) → gusta."
+     "n": "Gusta: la idea (one thing) is the subject, even though les is plural.",
+     "w": {
+      "gustan": "La idea is singular, so gusta; les just says who likes it.",
+      "gustas": "Gustas means 'you are liked'.",
+      "gustamos": "Gustamos means 'we are liked'."
+     },
+     "easy": true
     }
-   ]
+   ],
+   "rule": {
+    "title": "Verbs like gustar (me falta, me queda, le encanta)",
+    "rule": "With gustar-type verbs the thing is the subject, so the verb matches the thing, not the person. Me/te/le/nos/les says who it affects.",
+    "formula": [
+     "me/te/le/nos/les + gusta (one thing / an action) / gustan (several things)",
+     "Same pattern: encantar, faltar, quedar, doler, importar, interesar"
+    ],
+    "ex": [
+     [
+      "¿Le interesan los lotes de la primera fila?",
+      "Are you interested in the front-row lots?"
+     ],
+     [
+      "Nos faltan dos documentos para la firma.",
+      "We're missing two documents for the signing."
+     ],
+     [
+      "¿Les gusta la idea de verlo el sábado?",
+      "Do you like the idea of seeing it on Saturday?"
+     ]
+    ],
+    "trap": "Don't match the person: a mi papá le encantan los tacos (tacos = plural), not encanta. With an action (regatear) it's always singular: le encanta regatear."
+   }
   },
   "perfect": {
    "name": "Present perfect and pluperfect (he hecho, había cerrado)",
@@ -940,7 +1615,13 @@
       "hecho"
      ],
      "en": "I still haven't made the deposit; I'll do it tomorrow.",
-     "n": "Hacer has an irregular participle: hecho."
+     "n": "He hecho: haber + hecho (the irregular participle of hacer).",
+     "w": {
+      "he hacido": "Hacido doesn't exist; it's hecho.",
+      "haya hecho": "Haya is subjunctive; nothing triggers it.",
+      "hecho": "You need the helper: he hecho."
+     },
+     "easy": true
     },
     {
      "q": "Cuando llegué al banco, ya ___.",
@@ -951,7 +1632,13 @@
       "cerrarán"
      ],
      "en": "When I got to the bank, they had already closed.",
-     "n": "An earlier past action → pluperfect (habían cerrado)."
+     "n": "Habían cerrado: it closed before you arrived (another past moment), so había/habían.",
+     "w": {
+      "han cerrado": "Han cerrado is 'have closed (now)'; your arrival is in the past, so habían.",
+      "hayan cerrado": "Hayan cerrado is subjunctive, and nothing here triggers it.",
+      "cerrarán": "Cerrarán is future ('they will close'); this already happened."
+     },
+     "easy": true
     },
     {
      "q": "¿Ya ___ el terreno en persona? — Todavía no, pero voy el sábado.",
@@ -962,7 +1649,12 @@
       "he visto"
      ],
      "en": "Have you seen the land in person yet? — Not yet, but I'm going on Saturday.",
-     "n": "Ya + present perfect for 'have you … yet?' (in Mexico ¿ya viste…? is just as common). Hayas visto needs a trigger like ojalá que; he visto is 'I have seen'."
+     "n": "Has visto: ¿ya…? + 'have you seen yet', tú form has + visto.",
+     "w": {
+      "hayas visto": "Hayas visto is subjunctive and needs a trigger like ojalá que.",
+      "haber visto": "You need a conjugated helper: has.",
+      "he visto": "He visto is 'I have seen'; you're asking him."
+     }
     },
     {
      "q": "Se me olvidó que ya te lo ___.",
@@ -973,7 +1665,12 @@
       "dicho"
      ],
      "en": "I forgot I had already told you.",
-     "n": "Decir → dicho (irregular). Earlier past → había dicho."
+     "n": "Había dicho: you had already told him before you forgot, and dicho is the participle of decir.",
+     "w": {
+      "había decido": "Decido is 'I decide'; the participle of decir is dicho.",
+      "haya decido": "Wrong helper and wrong participle.",
+      "dicho": "You need the helper: había dicho."
+     }
     },
     {
      "q": "La ventana está rota; alguien la ___.",
@@ -984,7 +1681,13 @@
       "haya rompido"
      ],
      "en": "The window is broken; someone has broken it.",
-     "n": "Romper → roto (irregular). After haber the participle doesn't change for gender."
+     "n": "Ha roto: someone has broken it; roto is the irregular participle of romper.",
+     "w": {
+      "ha rompido": "Rompido doesn't exist; it's roto.",
+      "ha rota": "After haber the participle never changes: ha roto.",
+      "haya rompido": "Rompido doesn't exist, and no subjunctive trigger."
+     },
+     "easy": true
     },
     {
      "q": "Nunca ___ en un lugar tan tranquilo.",
@@ -995,7 +1698,12 @@
       "vivido"
      ],
      "en": "I had never lived in such a quiet place.",
-     "n": "Había + vivido (regular -ido participle)."
+     "n": "Había vivido: never had lived (before this moment in the past).",
+     "w": {
+      "había vivo": "Vivo is 'alive / I live'; the participle is vivido.",
+      "habían vivo": "Wrong person and wrong participle.",
+      "vivido": "You need the helper: había vivido."
+     }
     },
     {
      "q": "¿Ya ___ el estado de cuenta? (usted)",
@@ -1006,9 +1714,38 @@
       "he revisado"
      ],
      "en": "Have you checked the account statement yet? (formal)",
-     "n": "With usted the helper is ha: ¿ya ha revisado…? Has is for tú, he is 'I have'."
+     "n": "Ha revisado: usted uses ha + participle.",
+     "w": {
+      "has revisado": "Has is for tú; the hint says usted.",
+      "haya revisado": "Subjunctive, no trigger.",
+      "he revisado": "He revisado is 'I have checked'."
+     }
     }
-   ]
+   ],
+   "rule": {
+    "title": "Have done / had done (he hecho, había cerrado)",
+    "rule": "Haber + participle = 'have done': he/has/ha/hemos/han for 'have done (up to now)', and había/habían for 'had already done' before another past moment. The participle never changes: always -ado/-ido or an irregular like hecho, dicho, visto, roto.",
+    "formula": [
+     "he / has / ha / hemos / han + -ado / -ido",
+     "había / habías / habían + -ado / -ido (earlier than another past event)",
+     "Irregular: hecho, dicho, visto, roto, puesto, escrito, vuelto, abierto"
+    ],
+    "ex": [
+     [
+      "¿Ya ha revisado el contrato?",
+      "Have you checked the contract yet?"
+     ],
+     [
+      "Todavía no he hecho el depósito.",
+      "I haven't made the deposit yet."
+     ],
+     [
+      "Cuando llegué, el banco ya había cerrado.",
+      "When I got there, the bank had already closed."
+     ]
+    ],
+    "trap": "Hacido, rompido, decido (for dicho) don't exist. And in Mexico ¿ya viste…? is as common as ¿ya has visto…?"
+   }
   },
   "relative": {
    "name": "Relative pronouns (que, quien, lo que, donde)",
@@ -1023,7 +1760,13 @@
       "cual"
      ],
      "en": "The neighbor who lives upstairs makes a lot of noise.",
-     "n": "A defining clause with no preposition → que."
+     "n": "Que: the everyday link for 'who' right after a person.",
+     "w": {
+      "quien": "Quien needs a preposition before it (con quien); right after a noun use que.",
+      "lo que": "Lo que means 'what'; here you're describing the neighbor.",
+      "cual": "Cual needs el/la and is rare in speech."
+     },
+     "easy": true
     },
     {
      "q": "No entiendo ___ dijo el mecánico.",
@@ -1034,7 +1777,13 @@
       "quien"
      ],
      "en": "I don't understand what the mechanic said.",
-     "n": "What (the thing that) → lo que."
+     "n": "Lo que: 'what' he said (the thing that).",
+     "w": {
+      "que": "Que alone can't mean 'what' here; use lo que.",
+      "cual": "Cual isn't used for 'what' in a statement.",
+      "quien": "Quien is for people."
+     },
+     "easy": true
     },
     {
      "q": "Esta es la colonia ___ crecí.",
@@ -1045,7 +1794,12 @@
       "quien"
      ],
      "en": "This is the neighborhood where I grew up.",
-     "n": "Place → donde (or en la que)."
+     "n": "Donde: a place (la colonia).",
+     "w": {
+      "que": "For a place you grew up in, use donde (or en la que).",
+      "lo que": "Lo que means 'what'.",
+      "quien": "Quien is for people."
+     }
     },
     {
      "q": "La señora con ___ hablé es la dueña.",
@@ -1056,7 +1810,12 @@
       "donde"
      ],
      "en": "The woman I spoke with is the owner.",
-     "n": "A person after a preposition → quien (or la que)."
+     "n": "Quien: after a preposition (con) for a person, use quien.",
+     "w": {
+      "lo que": "Lo que means 'what'.",
+      "cual": "Con la cual works in writing, but cual alone does not.",
+      "donde": "Donde is for places."
+     }
     },
     {
      "q": "___ más me molesta es el ruido de la noche.",
@@ -1067,7 +1826,13 @@
       "Quien"
      ],
      "en": "What bothers me most is the noise at night.",
-     "n": "What... → lo que."
+     "n": "Lo que: 'what bothers me most' starts with lo que.",
+     "w": {
+      "Que": "Que can't start a 'what' sentence; use lo que.",
+      "Cual": "Cual doesn't work for 'what' here.",
+      "Quien": "Quien is for people."
+     },
+     "easy": true
     },
     {
      "q": "El taller ___ me recomendaste estaba cerrado.",
@@ -1078,7 +1843,12 @@
       "donde"
      ],
      "en": "The shop you recommended to me was closed.",
-     "n": "Que, even where English drops “that”."
+     "n": "Que: right after a thing (el taller), use que.",
+     "w": {
+      "quien": "Quien is only for people.",
+      "lo que": "Lo que means 'what'.",
+      "donde": "The workshop is what you recommended, not where: que."
+     }
     },
     {
      "q": "Busco a alguien ___ sepa arreglar el portón.",
@@ -1089,9 +1859,39 @@
       "cual"
      ],
      "en": "I'm looking for someone who knows how to fix the gate.",
-     "n": "Que after alguien (no preposition). Sepa is subjunctive: the person isn't known yet."
+     "n": "Que: right after alguien, use que (and the subjunctive sepa, because that person may not exist).",
+     "w": {
+      "quien": "Right after a noun or alguien use que.",
+      "lo que": "Lo que means 'what'.",
+      "cual": "Cual alone does not work here."
+     }
     }
-   ]
+   ],
+   "rule": {
+    "title": "Que, quien, lo que, donde",
+    "rule": "Que links almost anything ('that / who / which'), and quien is only for people after a preposition (con quien, a quien). Lo que means 'what / the thing that', and donde is for places.",
+    "formula": [
+     "person or thing + que → el señor que vino",
+     "preposition + quien (people) → la señora con quien hablé",
+     "lo que = 'what' → no entiendo lo que dijo",
+     "place + donde → la colonia donde vivo"
+    ],
+    "ex": [
+     [
+      "El cliente que vino ayer quiere el lote L-702.",
+      "The client who came yesterday wants lot L-702."
+     ],
+     [
+      "No entendí lo que dijo el notario.",
+      "I didn't understand what the notary said."
+     ],
+     [
+      "Esa es la zona donde vamos a construir.",
+      "That's the area where we're going to build."
+     ]
+    ],
+    "trap": "Don't start a 'what' sentence with que alone: Que más me preocupa ✗ → Lo que más me preocupa ✓."
+   }
   },
   "clitic_usted": {
    "name": "Double pronouns with usted (¿le comparto…? → se la comparto)",
@@ -1106,7 +1906,13 @@
       "se lo"
      ],
      "en": "The quote? I’ll gladly share it with you today.",
-     "n": "le + la (la cotización) → se la."
+     "n": "Se la: le (to you, the client) became se because la follows it. La = la cotización.",
+     "w": {
+      "le la": "Le lo / le la never happen: le turns into se before lo, la, los or las.",
+      "la se": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
+      "se lo": "La cotización is feminine, so la."
+     },
+     "easy": true
     },
     {
      "q": "¿Le mando las fotos del terreno? — Sí, ___, por favor.",
@@ -1117,7 +1923,12 @@
       "me las manda"
      ],
      "en": "Shall I send you the photos of the land? — Yes, send them to me, please.",
-     "n": "Usted command + me + las. Las = las fotos. Mándeselas would mean 'send them to him/her'."
+     "n": "Mándemelas: usted command (mande) + me (to me) + las (las fotos).",
+     "w": {
+      "mándemelos": "Las fotos is feminine plural (la foto), so las.",
+      "mándeselas": "Mándeselas means 'send them to him/her'; he wants them for himself: me.",
+      "me las manda": "That's a statement ('you send them to me'), not the polite request."
+     }
     },
     {
      "q": "No tengo el contrato aquí, pero mañana ___ llevo a su oficina.",
@@ -1128,7 +1939,13 @@
       "se la"
      ],
      "en": "I don’t have the contract here, but tomorrow I’ll bring it to your office.",
-     "n": "el contrato → lo; le + lo → se lo."
+     "n": "Se lo: le (to you) became se because lo follows it. Lo = el contrato.",
+     "w": {
+      "le lo": "Le lo / le la never happen: le turns into se before lo, la, los or las.",
+      "lo le": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
+      "se la": "El contrato is masculine, so lo."
+     },
+     "easy": true
     },
     {
      "q": "¿Ya le mandaron los recibos? No, todavía no ___ mandan.",
@@ -1139,7 +1956,12 @@
       "se los"
      ],
      "en": "Have they sent you the receipts yet? No, they still haven’t sent them to me.",
-     "n": "me + los (los recibos). Only le/les change to se."
+     "n": "Me los: the client answers about himself, me (to me) + los (los recibos).",
+     "w": {
+      "me les": "Les isn't 'them' for things; los recibos → los.",
+      "los me": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
+      "se los": "He's talking about himself (to me), so me, not se."
+     }
     },
     {
      "q": "¿Me puede mandar la información? — Claro, ___ ahorita.",
@@ -1150,7 +1972,12 @@
       "le la mando"
      ],
      "en": "Can you send me the information? — Sure, I'll send it to you right now.",
-     "n": "Talking to a client (usted): le + la → se la. La = la información. Te la is for someone you call tú."
+     "n": "Se la mando: the client asked with me, so you answer with le → se (to you, usted) + la (la información).",
+     "w": {
+      "se lo mando": "La información is feminine, so la.",
+      "te la mando": "Te is for people you call tú. With a client (¿me puede…?) use se.",
+      "le la mando": "Le lo / le la never happen: le turns into se before lo, la, los or las."
+     }
     },
     {
      "q": "Señores, ¿las cotizaciones? Ya ___ envié a los dos.",
@@ -1161,7 +1988,12 @@
       "se los"
      ],
      "en": "Gentlemen, the quotes? I already sent them to both of you.",
-     "n": "les (ustedes) + las → se las."
+     "n": "Se las: les (to both of you) became se because las follows it. Las = las cotizaciones.",
+     "w": {
+      "les las": "Les las never happens: les turns into se before las.",
+      "las les": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
+      "se los": "Las cotizaciones is feminine plural, so las."
+     }
     },
     {
      "q": "___ comparto mi ubicación para que llegue sin problema.",
@@ -1172,7 +2004,12 @@
       "La"
      ],
      "en": "I’ll share my location with you so you can get here without any trouble.",
-     "n": "Only one pronoun (“to you”) → le. It becomes se only before lo/la/los/las."
+     "n": "Le: only one pronoun here (to you); mi ubicación is spelled out, so le stays le.",
+     "w": {
+      "Lo": "Lo would be 'it/him' as the thing; you're sharing it with the client: le (to you).",
+      "Se": "Se only replaces le when lo/la/los/las follows.",
+      "La": "La would be 'her/it' as the thing, but the thing (mi ubicación) is already in the sentence."
+     }
     },
     {
      "q": "¿Le explico cómo llegar? — Sí, ___, por favor.",
@@ -1183,7 +2020,12 @@
       "explíquemela"
      ],
      "en": "Shall I explain how to get there? — Yes, explain it to me, please.",
-     "n": "Usted command + me + lo. Lo stands for the whole idea (cómo llegar). Explíqueselo would be 'explain it to him/her'."
+     "n": "Explíquemelo: usted command + me (to me) + lo (how to get there, the whole idea).",
+     "w": {
+      "explíqueselo": "Explíqueselo means 'explain it to him/her'; you want it explained to you.",
+      "me lo explica": "That's a statement, not the polite command.",
+      "explíquemela": "An idea (cómo llegar) uses lo."
+     }
     },
     {
      "q": "¿Me manda el contrato? — Sí, ahorita ___ mando.",
@@ -1194,7 +2036,13 @@
       "le lo"
      ],
      "en": "Will you send me the contract? — Yes, I'll send it to you right now.",
-     "n": "A client (usted) asks: le + lo → se lo. Lo = el contrato."
+     "n": "Se lo: the client asked ¿me manda?, so you reply le → se (to you) + lo (el contrato).",
+     "w": {
+      "te lo": "Te lo is for a friend (tú). A client who says ¿me manda? gets se lo.",
+      "se la": "El contrato is masculine, so lo.",
+      "le lo": "Le lo / le la never happen: le turns into se before lo, la, los or las."
+     },
+     "easy": true
     },
     {
      "q": "Las escrituras están en la notaría. ¿Quiere que ___ traiga?",
@@ -1205,7 +2053,12 @@
       "me las"
      ],
      "en": "The deeds are at the notary's office. Do you want me to bring them to you?",
-     "n": "le + las → se las. Las = las escrituras."
+     "n": "Se las: le (to you) became se because las follows it. Las = las escrituras.",
+     "w": {
+      "se los": "Las escrituras is feminine plural, so las.",
+      "le las": "Le lo / le la never happen: le turns into se before lo, la, los or las.",
+      "me las": "Me las would be 'bring them to me'; you're offering to bring them to the client."
+     }
     },
     {
      "q": "¿Les enseño los lotes a sus papás? — Sí, ___ el sábado, por favor.",
@@ -1216,9 +2069,38 @@
       "se los enseña"
      ],
      "en": "Shall I show the lots to your parents? — Yes, show them to them on Saturday, please.",
-     "n": "Usted command + se (les → se) + los. Los = los lotes."
+     "n": "Enséñeselos: usted command (enseñe) + se (les → se, to your parents) + los (los lotes).",
+     "w": {
+      "enséñeselas": "Los lotes is masculine plural, so los.",
+      "enséñemelos": "Enséñemelos means 'show them to me'; they're for his parents.",
+      "se los enseña": "That's a statement, not the polite command."
+     }
     }
-   ]
+   ],
+   "rule": {
+    "title": "Se lo / se la with clients (usted)",
+    "rule": "With a client, 'to you' is le, so it turns into se before lo/la/los/las: se lo mando, se la comparto. 'To me' stays me, and with a usted command the pronouns go on the end: mándemelo, explíquemelo.",
+    "formula": [
+     "to you (usted) + it → se lo / se la / se los / se las",
+     "to me + it → me lo / me la… · usted command → mándemelas",
+     "tú friend → te lo; client → se lo"
+    ],
+    "ex": [
+     [
+      "¿La cotización? Con gusto se la comparto hoy.",
+      "The quote? I'll gladly share it with you today."
+     ],
+     [
+      "Las escrituras están en la notaría; mañana se las llevo.",
+      "The deeds are at the notary; I'll bring them to you tomorrow."
+     ],
+     [
+      "Si tiene las fotos, mándemelas por WhatsApp.",
+      "If you have the photos, send them to me on WhatsApp."
+     ]
+    ],
+    "trap": "Te lo is for people you call tú; with clients it's se lo. Le la / le lo never happen."
+   }
   },
   "quedar_distancia": {
    "name": "Quedar and distances (queda a 15 minutos de…)",
@@ -1233,7 +2115,13 @@
       "por"
      ],
      "en": "The land is fifteen minutes from the airport.",
-     "n": "Distance or time away → a: queda a 15 minutos de…"
+     "n": "A: distances and travel times use a (queda a quince minutos).",
+     "w": {
+      "en": "En quince minutos means 'within fifteen minutes' (time until), not distance.",
+      "de": "De goes after the time (minutos del aeropuerto), not before it.",
+      "por": "Por quince minutos means \"for fifteen minutes\"."
+     },
+     "easy": true
     },
     {
      "q": "¿La playa queda lejos? — No, queda a cinco minutos ___ fraccionamiento.",
@@ -1244,7 +2132,12 @@
       "en el"
      ],
      "en": "Is the beach far? — No, it's five minutes from the development.",
-     "n": "A cinco minutos de + el fraccionamiento → del. Fraccionamiento is masculine, so not de la."
+     "n": "Del: a cinco minutos de + el fraccionamiento → del.",
+     "w": {
+      "de la": "Fraccionamiento is masculine, so del.",
+      "al": "Al means 'to the', not 'from the'.",
+      "en el": "The distance is measured from it: del."
+     }
     },
     {
      "q": "¿Dónde ___ la oficina de ventas?",
@@ -1255,7 +2148,13 @@
       "es"
      ],
      "en": "Where is the sales office?",
-     "n": "Where a place is → queda (or está), not es."
+     "n": "Queda: ¿dónde queda…? is the everyday way to ask where a place is, singular for la oficina.",
+     "w": {
+      "quede": "Quede is subjunctive; a direct question uses queda.",
+      "quedan": "La oficina is singular, so queda.",
+      "es": "Location of a place uses quedar or estar, not ser."
+     },
+     "easy": true
     },
     {
      "q": "El centro no queda ___; son como dieciocho minutos.",
@@ -1266,7 +2165,12 @@
       "cerca de"
      ],
      "en": "Downtown isn’t far; it’s about eighteen minutes.",
-     "n": "Lejos / cerca alone when no place follows; lejos de / cerca de + place."
+     "n": "Lejos: no queda lejos = it isn't far (nothing follows).",
+     "w": {
+      "lejos de": "Lejos de needs a place after it (lejos del mar).",
+      "a lejos": "There's no a before lejos.",
+      "cerca de": "Cerca de needs a place after it, and it contradicts the 18 minutes."
+     }
     },
     {
      "q": "El aeropuerto queda cerca ___ Bajos de Chila.",
@@ -1277,7 +2181,12 @@
       "por"
      ],
      "en": "The airport is close to Bajos de Chila.",
-     "n": "cerca de + place."
+     "n": "De: cerca always takes de before the place (cerca de Bajos de Chila).",
+     "w": {
+      "a": "Cerca is always followed by de.",
+      "en": "Cerca is always followed by de.",
+      "por": "Por would mean 'around', but cerca still takes de."
+     }
     },
     {
      "q": "¿Le ___ bien el sábado a las diez?",
@@ -1288,7 +2197,12 @@
       "quedo"
      ],
      "en": "Does Saturday at ten work for you?",
-     "n": "Quedar bien = to suit. The subject is el sábado → queda."
+     "n": "Queda: ¿le queda bien? = does it work for you? (singular for el sábado).",
+     "w": {
+      "quede": "A direct question uses queda.",
+      "quedan": "El sábado is singular, so queda.",
+      "quedo": "Quedo is 'I stay'."
+     }
     },
     {
      "q": "Entonces ___ el sábado en la entrada del fraccionamiento.",
@@ -1299,7 +2213,12 @@
       "queda"
      ],
      "en": "So we’ll meet on Saturday at the entrance to the development.",
-     "n": "Quedar = to agree on a plan: quedamos el sábado."
+     "n": "Quedamos: quedar = to agree on a plan (we're set for Saturday).",
+     "w": {
+      "quedemos": "Quedemos is 'let's agree'; you're confirming what's already agreed.",
+      "quedan": "Quedan is 'they agree'.",
+      "queda": "Queda is 'it is located / is left'."
+     }
     },
     {
      "q": "Los lotes de la segunda fila quedan ___ cien metros del mar.",
@@ -1310,9 +2229,39 @@
       "de"
      ],
      "en": "The second-row lots are a hundred meters from the sea.",
-     "n": "Distance → a: a 100 metros de…"
+     "n": "A: distances use a (a cien metros del mar).",
+     "w": {
+      "en": "Distance uses a, not en.",
+      "por": "Por cien metros means 'along a hundred meters'.",
+      "de": "De goes after the distance (metros del mar)."
+     },
+     "easy": true
     }
-   ]
+   ],
+   "rule": {
+    "title": "Quedar and distances (queda a 15 minutos)",
+    "rule": "Quedar is the everyday verb for where places are and for agreeing on plans. Distances use a: queda a cinco minutos de la playa.",
+    "formula": [
+     "place + queda + a + time/distance + de + place",
+     "¿Dónde queda…? = Where is…?",
+     "quedamos el sábado = we agreed on Saturday · ¿le queda bien? = does it work for you?"
+    ],
+    "ex": [
+     [
+      "El terreno queda a quince minutos del aeropuerto.",
+      "The land is fifteen minutes from the airport."
+     ],
+     [
+      "¿Dónde queda la oficina de ventas?",
+      "Where is the sales office?"
+     ],
+     [
+      "¿Le queda bien el sábado a las diez?",
+      "Does Saturday at ten work for you?"
+     ]
+    ],
+    "trap": "De + el → del (del aeropuerto). Use a for the distance itself: a cien metros, not en cien metros."
+   }
   },
   "estar_participio": {
    "name": "Estar + participle and quedan (está apartado, quedan dos)",
@@ -1327,7 +2276,12 @@
       "vendiendo"
      ],
      "en": "The front-row lots are already sold.",
-     "n": "Agrees with los lotes → vendidos."
+     "n": "Vendidos: the participle matches los lotes (masculine plural).",
+     "w": {
+      "vendidas": "Lotes is masculine, so vendidos.",
+      "vendido": "Lotes is plural, so vendidos.",
+      "vendiendo": "Están vendiendo means 'are selling', not 'are sold'."
+     }
     },
     {
      "q": "La oficina ___ cerrada los domingos.",
@@ -1338,7 +2292,13 @@
       "hay"
      ],
      "en": "The office is closed on Sundays.",
-     "n": "A resulting state → estar + participle; cerrada agrees with la oficina."
+     "n": "Está: closed is the office's state, so estar.",
+     "w": {
+      "es": "States like cerrada use estar.",
+      "tiene": "Tiene cerrada doesn't work here.",
+      "hay": "Hay means 'there is'."
+     },
+     "easy": true
     },
     {
      "q": "Solo ___ un lote en esa calle.",
@@ -1349,7 +2309,13 @@
       "son"
      ],
      "en": "There’s only one lot left on that street.",
-     "n": "One thing left → queda (singular)."
+     "n": "Queda: one lot left, singular.",
+     "w": {
+      "quedan": "Un lote is singular, so queda.",
+      "está": "Está would need a place or state; 'left' is queda.",
+      "son": "Son doesn't mean 'there are left'."
+     },
+     "easy": true
     },
     {
      "q": "Todavía ___ cinco lotes con vista al mar.",
@@ -1360,7 +2326,13 @@
       "es"
      ],
      "en": "There are still five lots with an ocean view left.",
-     "n": "Plural → quedan."
+     "n": "Quedan: five lots left, plural.",
+     "w": {
+      "queda": "Cinco lotes is plural, so quedan.",
+      "están": "Están would need a place or state; 'left' is quedan.",
+      "es": "Es doesn't mean 'there are left'."
+     },
+     "easy": true
     },
     {
      "q": "La cotización ya está ___; ahorita se la mando.",
@@ -1371,7 +2343,12 @@
       "hace"
      ],
      "en": "The quote is done; I’ll send it to you right now.",
-     "n": "Hacer → hecho (irregular); agrees with la cotización → hecha."
+     "n": "Hecha: the participle matches la cotización (feminine).",
+     "w": {
+      "hecho": "La cotización is feminine, so hecha.",
+      "haciendo": "Está haciendo is 'is making', still in progress.",
+      "hace": "Está hace isn't Spanish."
+     }
     },
     {
      "q": "El contrato ya está ___ por los dos.",
@@ -1382,7 +2359,12 @@
       "firmó"
      ],
      "en": "The contract is already signed by both of them.",
-     "n": "El contrato → firmado."
+     "n": "Firmado: matches el contrato (masculine singular), a finished state.",
+     "w": {
+      "firmada": "El contrato is masculine, so firmado.",
+      "firmando": "Está firmando means 'is signing' (in progress).",
+      "firmó": "Firmó is 'signed (past)', and it can't follow está."
+     }
     },
     {
      "q": "Las dos casas de la esquina están ___ hasta el viernes.",
@@ -1393,7 +2375,12 @@
       "apartando"
      ],
      "en": "The two corner houses are on hold until Friday.",
-     "n": "Las casas → apartadas (feminine plural)."
+     "n": "Apartadas: matches las dos casas (feminine plural).",
+     "w": {
+      "apartados": "Casas is feminine, so apartadas.",
+      "apartada": "Two houses, so plural: apartadas.",
+      "apartando": "Están apartando means 'are reserving'."
+     }
     },
     {
      "q": "¿Cuántos lotes ___ disponibles?",
@@ -1404,9 +2391,38 @@
       "son"
      ],
      "en": "How many lots are still available?",
-     "n": "Quedan + adjective = how many are left in that state."
+     "n": "Quedan: ¿cuántos lotes quedan? = how many are left (plural).",
+     "w": {
+      "queda": "Lotes is plural, so quedan.",
+      "quedamos": "Quedamos means 'we stay / we agree'.",
+      "son": "¿Cuántos son disponibles? isn't said; use quedan (or hay)."
+     }
     }
-   ]
+   ],
+   "rule": {
+    "title": "Estar + -ado (está apartado) and quedan",
+    "rule": "Estar + participle describes a result or state (está apartado, está firmado), and the ending matches the thing like an adjective: lote apartado, casas apartadas. Queda / quedan means 'there is / there are … left'.",
+    "formula": [
+     "estar + -ado/-ada/-ados/-adas (matches the thing)",
+     "queda (one left) · quedan (several left)",
+     "está firmado (state) vs. está firmando (in progress)"
+    ],
+    "ex": [
+     [
+      "Ese lote ya está apartado.",
+      "That lot is already reserved."
+     ],
+     [
+      "Las dos casas están vendidas.",
+      "Both houses are sold."
+     ],
+     [
+      "Todavía quedan cinco lotes con vista al mar.",
+      "There are still five ocean-view lots left."
+     ]
+    ],
+    "trap": "Match the thing, not you: la cotización está hecha, el contrato está hecho. And está vendiendo means 'is selling', not 'is sold'."
+   }
   },
   "habitual": {
    "name": "Habits: imperfect, soler and impersonal se (solía, se acostumbra)",
@@ -1421,7 +2437,13 @@
       "soleré"
      ],
      "en": "When I lived in Texas, I used to have dinner at six.",
-     "n": "Past habit → imperfect: solía + infinitive."
+     "n": "Solía: a past habit (cuando vivía…) uses solía + infinitive.",
+     "w": {
+      "suelo": "Suelo is the present; you lived there in the past.",
+      "suele": "Suele is for él/ella, and present.",
+      "soleré": "Soler has no future; soleré doesn't exist."
+     },
+     "easy": true
     },
     {
      "q": "En México se ___ comer entre las dos y las cuatro.",
@@ -1432,7 +2454,12 @@
       "acostumbre"
      ],
      "en": "In Mexico it’s customary to eat between two and four.",
-     "n": "Impersonal se + infinitive → singular verb."
+     "n": "Acostumbra: se acostumbra + infinitive (comer) is singular.",
+     "w": {
+      "acostumbran": "Before an infinitive, se acostumbra stays singular.",
+      "acostumbro": "Acostumbro is 'I usually'; se needs the él form.",
+      "acostumbre": "No subjunctive trigger."
+     }
     },
     {
      "q": "Los domingos mis suegros ___ hacer una comida grande.",
@@ -1443,7 +2470,13 @@
       "sueles"
      ],
      "en": "On Sundays my in-laws usually make a big meal.",
-     "n": "Soler changes o → ue: ellos suelen."
+     "n": "Suelen: mis suegros (they) usually do it, soler is stem-changing (o → ue).",
+     "w": {
+      "suele": "Suegros is plural, so suelen.",
+      "solemos": "Solemos is 'we usually'.",
+      "sueles": "Sueles is 'you usually'."
+     },
+     "easy": true
     },
     {
      "q": "De niño, todos los veranos ___ a la playa con mis papás.",
@@ -1454,7 +2487,13 @@
       "iré"
      ],
      "en": "As a kid, I went to the beach with my parents every summer.",
-     "n": "Repeated past action (todos los veranos) → imperfect."
+     "n": "Iba: de niño + todos los veranos is a past habit, imperfect.",
+     "w": {
+      "fui": "Fui is one finished trip; every summer is a habit.",
+      "voy": "Voy is the present.",
+      "iré": "Iré is the future."
+     },
+     "easy": true
     },
     {
      "q": "Aquí no se ___ llegar puntual a una fiesta.",
@@ -1465,7 +2504,12 @@
       "acostumbran"
      ],
      "en": "Here it isn’t customary to arrive on time to a party.",
-     "n": "Impersonal se + infinitive → acostumbra."
+     "n": "Acostumbra: se acostumbra + infinitive stays singular.",
+     "w": {
+      "acostumbras": "Acostumbras is 'you usually'.",
+      "acostumbrado": "You need a conjugated verb after se.",
+      "acostumbran": "Before an infinitive, se acostumbra stays singular."
+     }
     },
     {
      "q": "Cuando éramos niños, mi abuela nos ___ chocolate en las tardes.",
@@ -1476,7 +2520,12 @@
       "preparará"
      ],
      "en": "When we were kids, my grandmother used to make us hot chocolate in the afternoons.",
-     "n": "A habit in the past (cuando éramos niños) → imperfect."
+     "n": "Preparaba: a repeated thing in the past (every afternoon), imperfect.",
+     "w": {
+      "preparó": "Preparó is one time; en las tardes is a habit.",
+      "prepara": "The present doesn't fit cuando éramos niños.",
+      "preparará": "Preparará is future ('she will make'); this is about childhood."
+     }
     },
     {
      "q": "¿A qué hora ___ comer ustedes?",
@@ -1487,7 +2536,12 @@
       "soléis"
      ],
      "en": "What time do you all usually eat?",
-     "n": "Ustedes → suelen (o → ue). Soléis is Spain’s vosotros form."
+     "n": "Suelen: ustedes usually + infinitive (stem change o → ue).",
+     "w": {
+      "suelan": "Suelan is subjunctive; no trigger.",
+      "solen": "Solen doesn't exist; the o changes to ue: suelen.",
+      "soléis": "Vosotros form from Spain; Mexico uses ustedes: suelen."
+     }
     },
     {
      "q": "En esta casa se ___ los zapatos en la entrada.",
@@ -1498,9 +2552,38 @@
       "quiten"
      ],
      "en": "In this house you take your shoes off at the door.",
-     "n": "Se + plural noun (los zapatos) → plural verb: se quitan."
+     "n": "Quitan: se quitan los zapatos, plural to match los zapatos.",
+     "w": {
+      "quita": "Los zapatos is plural, so quitan.",
+      "quitamos": "Se quitamos isn't Spanish; with se use the plural ellos form.",
+      "quiten": "No subjunctive trigger."
+     }
     }
-   ]
+   ],
+   "rule": {
+    "title": "Habits: solía, suelen, se acostumbra",
+    "rule": "To say what usually happens, use soler + infinitive (suelo, suelen) for now, and solía or the imperfect for 'used to'. Se acostumbra + infinitive means 'it's customary to'.",
+    "formula": [
+     "soler (present) + infinitive → suelen comer a las tres",
+     "solía / imperfect = used to → solía cenar a las seis, iba a la playa",
+     "se acostumbra + infinitive → aquí se acostumbra llegar tarde"
+    ],
+    "ex": [
+     [
+      "Los clientes suelen visitar el terreno en la mañana.",
+      "Clients usually visit the land in the morning."
+     ],
+     [
+      "Cuando vivía en Texas, solía cenar a las seis.",
+      "When I lived in Texas, I used to eat dinner at six."
+     ],
+     [
+      "En México se acostumbra comer entre las dos y las cuatro.",
+      "In Mexico it's customary to eat between two and four."
+     ]
+    ],
+    "trap": "Soler is stem-changing: suelo, sueles, suele, suelen, but solemos. Solen doesn't exist."
+   }
   },
   "comparatives": {
    "name": "Comparatives and measurements (más grande que, mide 20 de frente)",
@@ -1515,7 +2598,13 @@
       "a"
      ],
      "en": "This lot is bigger than the one next to it.",
-     "n": "Comparing two things → más … que."
+     "n": "Que: más + adjective + que.",
+     "w": {
+      "de": "De is for numbers (más de 400), not comparing two lots.",
+      "como": "Como goes with tan (tan grande como).",
+      "a": "A is not used in comparisons."
+     },
+     "easy": true
     },
     {
      "q": "El terreno tiene más ___ cuatrocientos metros cuadrados.",
@@ -1526,7 +2615,13 @@
       "a"
      ],
      "en": "The land has more than four hundred square meters.",
-     "n": "Before a number → más de."
+     "n": "De: before a number, more than is más de (más de cuatrocientos metros).",
+     "w": {
+      "que": "Before a number, use más de, not más que.",
+      "como": "Como goes with tan.",
+      "a": "A is not used here."
+     },
+     "easy": true
     },
     {
      "q": "La vista desde el fondo es ___ que desde la calle.",
@@ -1537,7 +2632,12 @@
       "bueno"
      ],
      "en": "The view from the back is better than from the street.",
-     "n": "Bueno → mejor. Never más mejor."
+     "n": "Mejor: 'better' is mejor, never más bueno in this sense.",
+     "w": {
+      "más buena": "Más buena is rare for quality; say mejor.",
+      "más mejor": "Mejor already means \"more good\"; más mejor is wrong.",
+      "bueno": "Bueno + que is not a comparison."
+     }
     },
     {
      "q": "El L-689 es tan bonito ___ el L-702.",
@@ -1548,7 +2648,13 @@
       "tan"
      ],
      "en": "L-689 is as nice as L-702.",
-     "n": "tan + adjective + como."
+     "n": "Como: tan + adjective + como.",
+     "w": {
+      "que": "Que goes with más/menos, not tan.",
+      "de": "De is for numbers.",
+      "tan": "Tan is already there; the second word is como."
+     },
+     "easy": true
     },
     {
      "q": "Mide quince metros ___ frente por treinta de fondo.",
@@ -1559,7 +2665,12 @@
       "por"
      ],
      "en": "It’s fifteen meters wide by thirty deep.",
-     "n": "Medir X de frente por Y de fondo."
+     "n": "De: measurements use de (quince de frente, treinta de fondo).",
+     "w": {
+      "en": "Measurements use de.",
+      "a": "Measurements use de.",
+      "por": "Por goes between the two measures (… por treinta), not before frente."
+     }
     },
     {
      "q": "Este lote tiene ___ pendiente que el otro, así que es más fácil construir.",
@@ -1570,7 +2681,12 @@
       "poco"
      ],
      "en": "This lot has less slope than the other one, so it’s easier to build on.",
-     "n": "Less → menos … que."
+     "n": "Menos: menos + noun + que = less … than.",
+     "w": {
+      "más poco": "Más poco isn't used; say menos.",
+      "tan poca": "Tan goes with como, not que.",
+      "poco": "Poco que isn't a comparison."
+     }
     },
     {
      "q": "La casa salió más cara ___ lo que pensábamos.",
@@ -1581,7 +2697,12 @@
       "a"
      ],
      "en": "The house turned out more expensive than we thought.",
-     "n": "Before a clause → de lo que."
+     "n": "De: más … de lo que + a clause (de lo que pensábamos).",
+     "w": {
+      "que": "Before lo que + verb, use de: más cara de lo que pensábamos.",
+      "como": "Como goes with tan.",
+      "a": "A is not used here."
+     }
     },
     {
      "q": "Ya no hay tantos lotes ___ antes.",
@@ -1592,9 +2713,38 @@
       "tan"
      ],
      "en": "There aren’t as many lots as before.",
-     "n": "tantos + noun + como."
+     "n": "Como: tantos + noun + como.",
+     "w": {
+      "que": "Que goes with más/menos, not tantos.",
+      "de": "De is for numbers.",
+      "tan": "Tantos is already there; the second word is como."
+     }
     }
-   ]
+   ],
+   "rule": {
+    "title": "Comparisons and measurements (más grande que, mide 20 de frente)",
+    "rule": "Compare with más/menos + adjective + que, or tan + adjective + como for 'as … as'. Before a number use más de / menos de, and measurements use de: quince de frente por treinta de fondo.",
+    "formula": [
+     "más / menos + adjective + que → más grande que el otro",
+     "tan + adjective + como · tantos + noun + como",
+     "más de + number → más de 400 m² · mejor / peor (not más bueno)"
+    ],
+    "ex": [
+     [
+      "Este lote es más grande que el de al lado.",
+      "This lot is bigger than the one next door."
+     ],
+     [
+      "El terreno tiene más de cuatrocientos metros cuadrados.",
+      "The land has more than four hundred square meters."
+     ],
+     [
+      "Mide quince metros de frente por treinta de fondo.",
+      "It's fifteen meters wide by thirty deep."
+     ]
+    ],
+    "trap": "Más de with numbers (más de 400), más que with comparisons (más grande que). Más mejor ✗ → mejor ✓."
+   }
   }
  },
  "units": [
@@ -1779,7 +2929,12 @@
        "tráigamelo",
        "tráemela"
       ],
-      "p": "clitic_imperative"
+      "p": "clitic_imperative",
+      "n": "Tráigamela: usted command (traiga) + me + la, because la = la carta del dueño.",
+      "w": {
+       "tráigamelo": "The thing is feminine (la), so tráigamela.",
+       "tráemela": "Tráemela is the tú form; at the bank they use usted: tráigamela."
+      }
      },
      {
       "after": 6,
@@ -2127,7 +3282,12 @@
        "funcione",
        "funcionará"
       ],
-      "p": "pret_imp"
+      "p": "pret_imp",
+      "n": "Funcionaba: describing how something was working is background, so imperfect.",
+      "w": {
+       "funcione": "Funcione is subjunctive; no trigger.",
+       "funcionará": "Future, but it was yesterday."
+      }
      },
      {
       "after": 7,
@@ -2373,7 +3533,12 @@
        "está",
        "estará"
       ],
-      "p": "subj"
+      "p": "subj",
+      "n": "Esté: necesito que (a request about someone/something else) takes the subjunctive.",
+      "w": {
+       "está": "After necesito que use the subjunctive: esté.",
+       "estará": "No future after necesito que."
+      }
      },
      {
       "after": 5,
@@ -2703,7 +3868,11 @@
        "Por",
        "Para"
       ],
-      "p": "por_para"
+      "p": "por_para",
+      "n": "Por: because of the delay (the reason).",
+      "w": {
+       "Para": "Para el retraso would mean 'for the delay' (a goal), not 'because of'."
+      }
      },
      {
       "after": 8,
@@ -2945,7 +4114,12 @@
        "Tómate",
        "Se toma"
       ],
-      "p": "commands"
+      "p": "commands",
+      "n": "Tómese: usted command of tomarse (tome + se) with the patient.",
+      "w": {
+       "Tómate": "Tómate is the tú form; the hint says usted.",
+       "Se toma": "That's a statement, not an instruction."
+      }
      },
      {
       "after": 8,
@@ -3186,7 +4360,12 @@
        "encantan",
        "encantas"
       ],
-      "p": "gustar_like"
+      "p": "gustar_like",
+      "n": "Encanta: regatear (an action) is the subject, and actions are always singular.",
+      "w": {
+       "encantan": "An action (regatear) is singular: encanta.",
+       "encantas": "Encantas means 'you delight (someone)'."
+      }
      },
      {
       "after": 10,
@@ -3660,7 +4839,12 @@
        "Que",
        "Quien"
       ],
-      "p": "relative"
+      "p": "relative",
+      "n": "Lo que: 'what worries me most' starts with lo que.",
+      "w": {
+       "Que": "Que can't start a 'what' sentence; use lo que.",
+       "Quien": "Quien is for people."
+      }
      },
      {
       "after": 8,
@@ -3969,7 +5153,12 @@
        "arreglan",
        "arreglarán"
       ],
-      "p": "subj"
+      "p": "subj",
+      "n": "Arreglen: para que (so that) always takes the subjunctive.",
+      "w": {
+       "arreglan": "After para que use the subjunctive: arreglen.",
+       "arreglarán": "No future after para que."
+      }
      },
      {
       "after": 9,
@@ -4232,7 +5421,12 @@
        "le",
        "les"
       ],
-      "p": "clitic_usted"
+      "p": "clitic_usted",
+      "n": "La: se la preparo, le (for the client) became se because la (the quote) follows it.",
+      "w": {
+       "le": "Se le isn't possible here: the thing (la cotización) is la.",
+       "les": "Les isn't 'it'; the thing is la."
+      }
      },
      {
       "after": 10,
@@ -4485,7 +5679,12 @@
        "es",
        "son"
       ],
-      "p": "ser_estar"
+      "p": "ser_estar",
+      "n": "Está: where a thing (the master plan) is right now uses estar.",
+      "w": {
+       "es": "Location of a thing uses estar.",
+       "son": "El plan maestro is one thing, and location uses estar."
+      }
      },
      {
       "after": 8,
@@ -4741,7 +5940,12 @@
        "para",
        "a"
       ],
-      "p": "por_para"
+      "p": "por_para",
+      "n": "Por: passing through Bajos de Chila (the route).",
+      "w": {
+       "para": "Para would mean Bajos de Chila is the destination.",
+       "a": "A would mean going to it, not through it."
+      }
      },
      {
       "after": 5,
@@ -5019,7 +6223,12 @@
        "apartada",
        "apartados"
       ],
-      "p": "estar_participio"
+      "p": "estar_participio",
+      "n": "Apartado: matches ese lote (masculine singular), a state.",
+      "w": {
+       "apartada": "Lote is masculine, so apartado.",
+       "apartados": "One lot, so singular."
+      }
      },
      {
       "after": 6,
@@ -5286,7 +6495,12 @@
        "solemos",
        "suelo"
       ],
-      "p": "habitual"
+      "p": "habitual",
+      "n": "Solíamos: a past habit at home (we used to), so solíamos + infinitive.",
+      "w": {
+       "solemos": "Solemos is the present; the story talks about how it used to be.",
+       "suelo": "Suelo is 'I usually', present."
+      }
      },
      {
       "after": 10,
@@ -5532,7 +6746,12 @@
        "que",
        "como"
       ],
-      "p": "comparatives"
+      "p": "comparatives",
+      "n": "De: más … de lo que + a clause.",
+      "w": {
+       "que": "Before lo que + verb, use de.",
+       "como": "Como goes with tan."
+      }
      },
      {
       "after": 3,

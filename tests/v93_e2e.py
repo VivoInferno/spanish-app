@@ -21,8 +21,8 @@ async def main():
         pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto(URL); await pg.wait_for_selector('.stone'); await pg.wait_for_timeout(500)
         s = await pg.evaluate("__app.state")
-        check(await pg.evaluate("__app.version") == 'v9.3' and s['items'] == V91['items'] and s['path'] == V91['path'] and s['daily'] == V91['daily']
-              and s['streak'] == V91['streak'] and 'g:costera' in s['parked'], 'v9.2 data → v9.3 losslessly (items, path, daily, streak, g: parks)')
+        check(await pg.evaluate("__app.version") == 'v9.4' and s['items'] == V91['items'] and s['path'] == V91['path'] and s['daily'] == V91['daily']
+              and s['streak'] == V91['streak'] and 'g:costera' in s['parked'], 'v9.2 data → v9.4 losslessly (items, path, daily, streak, g: parks)')
 
         # ---------- 1. accent-insensitive grading in the app ----------
         w = await pg.evaluate("""(() => { const C = __app.content; for (const u of C.units) for (const w of u.words) if (/[áéíóúñü]/.test(w.es) && !/[A-Z]/.test(w.es)) return { id: w.id, es: w.es, u: u.id }; })()""")

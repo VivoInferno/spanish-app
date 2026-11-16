@@ -20,7 +20,7 @@ def check(cond, msg):
 async def answer(page):
     e = await page.evaluate("__app.run && __app.entry")
     if not e: return False
-    if e.get('theme') or e.get('intro'): await page.click('#go'); return True
+    if e.get('theme') or e.get('intro') or e.get('rule'): await page.click('#go'); return True
     ex = await page.evaluate("({kind: __app.ex.kind, answer: __app.ex.answer, answers: __app.ex.answers, tiles: __app.ex.tiles})")
     if ex['kind'] == 'mc':
         opts = await page.query_selector_all('.opt'); texts = [await o.inner_text() for o in opts]; await opts[texts.index(ex['answer'])].click()
@@ -61,7 +61,7 @@ async def main():
         page.on('console', lambda m: errors.append(m.text) if m.type == 'error' else None)
         await page.clock.install(time=at(2026, 11, 11, 9)); await page.clock.pause_at(at(2026, 11, 11, 9))
         await page.goto(URL); await page.wait_for_selector('#daybar')
-        check(await page.evaluate("__app.version") == 'v9.3', 'app version is v9.3')
+        check(await page.evaluate("__app.version") == 'v9.4', 'app version is v9.4')
         # --- migration from v4 progress
         s = await page.evaluate("__app.state"); stored = await page.evaluate(f"JSON.parse(localStorage.getItem('{KEY}'))")
         diff = [k for k, v in raw.items() if k not in ('schema', 'settings', 'path') and s.get(k) != v]

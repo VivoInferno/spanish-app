@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const APP_VERSION = 'v9.3'; // keep in sync with CACHE in sw.js (espanol-v9-3)
+  const APP_VERSION = 'v9.4'; // keep in sync with CACHE in sw.js (espanol-v9-4)
   const KEY = 'spanish-app-state-v1'; // unchanged since v1 — never rename
   const DAY = SRS.DAY;
   const STONES = [
@@ -16,7 +16,7 @@
   // ---------- state + migration ----------
   const defaults = () => ({ v: 1, schema: 5, placementDone: false, created: Date.now(), items: {}, pstats: {}, recent: {},
     settings: { newPerSession: 5, rate: 0.9, autoAdvance: false, sound: true, anim: true, goalMin: Daily.GOAL_MIN, voice: '', voice2: '', voiceMode: 'recorded' }, sessions: 0,
-    path: { done: {}, tests: {}, testedOut: {} }, parked: {}, daily: {}, streak: Daily.seed(), parkedDefaults: {}, listenPauseUntil: 0, speakPauseUntil: 0 });
+    path: { done: {}, tests: {}, testedOut: {} }, parked: {}, daily: {}, streak: Daily.seed(), parkedDefaults: {}, listenPauseUntil: 0, speakPauseUntil: 0, rulesSeen: {}, pace: {} });
   function load() {
     let raw = null;
     try { raw = JSON.parse(localStorage.getItem(KEY)); } catch (e) { /* fresh */ }
@@ -48,6 +48,10 @@
     if (typeof s.settings.voice2 !== 'string') s.settings.voice2 = '';
     // v9: settings.voiceMode = 'recorded' (natural pre-recorded voices, default) or 'device' (Web Speech voices above). Schema stays 5.
     if (s.settings.voiceMode !== 'device') s.settings.voiceMode = 'recorded';
+    // v9.4: rulesSeen (pattern → when its rule card was shown) and pace (pattern → easy one-contrast drills left after the card).
+    // Optional additions; schema stays 5. Patterns already studied still get their card once, the next time they come up.
+    s.rulesSeen = raw.rulesSeen && typeof raw.rulesSeen === 'object' ? raw.rulesSeen : {};
+    s.pace = raw.pace && typeof raw.pace === 'object' ? raw.pace : {};
     s.schema = 5;
     return s;
   }
@@ -153,6 +157,7 @@
     });
     Object.values(C.patterns).forEach(p => p.items.forEach(it => { const full = it.q.replace('___', it.o[0]); add(full); add(full.replace(/\s*\([^)]*\)\s*$/, '')); toks(it.q); toks(full);
       const t = patternTarget(it); if (t) { add(t.es); if (t.ctxEs) add(t.ctxEs); } })); // v9.3: grammar tiles / say-it lines
+    Object.values(C.patterns).forEach(p => p.rule && p.rule.ex.forEach(([es]) => { add(es.replace(/\s*→\s*/g, '. ')); toks(es.replace(/→/g, ' ')); })); // v9.4: rule card examples
     [VOICE_TEST, RATE_TEST].forEach(add);
     return { main: [...main], story, second: [VOICE2_TEST] };
   }
@@ -397,6 +402,12 @@
     const i = pick(pool); rec.push(i); while (rec.length > Math.max(1, items.length - 2)) rec.shift();
     return i;
   }
+  function easyItem(p) { // v9.4: an easy, one-contrast item (content.json "easy"), not one of the last few seen
+    const items = IDX.patterns[p].items, rec = S.recent[p] = S.recent[p] || [];
+    const easy = items.map((it, i) => it.easy ? i : -1).filter(i => i >= 0); if (!easy.length) return patternItem(p);
+    const pool = easy.filter(i => !rec.includes(i)), i = pick(pool.length ? pool : easy); rec.push(i); while (rec.length > Math.max(1, items.length - 2)) rec.shift();
+    return i;
+  }
   const knownCard = c => c && (c.known || c.s >= 21);
 
   // ---------- path state ----------
@@ -426,22 +437,26 @@
   function makeExercise(entry) {
     if (entry.id.startsWith('p:')) {
       const p = entry.id.slice(2), pat = IDX.patterns[p];
-      const i = entry.itemIdx != null ? entry.itemIdx : patternItem(p); const it = pat.items[i];
+      const pacedRun = run && run.mode !== 'placement' && run.mode !== 'test' && (S.pace[p] || 0) > 0 && entry.ex == null;
+      const i = entry.itemIdx != null ? entry.itemIdx : pacedRun ? easyItem(p) : patternItem(p); const it = pat.items[i];
       const full = it.q.replace('___', it.o[0]), name = 'Grammar · ' + pat.name.replace(/\s*\(.*\)\s*$/, '');
       const reveal = { es: full, en: it.en, note: it.n }, speakAfter = full.replace(/\s*\([^)]*\)\s*$/, '');
       // v9.3: practice and review mix in spoken-style drills for grammar: build the reply from tiles or say it out loud.
       // Placement and the unit test stay choose-the-right-form so their scores mean the same thing as before.
+      const base = { pk: p, item: it };
+      // v9.4 pacing: right after a rule card, the next drills isolate the main contrast (answer vs. its first distractor) on easy items
+      if (pacedRun || entry.ex === 'paced') return Object.assign({ kind: 'mc', paced: true, label: name + ' · one contrast', prompt: it.q, options: shuffle(it.o.slice(0, 2)), answer: it.o[0], reveal, speakAfter }, base);
       const t = patternTarget(it), plain = !run || run.mode === 'placement' || run.mode === 'test';
       let kind = entry.ex || (plain || !t ? 'mc' : (r => r < 0.3 ? 'ptiles' : r < 0.45 ? 'pspeak' : 'mc')(Math.random()));
       if (kind === 'pspeak' && (!t || !speakOk())) kind = t ? 'ptiles' : 'mc';
       if (kind === 'ptiles' && t) {
         const have = new Set(tileTokens(t.es).map(strip)); // distractors come from the wrong options: different pronouns / forms, never accent-only twins
         const ds = shuffle([...new Set(it.o.slice(1).flatMap(tileTokens).filter(x => !have.has(strip(x))))]).slice(0, 2);
-        return Object.assign({ kind: 'build', label: name + ' · build it', tiles: shuffle(tileTokens(t.es).concat(ds)), answers: [t.es], opts: { lang: 'es' }, reveal, speakAfter, pattern: true },
+        return Object.assign({ kind: 'build', label: name + ' · build it', pk: p, item: it, tiles: shuffle(tileTokens(t.es).concat(ds)), answers: [t.es], opts: { lang: 'es' }, reveal, speakAfter, pattern: true },
           t.ctxEs ? { bigEs: t.ctxEs, hintEn: 'Reply: ' + t.en } : { big: t.en });
       }
-      if (kind === 'pspeak' && t) return { kind: 'speak', label: name + ' · say it', sayEs: t.es, hintEn: t.en, answers: [t.es], opts: { lang: 'es', sentence: true }, reveal, speakAfter, tries: 0, pattern: true };
-      return { kind: 'mc', label: run && run.mode === 'placement' ? 'Grammar' : name, prompt: it.q, options: shuffle(it.o), answer: it.o[0], reveal, speakAfter };
+      if (kind === 'pspeak' && t) return { pk: p, item: it, kind: 'speak', label: name + ' · say it', sayEs: t.es, hintEn: t.en, answers: [t.es], opts: { lang: 'es', sentence: true }, reveal, speakAfter, tries: 0, pattern: true };
+      return Object.assign({ kind: 'mc', label: run && run.mode === 'placement' ? 'Grammar' : name, prompt: it.q, options: shuffle(it.o), answer: it.o[0], reveal, speakAfter }, base);
     }
     const w = IDX.words[entry.id.slice(2)], card = S.items[entry.id];
     const sents = IDX.sentByWord[w.id] || [];
@@ -599,8 +614,9 @@
     const entry = run.queue[run.i];
     if (entry.theme) return renderTheme(entry);
     if (entry.intro) return renderIntro(entry);
-    run.ex = makeExercise(entry); run.answered = false;
-    renderExercise(entry, run.ex);
+    const show = () => { run.ex = makeExercise(entry); run.answered = false; renderExercise(entry, run.ex); };
+    if (entry.id.startsWith('p:') && ruleOk() && !S.rulesSeen[entry.id.slice(2)] && IDX.patterns[entry.id.slice(2)].rule) return renderRuleStep(entry.id.slice(2), run.i, show);
+    show();
   }
   function finishRun() {
     sessionDone();
@@ -616,6 +632,55 @@
     const el = app.querySelector('.bar span'); if (!el) return; void el.offsetWidth; el.style.width = pct + '%';
   }
   function bindQuit(onQuit) { bindLp(); document.getElementById('quit').onclick = () => { if (run && run.mode === 'placement' && !confirm('Leave placement? Progress on it will be lost.')) return; hush(); stopRec(); closeHint(); tick(); save(); run = null; story = null; (onQuit || renderHome)(); }; }
+
+  // ---------- v9.4 grammar teaching layer: rule cards, the 📘 Rule button, "why" after every grammar answer ----------
+  const ruleOk = () => !!run && run.mode !== 'placement' && run.mode !== 'test'; // no teaching inside placement or the unit test
+  function ruleCardHtml(pk) {
+    const p = IDX.patterns[pk], r = p && p.rule; if (!r) return p ? `<p>${esc(p.explain)}</p>` : '';
+    const say = es => es.replace(/\s*→\s*/g, '. ');
+    return `<div class="rule-card" data-p="${esc(pk)}"><div class="rule-title">📘 ${esc(r.title)}</div><p class="rule-text">${esc(r.rule)}</p>
+      <div class="rule-formula">${r.formula.map(f => `<div>${esc(f)}</div>`).join('')}</div>
+      <div class="rule-ex">${r.ex.map(([es, en]) => `<div class="example" data-en="${esc(en)}"><div>${tokenize(es)} <button class="icon speak" data-say="${esc(say(es))}" aria-label="Play">🔊</button></div><div class="muted">${esc(en)}</div></div>`).join('')}</div>
+      ${r.trap ? `<p class="rule-trap"><b>Watch out:</b> ${esc(r.trap)}</p>` : ''}</div>`;
+  }
+  // first exposure: the card, then (on Continue) at least three drills of this pattern in a row, the first two easy one-contrast ones
+  function startPacing(pk, from) {
+    S.rulesSeen[pk] = Date.now(); S.pace[pk] = 2; save();
+    const q = run.queue, id = pid(pk); let n = 0;
+    while (from + n < q.length && q[from + n].id === id && !q[from + n].intro) n++;
+    for (; n < 3; n++) q.splice(from + n, 0, { id, practice: true, paced: true });
+  }
+  function renderRuleStep(pk, from, after) {
+    const p = IDX.patterns[pk];
+    app.innerHTML = progressBar() + `<main class="card rule-step"><div class="label"><span class="badge new">NEW</span> Grammar rule · ${esc(p.name.replace(/\s*\(.*\)\s*$/, ''))}</div>${ruleCardHtml(pk)}</main><footer><button class="btn primary" id="go">Continue</button></footer>`;
+    bindQuit(); bindSpeak(); setBar(run.i / run.queue.length);
+    run.answered = false; run.ruleStep = pk; // (debug surface: __app.entry reports rule: true while the card is up)
+    document.getElementById('go').onclick = step(() => { run.ruleStep = null; startPacing(pk, from); after(); });
+  }
+  function openRule(pk) {
+    closeRule(); closeHint();
+    const m = document.createElement('div'); m.className = 'rule-modal'; m.id = 'ruleModal'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-modal', 'true');
+    m.innerHTML = `<div class="rule-sheet">${ruleCardHtml(pk)}<button class="btn primary" id="ruleClose" type="button">Got it</button></div>`;
+    document.body.appendChild(m);
+    m.querySelectorAll('.speak').forEach(b => b.onclick = e => { e.preventDefault(); e.stopPropagation(); speak(b.dataset.say); });
+    m.onclick = e => { if (e.target === m || e.target.id === 'ruleClose') closeRule(); };
+  }
+  function closeRule() { const m = document.getElementById('ruleModal'); if (m) m.remove(); }
+  document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-rule]'); if (b) { e.preventDefault(); openRule(b.dataset.rule); } });
+  // which wrong option did they give? (an answer button, or a tiles / spoken reply built with that option)
+  function wrongFor(it, given) {
+    const c = x => Check.stripAcc(Check.clean(x)); if (!it.w || !given) return null;
+    for (const o of it.o.slice(1)) {
+      const full = it.q.replace('___', o).replace(/\s*\([^)]*\)\s*$/, ''), parts = full.split(' — ');
+      if (c(o) === c(given) || c(full) === c(given) || (parts.length === 2 && c(parts[1]) === c(given))) return it.w[o] ? [o, it.w[o]] : null;
+    }
+    return null;
+  }
+  function whyHtml(it, pk, ok, given) {
+    if (!it || !it.n) return '';
+    const wr = ok ? null : wrongFor(it, given), hasRule = pk && IDX.patterns[pk] && IDX.patterns[pk].rule;
+    return `<div class="why"><b>Why:</b> ${esc(it.n)}</div>${wr ? `<div class="why-wrong"><b>Not “${esc(wr[0])}”:</b> ${esc(wr[1])}</div>` : ''}${hasRule ? `<button class="rule-link" type="button" data-rule="${esc(pk)}">📘 Rule</button>` : ''}`;
+  }
 
   function renderTheme(entry) {
     const u = C.units[IDX.unitIdx[run.uid]];
@@ -634,6 +699,7 @@
     document.getElementById('go').onclick = step(() => { run.i++; nextCard(); });
   }
   function renderIntro(entry) {
+    if (entry.id.startsWith('p:')) return renderRuleStep(entry.id.slice(2), run.i + 1, () => { run.i++; nextCard(); });
     let body;
     if (entry.id.startsWith('w:')) {
       const w = IDX.words[entry.id.slice(2)]; const ex = (IDX.sentByWord[w.id] || [])[0];
@@ -679,7 +745,8 @@
     else input = `<form id="f" autocomplete="off"><textarea id="ans" class="ans" rows="2" lang="${ex.opts.lang}" placeholder="${esc(ex.placeholder)}" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" enterkeyhint="done"></textarea></form>`;
     const cant = ex.audio ? '<button class="cant-listen" id="cantListen" type="button">🔇 No puedo escuchar ahora <span class="muted">· Can’t listen now</span></button>'
       : ex.kind === 'speak' ? '<button class="cant-listen" id="cantSpeak" type="button">🤐 No puedo hablar ahora <span class="muted">· Can’t speak now</span></button>' : '';
-    const label = `<div class="label">${run.mode === 'test' ? 'Test · ' : ''}${esc(ex.label)}</div>`;
+    const ruleBtn = ex.pk && ruleOk() && IDX.patterns[ex.pk].rule ? `<button class="rule-btn" id="ruleBtn" type="button" data-rule="${esc(ex.pk)}">📘 Rule</button>` : ''; // v9.4
+    const label = `<div class="label${ruleBtn ? ' with-rule' : ''}"><span>${run.mode === 'test' ? 'Test · ' : ''}${esc(ex.label)}</span>${ruleBtn}</div>`;
     const foot = ex.kind === 'mc' ? '' : ex.flip ? '<button class="btn secondary" id="skip" aria-label="Flip the card to see the answer">↻ Flip</button><button class="btn primary" id="check">Check</button>'
       : ex.kind === 'speak' ? '<button class="btn secondary" id="skip">I don\'t know</button>' : '<button class="btn secondary" id="skip">I don\'t know</button><button class="btn primary" id="check">Check</button>';
     app.innerHTML = progressBar() + `<main class="card ex-${ex.kind}${ex.flip ? ' ex-flip' : ''}${hintsOff() ? ' hints-off' : ''}">${newLabel(prompt)}${label}${prompt}${input}${cant}<div id="fb"></div></main><footer>${foot}</footer>`;
@@ -847,6 +914,7 @@
     // only "close" speech is Hard
     const g = result === 'exact' || result === 'accent' || result === 'typo' || result === 'alt' ? 3 : ok ? 2 : 1;
     const isPattern = entry.id.startsWith('p:');
+    if (isPattern && ex.paced && run.mode !== 'placement') S.pace[ex.pk] = Math.max(0, (S.pace[ex.pk] || 0) - 1); // v9.4 pacing
     const graded = run.mode !== 'placement' && !entry.practice && !run.firstDone[entry.id];
     if (run.mode === 'placement') run.results.push({ id: entry.id, ok });
     else {
@@ -872,7 +940,8 @@
     if (rv.es && rv.es !== correctForm) more += `<div class="rv-es"${rv.en ? ` data-en="${esc(rv.en)}"` : ''}>${tokenize(rv.es)} <button class="icon speak" data-say="${esc(ex.speakAfter || rv.es)}">🔊</button></div>`;
     else if (ex.speakAfter || rv.es) more += `<div><button class="icon speak" data-say="${esc(ex.speakAfter || rv.es)}">🔊</button></div>`;
     if (rv.en) more += `<div class="muted">${esc(rv.en)}</div>`;
-    if (rv.note && (!ok || isPattern)) more += `<p class="note">${esc(rv.note)}</p>`;
+    if (isPattern && ex.item) more += whyHtml(ex.item, ex.pk, ok, given); // v9.4: why, right or wrong, + why their pick was wrong
+    else if (rv.note && !ok) more += `<p class="note">${esc(rv.note)}</p>`;
     if (rv.ex && !ok) more += `<div class="example" data-en="${esc(rv.ex.en)}"><div>${tokenize(rv.ex.es)}</div><div class="muted">${esc(rv.ex.en)}</div></div>`;
     fb.innerHTML = `<div class="feedback ${ok ? 'good' : 'miss'}">${head}${more}</div>`;
     bindSpeak();
@@ -1066,6 +1135,7 @@
         if (target && !story['g' + target]) { story['g' + target] = 1; grade(target, ok ? 3 : 1); }
         if (pendingQ.p) pstat(pendingQ.p, ok);
         save();
+        if (pendingQ.n) b.closest('.squestion').insertAdjacentHTML('beforeend', `<div class="sq-why">${whyHtml(pendingQ, pendingQ.p, ok, b.dataset.o)}</div>`); // v9.4
         if (ok) FX.correct([b]); else FX.miss([b]);
         lastStep = performance.now();
         app.querySelector('footer').innerHTML = '<button class="btn primary" id="next">Continue</button>';
@@ -1217,6 +1287,7 @@
       <h3>Weak patterns</h3><ul class="list">${weak}</ul>
       <h3>Units · ${esc(IDX.section.cefr)}</h3><ul class="list">${units}</ul>
       <h3>Parked words</h3><p class="muted small">Not a priority — skipped in lessons, practice, tests and reviews until you reach C2.</p><ul class="list" id="parked">${parked}</ul>
+      <h3>📘 Grammar rules</h3><p class="muted small">Tap one to read its rule card again.</p><ul class="list rules-list">${Object.keys(C.patterns).filter(p => C.patterns[p].rule).map(p => `<li><button class="linklike" type="button" data-rule="${esc(p)}">${esc(C.patterns[p].rule.title)}</button></li>`).join('')}</ul>
       <h3>Grammar patterns</h3><ul class="list">${patterns}</ul>
       <h3>Settings</h3>
       <label class="set">New words per unit intro <span class="muted small">4–5 per unit</span></label>
@@ -1452,10 +1523,10 @@
     const p2 = Rec.lookup(Rec.man, VOICE2_TEST, Rec.man.second); if (p2) out.add(p2);
     return [...out];
   }
-  window.__app = { version: APP_VERSION, get state() { return S; }, get ex() { return run && run.ex; }, get entry() { return run && run.queue[run.i]; }, get run() { return run; }, get story() { return story; },
-    makeExercise: e => makeExercise(e), get content() { return C; }, importBackup: (t) => importBackup(t, true), openStone: (u, i) => openStone(u, i), testQueue: u => testQueue(C.units[IDX.unitIdx[u]]), practiceQueue: u => practiceQueue(C.units[IDX.unitIdx[u]]), dueIds: () => dueIds(Date.now()), currentPos: () => currentPos(),
+  window.__app = { version: APP_VERSION, get state() { return S; }, get ex() { return run && run.ex; }, get entry() { return run && (run.ruleStep ? Object.assign({}, run.queue[run.i], { rule: true }) : run.queue[run.i]); }, get run() { return run; }, get story() { return story; },
+    makeExercise: e => makeExercise(e), nextCard: () => nextCard(), openRule: p => openRule(p), get content() { return C; }, importBackup: (t) => importBackup(t, true), openStone: (u, i) => openStone(u, i), testQueue: u => testQueue(C.units[IDX.unitIdx[u]]), practiceQueue: u => practiceQueue(C.units[IDX.unitIdx[u]]), dueIds: () => dueIds(Date.now()), currentPos: () => currentPos(),
     introQueue: u => introQueue(C.units[IDX.unitIdx[u]]), withTiles: (w, t) => withTiles(w, t), pickStoryTile: u => pickStoryTile(C.units[IDX.unitIdx[u]].story),
-    forceEx: (type, sent) => { if (!run || run.answered) return; const e = run.queue[run.i] = Object.assign({}, run.queue[run.i], { ex: type }, sent ? { sent } : {}); run.ex = makeExercise(e); renderExercise(e, run.ex); },
+    forceEx: (type, sent) => { if (!run || run.answered) return; run.ruleStep = null; const e = run.queue[run.i] = Object.assign({}, run.queue[run.i], { ex: type }, sent ? { sent } : {}); run.ex = makeExercise(e); renderExercise(e, run.ex); },
     speakPaused: () => speakPaused(), speakOk: () => speakOk(), cantSpeak: () => { const b = document.getElementById('cantSpeak'); if (b) b.click(); }, get voice() { return voice; }, get voice2() { return voice2; }, storyVoice: s => { const v = storyVoice(s); return v && { voice: v.voice && v.voice.name, pitch: v.pitch }; }, pickVoice: () => pickVoice(), gloss: w => gloss(w), pickExercise: (id, rev) => pickExercise(IDX.words[id], rev), unblockSpeech: () => unblockSpeech(), get micFails() { return micFails; }, get recActive() { return !!rec; }, get speechBlocked() { return speechBlocked; }, normalize: raw => normalize(raw), keepFooterVisible: () => keepFooterVisible(), speakables: () => speakables(), speak: (t, slow, spk) => speak(t, slow, spk != null ? storyVoice(spk) : null), unitAudio: u => unitAudio(C.units[IDX.unitIdx[u]]), get recorded() { return useRecorded(); }, recStory: s => storyVoice(s) && storyVoice(s).rec, offlineAudio: () => offlineAudio(),
     tick: () => tick(), listenPaused: () => listenPaused(), cantListen: () => { const b = document.getElementById('cantListen'); if (b) b.click(); }, todayMinutes: () => Daily.minutesOn(S.daily, todayKey()), streakNow: () => Daily.current(S.streak, todayKey()) };
   boot();
