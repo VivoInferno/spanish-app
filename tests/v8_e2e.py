@@ -83,7 +83,7 @@ async def main():
         V7 = strip_meta(json.load(open(FIX + 'v7-export.json')))
         ctx = await new_ctx(b, p, V7); page = await ctx.new_page(); page.on('pageerror', lambda e: errors.append(str(e)))
         await page.goto(URL); await page.wait_for_selector('.stone')
-        check(await page.evaluate("__app.version") == 'v9.4', 'app version is v9.4')
+        check(await page.evaluate("__app.version") == 'v9.5', 'app version is v9.5')
         await page.wait_for_timeout(700)
 
         # ---- voice choice ----
@@ -242,10 +242,18 @@ async def main():
                 said = said or await page.query_selector('#ssay .feedback.good') is not None
                 await page.click('#next'); continue
             if await page.query_selector('.squestion .opt') and not await page.query_selector('.squestion .opt.right'):
-                await page.locator('.squestion .opt').first.click()
+                # v9.5: a missed question comes back at the end, so answer it right (or the story never finishes)
+                right = await page.evaluate("(() => { const o = [...document.querySelectorAll('.squestion .opt')].map(b => b.dataset.o); const q = __app.story.u.story.qs.find(x => x.o.length === o.length && x.o.every(v => o.includes(v))); return q && q.o[0]; })()")
+                await page.locator(f'.squestion .opt[data-o="{right}"]').click()
                 if not await page.query_selector('#next'): print('   DEBUG story', (await page.inner_html('main'))[-1500:], await page.inner_html('footer'))
                 await page.click('#next'); continue
             if await page.query_selector('#stile') and await page.query_selector('#skip'):
+                if await page.evaluate("!!(__app.story.tile && __app.story.tile.again)"):  # v9.5: a skipped rebuild comes back; solve it this time
+                    ex = await page.evaluate("({tiles: __app.story.tile.ex.tiles, answers: __app.story.tile.ex.answers})"); used = []
+                    for wt in re.sub(r'[¿?¡!.,;:“”"]', '', ex['answers'][0]).split():
+                        for k, t in enumerate(ex['tiles']):
+                            if k not in used and t == wt: used.append(k); await page.click(f'#tiles .tile[data-k="{k}"]'); break
+                    await page.click('#check'); await page.click('#next'); continue
                 await page.click('#skip'); await page.click('#next'); continue
             if await page.query_selector('#next'): await page.click('#next')
             if await page.query_selector('.stone'): break

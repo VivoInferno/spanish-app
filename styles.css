@@ -246,3 +246,24 @@ textarea.ans:focus{border-color:var(--accent)}
 .rule-sheet .btn{width:100%;margin-top:14px}
 .linklike{font:inherit;background:none;border:0;padding:0;color:var(--accent,#0f766e);text-align:left;cursor:pointer}
 .sq-why{text-align:left}
+/* v9.5 undo snackbar (sits just above the footer buttons, big Undo target) + "Also written" number note */
+.undo-toast{position:fixed;left:50%;transform:translateX(-50%) translateY(16px);bottom:90px;z-index:75;display:flex;align-items:center;gap:12px;
+  width:min(440px,calc(100vw - 24px));box-sizing:border-box;min-height:56px;padding:6px 6px 6px 16px;border-radius:14px;background:#1c1c1e;color:#fff;
+  font-size:15px;box-shadow:0 6px 24px rgba(0,0,0,.25);opacity:0;transition:opacity .18s,transform .18s;pointer-events:none}
+.undo-toast .undo-btn{pointer-events:auto} /* taps on the message fall through to the lesson; only Undo is a target */
+.undo-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.undo-msg{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.undo-btn{flex:0 0 auto;min-width:88px;min-height:44px;border:0;border-radius:10px;background:var(--accent);color:#fff;font-size:16px;font-weight:700;cursor:pointer}
+.recent-head{margin-bottom:4px}#recent-hidden{margin-bottom:12px}
+/* v9.5 voice input: a big 🎤 "Say it" button between "I don't know" and Check (inside the footer, so it never covers it) */
+footer.has-vmic .btn{min-width:0}
+.vmic{flex:0 0 auto;min-width:76px;min-height:52px;padding:4px 12px;border:2px solid var(--accent);border-radius:14px;background:var(--card);color:var(--accent);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:12px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.vmic svg{width:24px;height:24px}
+.vmic.on{background:var(--accent);color:#fff;animation:vpulse 1.2s ease-in-out infinite}
+@keyframes vpulse{0%,100%{box-shadow:0 0 0 0 rgba(0,0,0,.0)}50%{box-shadow:0 0 0 6px rgba(88,86,214,.25)}}
+.vheard{min-height:0;margin:8px 2px 0;line-height:1.4;scroll-margin-bottom:120px}.vheard:empty{display:none}
+.vmiss{text-decoration:line-through;opacity:.7}
+.vlisten{color:var(--accent);font-weight:600}
+footer.has-vmic .btn{padding:14px 10px;font-size:16px;white-space:nowrap}
+#easy{font-size:15px;padding-left:8px;padding-right:8px;white-space:normal;line-height:1.2}

@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const APP_VERSION = 'v9.4'; // keep in sync with CACHE in sw.js (espanol-v9-4)
+  const APP_VERSION = 'v9.5'; // keep in sync with CACHE in sw.js (espanol-v9-5)
   const KEY = 'spanish-app-state-v1'; // unchanged since v1 — never rename
   const DAY = SRS.DAY;
   const STONES = [
@@ -43,6 +43,8 @@
     // v8 (schema 5): speakPauseUntil ("Can't speak now", 0 = on) and settings.voice ('' = automatic best Spanish voice).
     // Both are optional additions; items, path, daily, streak, parked and every other field pass through untouched.
     s.speakPauseUntil = +raw.speakPauseUntil || 0;
+    // v9.5: hidden = recently hidden words, newest first [{id, kind:'park'|'easy', at, word?, prev}] for Undo / Unhide. Optional; schema stays 5.
+    s.hidden = Array.isArray(raw.hidden) ? raw.hidden.filter(h => h && typeof h.id === 'string' && (h.kind === 'park' || h.kind === 'easy')).slice(0, 30) : [];
     if (typeof s.settings.voice !== 'string') s.settings.voice = '';
     // v8.1: settings.voice2 = second story voice ('' = automatic, Paulina first). Optional; schema stays 5.
     if (typeof s.settings.voice2 !== 'string') s.settings.voice2 = '';
@@ -451,7 +453,7 @@
       if (kind === 'pspeak' && (!t || !speakOk())) kind = t ? 'ptiles' : 'mc';
       if (kind === 'ptiles' && t) {
         const have = new Set(tileTokens(t.es).map(strip)); // distractors come from the wrong options: different pronouns / forms, never accent-only twins
-        const ds = shuffle([...new Set(it.o.slice(1).flatMap(tileTokens).filter(x => !have.has(strip(x))))]).slice(0, 2);
+        const ds = shuffle(noTwins([...new Set(it.o.slice(1).flatMap(tileTokens).filter(x => !have.has(strip(x))))], tileTokens(t.es), true)).slice(0, 2);
         return Object.assign({ kind: 'build', label: name + ' · build it', pk: p, item: it, tiles: shuffle(tileTokens(t.es).concat(ds)), answers: [t.es], opts: { lang: 'es' }, reveal, speakAfter, pattern: true },
           t.ctxEs ? { bigEs: t.ctxEs, hintEn: 'Reply: ' + t.en } : { big: t.en });
       }
@@ -515,7 +517,7 @@
   // ---------- v8 word picker: one word, three big stacked choices; distractors from this section's vocabulary ----------
   function pickExercise(w, reverse) {
     const core = x => strip(x.es.replace(/^(el|la|los|las) /, ''));
-    const pool = IDX.sectionWords.map(id => IDX.words[id]).filter(x => x.id !== w.id && !S.parked[x.id] && core(x) !== core(w) && x.en !== w.en);
+    const pool = IDX.sectionWords.map(id => IDX.words[id]).filter(x => x.id !== w.id && !S.parked[x.id] && core(x) !== core(w) && x.en !== w.en && !genderTwin(core(x), core(w)));
     // prefer the same unit, then the same kind of word (noun with article vs. verb / adjective) so the choice is not given away
     const kind = x => /^(el|la|los|las) /.test(x.es) ? 'n' : /(ar|er|ir|se)$/.test(x.es) ? 'v' : 'o';
     const rank = x => (x.unit === w.unit ? 0 : 2) + (kind(x) === kind(w) ? 0 : 1) + Math.random() * 1.5;
@@ -529,10 +531,15 @@
 
   // ---------- tile-order drills (word bank with 2 distractors) ----------
   const tileTokens = text => text.replace(/[¿?¡!.,;:“”"]/g, '').split(/\s+/).filter(Boolean);
+  // v9.5: a decoy must change the meaning, never just the gender / number (la for lo, lista for listo, abogada for abogado)
+  const gKey = x => { const c = Check.agreeKey(Check.clean(x)); return strip(c).replace(/(os|as|o|a)$/, ''); };
+  const genderTwin = (a, b) => strip(a) !== strip(b) && gKey(a) === gKey(b);
+  const agreeTwin = (a, b) => strip(a) !== strip(b) && strip(Check.agreeKey(Check.clean(a))) === strip(Check.agreeKey(Check.clean(b)));
+  const noTwins = (decoys, tokens, strict) => decoys.filter(d => !tokens.some(t => (strict ? agreeTwin : genderTwin)(d, t)));
   function tileExercise(target, lang, otherTexts, extra) {
     const tokens = tileTokens(target), lower = new Set(tokens.map(strip)); // v9.3: accent-insensitive, so no está/esta twins
     const others = shuffle(otherTexts).slice(0, 4).flatMap(tileTokens);
-    const distract = shuffle([...new Set(others.filter(t => t.length > 2 && !lower.has(strip(t))))]).slice(0, 2);
+    const distract = shuffle(noTwins([...new Set(others.filter(t => t.length > 2 && !lower.has(strip(t))))], lang === 'es' ? tokens : [])).slice(0, 2);
     return Object.assign({ kind: 'build', tiles: shuffle(tokens.concat(distract)), answers: [target], opts: { lang } }, extra);
   }
   const TILE_SHARE = 0.25; // about 1 in 4 word items with a short example sentence becomes a tile drill
@@ -593,7 +600,16 @@
     };
     tiles.onclick = e => { const t = e.target.closest('.tile'); if (!t || isLocked() || ex.order.includes(+t.dataset.k)) return; ex.order.push(+t.dataset.k); sync(+t.dataset.k, true); };
     line.onclick = e => { const t = e.target.closest('.tile'); if (!t || isLocked() || !ex.order.includes(+t.dataset.k)) return; ex.order = ex.order.filter(k => k !== +t.dataset.k); sync(+t.dataset.k, false); };
-    return () => { if (!ex.order.length) return null; const v = ex.order.map(k => ex.tiles[k]).join(' '); return { v, ok: (r => r === 'exact' || r === 'accent')(Check.check(v, ex.answers, { lang: ex.opts.lang, typo: false }).result) }; };
+    const read = () => { if (!ex.order.length) return null; const v = ex.order.map(k => ex.tiles[k]).join(' '); const res = Check.check(v, ex.answers, { lang: ex.opts.lang, typo: false }).result; return { v, res, ok: res === 'exact' || res === 'accent' || res === 'agree' }; }; // v9.5: agreement slips count
+    // v9.5 voice build: clear the answer, then glide the matched tiles in one after another (same FLIP glide as a tap)
+    let placeT = [];
+    read.place = ks => {
+      placeT.forEach(clearTimeout); placeT = [];
+      if (isLocked()) return;
+      [...ex.order].reverse().forEach(k => { ex.order = ex.order.filter(j => j !== k); sync(k, false); });
+      ks.forEach((k, n) => placeT.push(setTimeout(() => { if (isLocked() || ex.order.includes(k)) return; ex.order.push(k); sync(k, true); }, 60 + n * 90)));
+    };
+    return read;
   }
   const tilesHtml = ex => `<div class="answer-line" id="line"></div><div class="tiles" id="tiles">${ex.tiles.map((t, k) => `<button class="tile" data-k="${k}"${ex.opts.lang === 'es' ? ` data-lp="${esc(t)}"` : ''}>${esc(t)}</button>`).join('')}</div>`;
 
@@ -607,7 +623,41 @@
   let run = null;
   // words new to the learner (no card yet, or seen only once) get the purple "new" highlight in prompts during this run
   function newIdsFor(queue) { const ids = new Set(); queue.forEach(e => { if (e.id && e.id.startsWith('w:')) { const c = S.items[e.id]; if (!c || ((c.reps || 0) < 2 && !c.known)) ids.add(e.id.slice(2)); } }); return ids; }
-  function startRun(queue, mode, meta) { sessionStart(); run = Object.assign({ queue, i: 0, mode, results: [], firstDone: {}, score: 0, total: 0, misses: [] }, meta || {}); run.newIds = mode === 'placement' ? new Set() : newIdsFor(queue); nextCard(); }
+  // v9.5: a session is a fixed set of N drills. A miss never adds drills: the same item goes to the back of the line (fresh
+  // shuffle) and the session ends once every drill has been answered right once. The bar = drills right / N. The v9.4 rule-card
+  // pacing (3 drills of a new pattern in a row) is planned here, when the session is built, so it is part of N from the start.
+  const isDrill = e => !!(e && e.id && !e.theme && !e.intro);
+  let keySeq = 0;
+  function planRun(queue, mode) {
+    if (mode !== 'placement' && mode !== 'test') {
+      const seen = new Set();
+      for (let k = 0; k < queue.length; k++) {
+        const e = queue[k]; if (!isDrill(e) || !e.id.startsWith('p:')) continue;
+        const pk = e.id.slice(2); if (seen.has(pk)) continue; seen.add(pk);
+        if (S.rulesSeen[pk] || !IDX.patterns[pk] || !IDX.patterns[pk].rule) continue;
+        let n = 0; while (k + n < queue.length && queue[k + n].id === e.id && !queue[k + n].intro) n++;
+        for (; n < 3; n++) queue.splice(k + n, 0, { id: e.id, practice: true, paced: true });
+      }
+    }
+    queue.forEach(e => { if (isDrill(e) && !e.key) e.key = ++keySeq; });
+    return queue;
+  }
+  function runCounts() {
+    if (!run) return { done: 0, n: 0 };
+    const keys = new Set(); let done = 0;
+    run.queue.forEach(e => { if (!isDrill(e)) return; if (!e.key) e.key = ++keySeq; if (keys.has(e.key)) return;
+      if (run.done.has(e.key) || run.mode === 'placement' || !isParked(e.id)) { keys.add(e.key); if (run.done.has(e.key)) done++; } });
+    return { done, n: keys.size };
+  }
+  const runFrac = () => { const c = runCounts(); return c.n ? c.done / c.n : 0; };
+  // the missed drill goes to the back: same item (same word / same grammar sentence), new shuffle, practice only for SRS
+  function cycleBack(entry, ex) {
+    const copy = Object.assign({}, entry, { retry: (entry.retry || 0) + 1, practice: true });
+    delete copy.ok;
+    if (ex && ex.item && entry.id.startsWith('p:')) { const ix = IDX.patterns[entry.id.slice(2)].items.indexOf(ex.item); if (ix >= 0) copy.itemIdx = ix; }
+    run.queue.push(copy);
+  }
+  function startRun(queue, mode, meta) { sessionStart(); run = Object.assign({ queue: planRun(queue, mode), i: 0, mode, results: [], firstDone: {}, score: 0, total: 0, misses: [], done: new Set() }, meta || {}); run.newIds = mode === 'placement' ? new Set() : newIdsFor(queue); nextCard(); }
   function nextCard() {
     while (run.i < run.queue.length && run.queue[run.i].id && run.queue[run.i].id.startsWith('w:') && isParked(run.queue[run.i].id) && run.mode !== 'placement') run.i++;
     if (run.i >= run.queue.length) return finishRun();
@@ -626,7 +676,7 @@
     const { uid, stone } = run; setStone(uid, stone, true); S.lastStudy = Date.now(); save(); run = null;
     renderHome({ justDone: { uid, stone } });
   }
-  function progressBar() { const pct = run.barPct || 0; return `<div class="topbar"><button class="icon" id="quit" aria-label="Close">✕</button><div class="bar"><span style="width:${pct}%"></span></div>${lpHtml()}<span class="count">${Math.min(run.i + 1, run.queue.length)}/${run.queue.length}</span></div>`; }
+  function progressBar() { const pct = run.barPct || 0, rc = runCounts(); return `<div class="topbar"><button class="icon" id="quit" aria-label="Close">✕</button><div class="bar"><span style="width:${pct}%"></span></div>${lpHtml()}<span class="count" title="Drills right / drills in this session">${rc.done}/${rc.n}</span></div>`; }
   function setBar(frac) {
     const pct = Math.max(0, Math.min(100, 100 * frac)); if (run) run.barPct = pct;
     const el = app.querySelector('.bar span'); if (!el) return; void el.offsetWidth; el.style.width = pct + '%';
@@ -653,7 +703,7 @@
   function renderRuleStep(pk, from, after) {
     const p = IDX.patterns[pk];
     app.innerHTML = progressBar() + `<main class="card rule-step"><div class="label"><span class="badge new">NEW</span> Grammar rule · ${esc(p.name.replace(/\s*\(.*\)\s*$/, ''))}</div>${ruleCardHtml(pk)}</main><footer><button class="btn primary" id="go">Continue</button></footer>`;
-    bindQuit(); bindSpeak(); setBar(run.i / run.queue.length);
+    bindQuit(); bindSpeak(); setBar(runFrac());
     run.answered = false; run.ruleStep = pk; // (debug surface: __app.entry reports rule: true while the card is up)
     document.getElementById('go').onclick = step(() => { run.ruleStep = null; startPacing(pk, from); after(); });
   }
@@ -695,7 +745,7 @@
       <h3>Grammar focus</h3><ul class="list">${u.focus.map(p => `<li>${esc(C.patterns[p].name)}</li>`).join('')}</ul>
       <p class="muted small">Tip: press and hold any word to mark it “Not a priority”.</p></main>
       <footer><button class="btn primary" id="go">Start</button></footer>`;
-    bindQuit(); setBar(run.i / run.queue.length);
+    bindQuit(); setBar(runFrac());
     document.getElementById('go').onclick = step(() => { run.i++; nextCard(); });
   }
   function renderIntro(entry) {
@@ -713,12 +763,14 @@
       body = `<div class="label"><span class="badge new">NEW</span> Grammar pattern</div><div class="title">${esc(p.name)}</div><p>${esc(p.explain)}</p>`;
     }
     app.innerHTML = progressBar() + `<main class="card">${body}</main><footer><button class="btn primary" id="go">Continue</button></footer>`;
-    bindQuit(); bindSpeak(); setBar(run.i / run.queue.length);
+    bindQuit(); bindSpeak(); setBar(runFrac());
     if (entry.id.startsWith('w:')) autoSpeak(IDX.words[entry.id.slice(2)].es);
     const known = document.getElementById('known');
     if (known) known.onclick = () => {
-      S.items[entry.id] = SRS.markKnown(S.items[entry.id], Date.now(), 120); save();
-      run.queue = run.queue.filter((e, k) => k <= run.i || e.id !== entry.id); run.i++; nextCard();
+      const prev = S.items[entry.id], removed = run.queue.filter((e, k) => k > run.i && e.id === entry.id);
+      S.items[entry.id] = SRS.markKnown(S.items[entry.id], Date.now(), 120);
+      run.queue = run.queue.filter((e, k) => k <= run.i || e.id !== entry.id); run.i++;
+      hideEasy(entry.id, prev, removed); nextCard();
     };
     document.getElementById('go').onclick = step(() => { run.i++; nextCard(); });
   }
@@ -747,10 +799,11 @@
       : ex.kind === 'speak' ? '<button class="cant-listen" id="cantSpeak" type="button">🤐 No puedo hablar ahora <span class="muted">· Can’t speak now</span></button>' : '';
     const ruleBtn = ex.pk && ruleOk() && IDX.patterns[ex.pk].rule ? `<button class="rule-btn" id="ruleBtn" type="button" data-rule="${esc(ex.pk)}">📘 Rule</button>` : ''; // v9.4
     const label = `<div class="label${ruleBtn ? ' with-rule' : ''}"><span>${run.mode === 'test' ? 'Test · ' : ''}${esc(ex.label)}</span>${ruleBtn}</div>`;
-    const foot = ex.kind === 'mc' ? '' : ex.flip ? '<button class="btn secondary" id="skip" aria-label="Flip the card to see the answer">↻ Flip</button><button class="btn primary" id="check">Check</button>'
-      : ex.kind === 'speak' ? '<button class="btn secondary" id="skip">I don\'t know</button>' : '<button class="btn secondary" id="skip">I don\'t know</button><button class="btn primary" id="check">Check</button>';
-    app.innerHTML = progressBar() + `<main class="card ex-${ex.kind}${ex.flip ? ' ex-flip' : ''}${hintsOff() ? ' hints-off' : ''}">${newLabel(prompt)}${label}${prompt}${input}${cant}<div id="fb"></div></main><footer>${foot}</footer>`;
-    bindQuit(); bindSpeak(); setBar(run.i / run.queue.length);
+    const vm = ex.kind === 'mc' || ex.kind === 'speak' ? '' : vmicHtml(); // v9.5: say it instead of typing / tapping tiles
+    const foot = ex.kind === 'mc' ? '' : ex.flip ? `<button class="btn secondary" id="skip" aria-label="Flip the card to see the answer">↻ Flip</button>${vm}<button class="btn primary" id="check">Check</button>`
+      : ex.kind === 'speak' ? '<button class="btn secondary" id="skip">I don\'t know</button>' : `<button class="btn secondary" id="skip">I don\'t know</button>${vm}<button class="btn primary" id="check">Check</button>`;
+    app.innerHTML = progressBar() + `<main class="card ex-${ex.kind}${ex.flip ? ' ex-flip' : ''}${hintsOff() ? ' hints-off' : ''}">${newLabel(prompt)}${label}${prompt}${input}${vm ? '<div class="vheard muted small" id="vheard" aria-live="polite"></div>' : ''}${cant}<div id="fb"></div></main><footer${vm ? ' class="has-vmic"' : ''}>${foot}</footer>`;
+    bindQuit(); bindSpeak(); setBar(runFrac());
     if (ex.audio) document.getElementById('cantListen').onclick = e => cantListen(entry, e.currentTarget);
     if (ex.listen) {
       document.getElementById('play').onclick = () => speak(ex.listen);
@@ -771,9 +824,10 @@
     if (ex.kind === 'build') {
       const read = mountTiles(ex, () => run.answered);
       if (ex.bigEs) autoSpeak(ex.bigEs);
-      const doCheck = () => { const r = read(); if (!r) return; answer(entry, ex, r.ok ? 'exact' : 'wrong', r.v); };
+      voiceTiles(ex, read, () => run.answered);
+      const doCheck = () => { stopRec(); const r = read(); if (!r) return; answer(entry, ex, r.ok ? (r.res === 'agree' ? 'agree' : 'exact') : 'wrong', r.v); };
       document.getElementById('check').onclick = () => run.answered ? advance() : doCheck();
-      document.getElementById('skip').onclick = () => { if (!run.answered) answer(entry, ex, 'wrong', ''); };
+      document.getElementById('skip').onclick = () => { if (!run.answered) { stopRec(); answer(entry, ex, 'wrong', ''); } };
       return;
     }
     if (ex.kind === 'speak') {
@@ -790,11 +844,13 @@
     }
     const inp = document.getElementById('ans'); setTimeout(() => inp.focus(), 50);
     mountAnswerBox(inp, () => { if (run.answered) return advance(); doCheck(); });
-    const doCheck = () => { const v = inp.value.replace(/[\r\n]+/g, ' '); if (!v.trim()) return; const r = ex.alts ? Check.checkAlt(v, ex.answers, ex.opts, ex.alts) : Check.check(v, ex.answers, ex.opts); ex.matched = r.result === 'alt' ? null : r.answer; ex.res = r; answer(entry, ex, r.result, v); };
+    voiceType(inp, ex.opts.lang, () => run.answered);
+    const doCheck = () => { stopRec(); const v = inp.value.replace(/[\r\n]+/g, ' '); if (!v.trim()) return; const r = ex.alts ? Check.checkAlt(v, ex.answers, ex.opts, ex.alts) : Check.check(v, ex.answers, ex.opts); ex.matched = r.result === 'alt' ? null : r.answer; ex.res = r; answer(entry, ex, r.result, v); };
     document.getElementById('f').onsubmit = e => { e.preventDefault(); if (run.answered) return advance(); doCheck(); };
     document.getElementById('check').onclick = () => run.answered ? advance() : doCheck();
     document.getElementById('skip').onclick = () => {
       if (run.answered) return;
+      stopRec();
       if (ex.flip) { flipCard(true); ex.flipped = true; } // turning the card over shows the answer: graded as a miss
       answer(entry, ex, 'wrong', '');
     };
@@ -842,6 +898,7 @@
   function stopRec() {
     clearRecTimers();
     if (rec) { const r = rec; rec = null; r.onresult = r.onerror = r.onend = r.onnomatch = r.onspeechend = r.onaudiostart = null; try { r.abort(); } catch (e) { /* ignore */ } }
+    document.querySelectorAll('.vmic.on').forEach(b => { b.classList.remove('on'); b.setAttribute('aria-pressed', 'false'); const l = b.querySelector('.vmic-label'); if (l) l.textContent = 'Say it'; });
     document.querySelectorAll('.mic.on').forEach(b => { b.classList.remove('on'); b.setAttribute('aria-pressed', 'false'); const l = b.querySelector('.mic-label'); if (l) l.textContent = 'Tap to speak'; });
   }
   function releaseAudio() { // free the audio session before the mic takes it (pause + drop the clip, cancel device speech)
@@ -907,21 +964,111 @@
   }
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && rec) stopRec(); });
 
+  // ---------- v9.5 voice input: say the answer instead of typing it or tapping tiles ----------
+  // A 🎤 "Say it" button next to Check on every typed-answer card (dictation, flip, translate) and tile builder, in every
+  // lesson type including the unit test. Typed cards fill the box live (interim results) and stay editable; tile builders
+  // map the words onto the bank in spoken order. Nothing is ever submitted: he still taps Check. Same v9.1 hardening as
+  // repeat-after-me (release audio, try/catch start, 8 s idle / 12 s cap watchdog, 1.5 s after a stop tap); a refused or
+  // missing recogniser hides the button with a short note, and the 🤐 pause hides it too (speakOk()).
+  const MIC_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-2.1A7 7 0 0 0 19 12z" fill="currentColor"/></svg>';
+  const vmicHtml = () => speakOk() ? `<button class="vmic" id="vmic" type="button" aria-label="Say it instead of typing" aria-pressed="false">${MIC_SVG}<span class="vmic-label">Say it</span></button>` : '';
+  function mountVoice(lang, h) {
+    const btn = document.getElementById('vmic'); if (!btn) return;
+    const note = html => { const n = document.getElementById('vheard'); if (n) n.innerHTML = html || ''; };
+    const setOn = on => { btn.classList.toggle('on', on); btn.setAttribute('aria-pressed', on ? 'true' : 'false'); const l = btn.querySelector('.vmic-label'); if (l) l.textContent = on ? 'Stop' : 'Say it'; };
+    const AGAIN = 'I didn’t hear anything. Tap 🎤 and try again, or type it.';
+    const off = why => { // refused / unavailable / hung twice: no more voice input this session, but the card keeps working
+      blockSpeech(); stopRec(); document.querySelectorAll('.vmic').forEach(b => b.remove());
+      document.querySelectorAll('footer.has-vmic').forEach(f => f.classList.remove('has-vmic'));
+      note(why === 'not-allowed' || why === 'service-not-allowed' ? 'Mic not allowed, so type it instead.' : 'Voice input isn’t available right now, so type it instead.');
+    };
+    btn.onclick = e => {
+      e.preventDefault();
+      if (h.locked()) return;
+      if (rec) { // tap to stop: use what was heard; if iOS never answers the stop, finish anyway
+        const r = rec; try { r.stop(); } catch (err) { stopRec(); return h.text ? h.done(h.text) : note(AGAIN); }
+        recT.push(setTimeout(() => { if (rec === r) { stopRec(); if (h.text) h.done(h.text); else note(AGAIN); } }, micTimes()[2]));
+        return;
+      }
+      const Ctor = Speech.ctor(window);
+      if (!Ctor) return off('unavailable');
+      releaseAudio();
+      let r; try { r = new Ctor(); } catch (err) { return off('unavailable'); }
+      rec = r; h.text = ''; let delivered = false;
+      try { r.lang = lang === 'en' ? 'en-US' : 'es-MX'; r.interimResults = true; r.maxAlternatives = 1; r.continuous = false; } catch (err) { /* optional */ }
+      const live = () => rec === r;
+      let last = performance.now();
+      const deliver = () => { if (delivered) return; delivered = true; if (h.text) h.done(h.text); else note(AGAIN); };
+      r.onresult = ev => {
+        if (!live()) return; last = performance.now();
+        let txt = '', fin = true;
+        try { for (let k = 0; k < ev.results.length; k++) { txt += (k ? ' ' : '') + ev.results[k][0].transcript; if (ev.results[k].isFinal === false) fin = false; } } catch (err) { return; }
+        h.text = txt.replace(/\s+/g, ' ').trim(); micFails = 0;
+        if (h.interim) h.interim(h.text);
+        if (fin) { stopRec(); setOn(false); deliver(); }
+      };
+      r.onnomatch = () => { if (!live()) return; stopRec(); setOn(false); deliver(); };
+      r.onerror = ev => {
+        if (!live()) return;
+        const err = ev && ev.error; stopRec(); setOn(false);
+        if (Speech.isBlocking(err)) return off(err);
+        if (err === 'aborted') return;
+        if (h.text) return deliver();
+        note(err === 'no-speech' ? AGAIN : 'Something went wrong with the mic. Tap 🎤 to try again, or type it.');
+      };
+      r.onend = () => { if (!live()) return; stopRec(); setOn(false); deliver(); };
+      const failed = () => { if (!live()) return; stopRec(); setOn(false); micFails++; if (h.text) return deliver(); if (micFails >= 2) return off('timeout'); note('The mic didn’t respond. Tap 🎤 to try again, or type it.'); };
+      try { r.start(); } catch (err) { rec = null; micFails++; return micFails >= 2 ? off('start-failed') : note('The mic didn’t start. Tap 🎤 to try again, or type it.'); }
+      setOn(true); note('<span class="vlisten">Listening… say the sentence, then tap Stop or just pause</span>');
+      ['onaudiostart', 'onsoundstart', 'onspeechstart'].forEach(k => { try { r[k] = () => { last = performance.now(); }; } catch (err) { /* ignore */ } });
+      const [tIdle, tCap] = micTimes();
+      const idle = () => { if (!live()) return; if (performance.now() - last >= tIdle - 50) return failed(); recT.push(setTimeout(idle, tIdle - (performance.now() - last))); };
+      recT.push(setTimeout(idle, tIdle), setTimeout(failed, tCap));
+    };
+  }
+  function voiceType(inp, lang, locked) { // the words appear in the box as he speaks; he can edit them before Check
+    if (!document.getElementById('vmic')) return;
+    let base = '', lastVoice = '';
+    const put = t => { inp.value = oneLine(base + t); growBox(inp); };
+    // a second try replaces the first one (unless he edited it); text he typed himself stays and the speech is added after it
+    const start = () => { if (h.started) return; h.started = true; const v = inp.value.trim(); base = v && v !== lastVoice ? v + ' ' : ''; };
+    const h = { locked, text: '',
+      interim: t => { start(); put(t); },
+      done: t => { start(); put(t); lastVoice = inp.value.trim(); h.started = false; const n = document.getElementById('vheard'); if (n) n.innerHTML = 'Edit it if needed, then tap <b>Check</b>.'; } };
+    document.getElementById('vmic').addEventListener('pointerdown', () => { h.started = false; }, true);
+    mountVoice(lang, h);
+  }
+  function voiceTiles(ex, read, locked) { // the heard words go onto the matching tiles in spoken order; the rest is left to tap
+    if (!document.getElementById('vmic')) return;
+    const show = (m, final) => {
+      const n = document.getElementById('vheard'); if (!n) return;
+      setTimeout(() => { if (n.isConnected && n.innerHTML) n.scrollIntoView({ block: 'nearest' }); }, final ? 450 : 0);
+      n.innerHTML = m.words.length ? `Heard: “${m.words.map(x => x.ok ? esc(x.w) : `<span class="vmiss" title="No tile for this word">${esc(x.w)}</span>`).join(' ')}”${final && m.unmatched.length ? ' · tap tiles to fix the rest' : ''}` : '';
+    };
+    const h = { locked, text: '',
+      interim: t => show(Speech.mapToTiles(t, ex.tiles, ex.opts.lang), false),
+      done: t => { const m = Speech.mapToTiles(t, ex.tiles, ex.opts.lang); ex.voiceHeard = t; show(m, true); read.place(m.order); } };
+    mountVoice(ex.opts.lang, h);
+  }
+
   function answer(entry, ex, result, given) {
     run.answered = true; lastStep = performance.now();
+    closeUndo(); // v9.5: the next answer retires the Undo snackbar (Progress → Recently hidden still has it)
     const ok = result !== 'wrong';
     // a one-letter slip, a real synonym (v8 'alt') and (v9.3) any accent / ñ / ü difference count as a normal correct answer;
     // only "close" speech is Hard
-    const g = result === 'exact' || result === 'accent' || result === 'typo' || result === 'alt' ? 3 : ok ? 2 : 1;
+    const g = result === 'exact' || result === 'accent' || result === 'typo' || result === 'alt' || result === 'agree' ? 3 : ok ? 2 : 1;
     const isPattern = entry.id.startsWith('p:');
     if (isPattern && ex.paced && run.mode !== 'placement') S.pace[ex.pk] = Math.max(0, (S.pace[ex.pk] || 0) - 1); // v9.4 pacing
     const graded = run.mode !== 'placement' && !entry.practice && !run.firstDone[entry.id];
+    if (!entry.key) entry.key = ++keySeq;
+    if (ok || run.mode === 'placement') run.done.add(entry.key);
     if (run.mode === 'placement') run.results.push({ id: entry.id, ok });
     else {
       if (graded) { run.firstDone[entry.id] = true; run.prev = S.items[entry.id] ? Object.assign({}, S.items[entry.id]) : undefined; grade(entry.id, g); }
       if (isPattern) pstat(entry.id.slice(2), ok);
-      if (run.mode === 'test') { run.total++; if (ok) run.score++; else run.misses.push(ex.kind === 'mc' ? ex.reveal.es : (ex.reveal.es || ex.answers[0])); entry.ok = ok; }
-      else if (!ok) requeueAfterMiss(entry);
+      if (run.mode === 'test' && !entry.retry) { run.total++; if (ok) run.score++; else run.misses.push(ex.kind === 'mc' ? ex.reveal.es : (ex.reveal.es || ex.answers[0])); entry.ok = ok; } // first attempts only
+      if (!ok) cycleBack(entry, ex); // v9.5: no extra drills, the same one comes back at the end
       save();
     }
     const fb = document.getElementById('fb');
@@ -930,9 +1077,10 @@
     const cf = ansEs ? tokenize(correctForm) : esc(correctForm);
     const head = result === 'alt' ? `<div class="ok">✓ Correct</div><p class="alt-note"><span aria-hidden="true">ℹ️</span> ${esc((ex.res.note || '').replace(/^Correct! /, ''))}${strip(ex.res.answer) !== strip(given) ? ` <span class="muted">Course word: <b>${esc(ex.res.answer)}</b></span>` : ''}</p>`
       : result === 'close' ? `<div class="ok warn">✓ Close. Full line: <b>${esc(ex.answers[0])}</b>${ex.heard ? `<div class="muted small">Heard: “${esc(ex.heard)}”</div>` : ''}</div>`
-      : result === 'exact' ? '<div class="ok">✓ Correct</div>'
-      : result === 'accent' ? `<div class="ok">✓ Correct</div><div class="muted small spelled">Spelled: ${cf}</div>`
-      : result === 'typo' ? `<div class="ok typo">✓ Correct, watch the spelling: <b class="fixed">${Check.markFixes(correctForm, ex.res)}</b></div>`
+      : result === 'exact' ? `<div class="ok">✓ Correct</div>${alsoWritten(ex, correctForm, given)}`
+      : result === 'accent' ? `<div class="ok">✓ Correct</div><div class="muted small spelled">Spelled: ${cf}</div>${alsoWritten(ex, correctForm, given)}`
+      : result === 'agree' ? `<div class="ok">✓ Correct</div><div class="muted small spelled natural">Natural: ${cf}</div>${alsoWritten(ex, correctForm, given)}`
+      : result === 'typo' ? `<div class="ok typo">✓ Correct, watch the spelling: <b class="fixed">${Check.markFixes(correctForm, ex.res)}</b></div>${alsoWritten(ex, correctForm, given)}`
       : ex.flipped ? `<div class="bad">↻ Flipped: <b>${cf}</b></div>`
       : `<div class="bad">✗ ${ex.kind === 'mc' ? 'Answer' : 'Correct answer'}: <b>${cf}</b>${ex.kind === 'speak' && ex.heard ? `<div class="muted small">Heard: “${esc(ex.heard)}”</div>` : ''}</div>`;
     const rv = ex.reveal || {};
@@ -946,7 +1094,7 @@
     fb.innerHTML = `<div class="feedback ${ok ? 'good' : 'miss'}">${head}${more}</div>`;
     bindSpeak();
     const inp = document.getElementById('ans'); if (inp) inp.readOnly = true;
-    setBar((run.i + 1) / run.queue.length);
+    setBar(runFrac()); { const c = document.querySelector('.topbar .count'), rc = runCounts(); if (c) c.textContent = `${rc.done}/${rc.n}`; }
     const chosen = ex.kind === 'mc' ? app.querySelector(ok ? '.opt.right' : '.opt.wrong') : ex.kind === 'build' ? document.getElementById('line') : ex.kind === 'speak' ? document.getElementById('mic') : inp;
     if (ex.flip) flipCard(true); // the card turns over after Check too, so the Spanish is on the card
     if (ex.kind === 'speak') { const m = document.getElementById('mic'); if (m) m.disabled = true; }
@@ -960,27 +1108,15 @@
     const ov = document.getElementById('override');
     if (ov) ov.onclick = () => {
       if (graded) { if (run.prev) S.items[entry.id] = run.prev; else delete S.items[entry.id]; grade(entry.id, 3); }
-      if (run.mode === 'test' && !entry.ok) { run.score++; entry.ok = true; run.misses.pop(); }
-      run.queue = run.queue.filter((e, k) => k <= run.i || !(e.id === entry.id && e.fromMiss)); save(); advance();
+      if (run.mode === 'test' && !entry.retry && !entry.ok) { run.score++; entry.ok = true; run.misses.pop(); }
+      run.done.add(entry.key); run.queue = run.queue.filter((e, k) => k <= run.i || !(e.key === entry.key && e.retry)); save(); advance(); // v9.5: drop its retry
     };
     const ez = document.getElementById('easy');
-    if (ez) ez.onclick = () => { S.items[entry.id] = SRS.markKnown(S.items[entry.id], Date.now(), 120); save(); advance(); };
-    if (ok && (result === 'exact' || result === 'accent') && S.settings.autoAdvance && run.mode !== 'placement') run.timer = setTimeout(advance, 900);
+    if (ez) ez.onclick = () => { if (performance.now() - lastStep < guardMs()) return; const prev = S.items[entry.id]; S.items[entry.id] = SRS.markKnown(S.items[entry.id], Date.now(), 120); hideEasy(entry.id, prev, []); advance(); };
+    if (ok && (result === 'exact' || result === 'accent' || result === 'agree') && S.settings.autoAdvance && run.mode !== 'placement') run.timer = setTimeout(advance, ex.res && ex.res.numbers ? 1800 : 900);
     else setTimeout(() => document.getElementById('next') && document.getElementById('next').focus(), 30);
   }
   function advance() { if (!run || !stepOk()) return; clearTimeout(run.timer); stopRec(); closeHint(); run.i++; nextCard(); }
-  function requeueAfterMiss(entry) {
-    const q = run.queue, at = run.i;
-    if (entry.id.startsWith('p:')) {
-      if (q.filter((e, k) => k > at && e.id === entry.id && e.fromMiss).length >= 2) return;
-      q.splice(Math.min(q.length, at + 3), 0, { id: entry.id, practice: true, fromMiss: true });
-      q.splice(Math.min(q.length, at + 7), 0, { id: entry.id, practice: true, fromMiss: true });
-    } else {
-      if (q.some((e, k) => k > at && e.id === entry.id && e.fromMiss)) return;
-      q.splice(Math.min(q.length, at + 4), 0, { id: entry.id, practice: true, fromMiss: true, ex: entry.ex === 'en2es' ? 'es2en' : 'en2es' });
-    }
-  }
-
   // ---------- stone builders ----------
   function introQueue(u) {
     const q = [{ theme: true, id: '' }];
@@ -1086,35 +1222,41 @@
   function mountStoryTile() {
     const st = story.u.story, line = st.lines[story.tile.after];
     const ex = story.tile.ex = story.tile.ex || tileExercise(line.es, 'es', st.lines.filter(l => l !== line).map(l => l.es), { label: 'Rebuild the line in Spanish', big: line.en });
-    const box = document.getElementById('stile'); box.innerHTML = `<div class="label">${esc(ex.label)}</div><div class="prompt en-prompt">${esc(ex.big)}</div>${tilesHtml(ex)}<div id="fb"></div>`;
+    const vm = vmicHtml();
+    const box = document.getElementById('stile'); box.innerHTML = `<div class="label">${esc(ex.label)}</div><div class="prompt en-prompt">${esc(ex.big)}</div>${tilesHtml(ex)}${vm ? '<div class="vheard muted small" id="vheard" aria-live="polite"></div>' : ''}<div id="fb"></div>`;
     const read = mountTiles(ex, () => story.tile.checked);
     setTimeout(() => box.scrollIntoView({ block: 'end', behavior: S.settings.anim === false ? 'auto' : 'smooth' }), 60); // bring the word bank into view
-    const foot = app.querySelector('footer'); foot.innerHTML = '<button class="btn secondary" id="skip">Skip</button><button class="btn primary" id="check">Check</button>';
+    const foot = app.querySelector('footer'); foot.innerHTML = `<button class="btn secondary" id="skip">Skip</button>${vm}<button class="btn primary" id="check">Check</button>`;
+    foot.classList.toggle('has-vmic', !!vm); voiceTiles(ex, read, () => story.tile.checked);
     const finish = () => { story.tile.done = true; storyNext(); };
     const grade = (r) => {
       story.tile.checked = true; lastStep = performance.now();
-      const ok = r && r.ok;
+      const ok = r && r.ok; story.tile.retry = !ok; // v9.5: a missed rebuild comes back at the end
       document.getElementById('fb').innerHTML = `<div class="feedback ${ok ? 'good' : 'miss'}">${ok ? '<div class="ok">✓ Correct</div>' : `<div class="bad">✗ Correct answer: <b>${esc(line.es)}</b></div>`}</div>`;
       if (ok) FX.correct([document.getElementById('line')]); else FX.miss([document.getElementById('line')]);
       if (ok) autoSpeak(line.es, storyVoice(line.s));
       document.getElementById('fb').scrollIntoView({ block: 'nearest' });
       foot.innerHTML = '<button class="btn primary" id="next">Continue</button>'; document.getElementById('next').onclick = step(finish);
     };
-    document.getElementById('check').onclick = step(() => { if (story.tile.checked) return; const r = read(); if (r) grade(r); });
-    document.getElementById('skip').onclick = step(() => { if (!story.tile.checked) grade(null); });
+    document.getElementById('check').onclick = step(() => { if (story.tile.checked) return; stopRec(); const r = read(); if (r) grade(r); });
+    document.getElementById('skip').onclick = step(() => { if (!story.tile.checked) { stopRec(); grade(null); } });
   }
   function renderStory(speakLast) {
     document.querySelectorAll(".tile-ghost").forEach(n => n.remove());
     const { u } = story, st = u.story, lines = st.lines.slice(0, story.shown);
-    const pendingQ = st.qs.find(q => q.after === story.shown - 1 && story.answered[st.qs.indexOf(q)] == null); // == null: a wrong answer (false) is answered too
-    const tileDue = !pendingQ && story.tile && !story.tile.done && story.tile.after === story.shown - 1;
+    // v9.5: a missed question comes back after the last line (fresh shuffle) until it's answered right; no extra questions
+    const atEnd = story.shown >= st.lines.length, missQ = story.missQ || [];
+    const firstQ = st.qs.find(q => q.after === story.shown - 1 && story.answered[st.qs.indexOf(q)] == null); // == null: not tried yet
+    const retryQi = !firstQ && atEnd && missQ.length ? missQ[0] : null;
+    const pendingQ = firstQ || (retryQi != null ? st.qs[retryQi] : null);
+    const tileDue = !pendingQ && story.tile && !story.tile.done && (story.tile.after === story.shown - 1 || (story.tile.again && atEnd));
     const sayDue = !pendingQ && !tileDue && story.say && !story.say.done && story.say.after === story.shown - 1 && speakOk();
-    const done = story.shown >= st.lines.length && !pendingQ && !tileDue && !sayDue;
-    const frac = (story.shown + Object.keys(story.answered).length + (story.tile && story.tile.done ? 1 : 0)) / (st.lines.length + st.qs.length + (story.tile ? 1 : 0));
+    const done = story.shown >= st.lines.length && !pendingQ && !tileDue && !sayDue && !(story.tile && story.tile.retry);
+    const frac = (story.shown + Object.values(story.answered).filter(Boolean).length + (story.tile && story.tile.done && !story.tile.retry ? 1 : 0)) / (st.lines.length + st.qs.length + (story.tile ? 1 : 0));
     app.innerHTML = `<div class="topbar"><button class="icon" id="quit" aria-label="Close">✕</button><div class="bar"><span style="width:${story.bar || 0}%"></span></div>${lpHtml()}<button class="icon small-btn" id="en" aria-pressed="${story.showEn}">EN</button></div>
       <main class="card story ${story.entered ? 'no-enter' : ''}"><div class="label">Story · ${esc(u.title)}</div><h1>${esc(st.title)}</h1>
       ${lines.map((l, k) => `<div class="sline ${k === lines.length - 1 ? 'fresh' : ''} ${tileDue && k === story.tile.after ? 'veil' : ''}" data-k="${k}">${l.s ? `<div class="speaker">${esc(l.s)}</div>` : ''}<div class="ses" data-en="${esc(l.en)}"><button class="icon speak" data-say="${esc(l.es)}" data-spk="${esc(l.s || '')}">🔊</button> <span>${tokenize(l.es)}</span></div><div class="sen muted ${story.showEn ? '' : 'hidden'}">${esc(l.en)}</div></div>`).join('')}
-      ${pendingQ ? `<div class="squestion"><div class="prompt">${esc(pendingQ.q)}</div><div class="options">${shuffle(pendingQ.o).map(o => `<button class="opt" data-o="${esc(o)}">${esc(o)}</button>`).join('')}</div><div id="fb"></div></div>` : ''}
+      ${pendingQ ? `<div class="squestion${retryQi != null ? ' sq-retry' : ''}">${retryQi != null ? '<div class="label">Try this one again</div>' : ''}<div class="prompt">${esc(pendingQ.q)}</div><div class="options">${shuffle(pendingQ.o).map(o => `<button class="opt" data-o="${esc(o)}">${esc(o)}</button>`).join('')}</div><div id="fb"></div></div>` : ''}
       ${tileDue ? '<div class="squestion stile" id="stile"></div>' : ''}
       ${sayDue ? '<div class="squestion ssay" id="ssay"></div>' : ''}
       </main><footer>${pendingQ || tileDue || sayDue ? '' : `<button class="btn primary" id="next">${done ? 'Finish story' : 'Continue'}</button>`}</footer>`;
@@ -1126,14 +1268,16 @@
     if (speakLast && lines.length) autoSpeak(lines[lines.length - 1].es, storyVoice(lines[lines.length - 1].s));
     if (pendingQ) {
       const qi = st.qs.indexOf(pendingQ);
+      const isRetry = retryQi != null; let taken = false;
       app.querySelectorAll('.squestion .opt').forEach(b => b.onclick = () => {
-        if (story.answered[qi] != null) return;
+        if (taken || (!isRetry && story.answered[qi] != null)) return; taken = true;
         const ok = b.dataset.o === pendingQ.o[0]; story.answered[qi] = ok;
+        story.missQ = (story.missQ || []).filter(x => x !== qi); if (!ok) story.missQ.push(qi); // to the back of the line
         app.querySelectorAll('.squestion .opt').forEach(x => { if (x.dataset.o === pendingQ.o[0]) x.classList.add('right'); });
         if (!ok) b.classList.add('wrong');
         const target = pendingQ.p ? pid(pendingQ.p) : pendingQ.k && !S.parked[pendingQ.k] && S.items[wid(pendingQ.k)] ? wid(pendingQ.k) : null;
         if (target && !story['g' + target]) { story['g' + target] = 1; grade(target, ok ? 3 : 1); }
-        if (pendingQ.p) pstat(pendingQ.p, ok);
+        if (pendingQ.p && !isRetry) pstat(pendingQ.p, ok); // stats and SRS count the first try only
         save();
         if (pendingQ.n) b.closest('.squestion').insertAdjacentHTML('beforeend', `<div class="sq-why">${whyHtml(pendingQ, pendingQ.p, ok, b.dataset.o)}</div>`); // v9.4
         if (ok) FX.correct([b]); else FX.miss([b]);
@@ -1149,7 +1293,9 @@
     const st = story.u.story;
     const pendingQ = st.qs.find(q => q.after === story.shown - 1 && story.answered[st.qs.indexOf(q)] == null);
     if (pendingQ) return renderStory(false);
-    if (story.tile && !story.tile.done && story.tile.after === story.shown - 1) return renderStory(false);
+    if (story.tile && !story.tile.done && (story.tile.after === story.shown - 1 || (story.tile.again && story.shown >= st.lines.length))) return renderStory(false);
+    if (story.shown >= st.lines.length && story.missQ && story.missQ.length) return renderStory(false); // v9.5 retries before finishing
+    if (story.shown >= st.lines.length && story.tile && story.tile.retry) { story.tile = { after: story.tile.after, done: false, again: true }; return renderStory(false); }
     if (story.say && !story.say.done && story.say.after === story.shown - 1 && speakOk()) return renderStory(false);
     if (story.shown >= st.lines.length) { sessionDone(); const uid = story.u.id; setStone(uid, 1, true); save(); story = null; return renderHome({ justDone: { uid, stone: 1 } }); }
     story.shown++; renderStory(true);
@@ -1265,6 +1411,7 @@
     if (opts.justDone) { const el = app.querySelector('.stone.just-done'); FX.stone(el); }
     T.shownDay = todayKey(); celebrateGoal();
   }
+  function agoText(t) { const m = Math.round((Date.now() - t) / 60000); return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`; }
   function toast(msg) { let t = document.getElementById('toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; t.className = 'toast'; document.body.appendChild(t); } t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 1800); }
 
   // ---------- progress ----------
@@ -1281,12 +1428,14 @@
     }).join('');
     const weak = st.weak.map(w => `<li><span>${esc(C.patterns[w.p].name)}</span><span class="muted">${w.acc != null ? Math.round(w.acc * 100) + '%' : ''}</span></li>`).join('') || '<li class="muted">None right now</li>';
     const parked = Object.keys(S.parked).filter(w => IDX.words[w] || (w.startsWith('g:') && !S.parked[w].applied)).map(w => { const i = wordInfo(w); return `<li><span>${IDX.words[w] ? wordSpan(w, i.es) : `<span class="w" data-lp="${esc(i.es)}">${esc(i.es)}</span>`} <span class="muted">· ${esc(i.en)}</span></span><button class="btn secondary slim unpark" data-id="${esc(w)}">Unpark</button></li>`; }).join('') || '<li class="muted">None. Press and hold any word to park it.</li>';
+    const rh = (S.hidden || []).filter(stillHidden).slice(0, 8); // v9.5 Recently hidden, newest first
+    const recent = rh.map((h, k) => `<li><span>${h.id.startsWith('p:') ? esc(hiddenLabel(h.id)) : IDX.words[h.id.replace(/^w:/, '')] ? wordSpan(h.id.replace(/^w:/, ''), hiddenLabel(h.id)) : `<span class="w" data-lp="${esc(hiddenLabel(h.id))}">${esc(hiddenLabel(h.id))}</span>`} <span class="muted small">· ${h.kind === 'park' ? 'not a priority' : 'hidden for months'} · ${agoText(h.at)}</span></span><button class="btn secondary slim unhide" data-k="${k}">Unhide</button></li>`);
     app.innerHTML = `<div class="topbar"><button class="icon" id="back" aria-label="Back">←</button><div class="title">Progress</div></div>
       <main class="card">
       <div class="today"><div><b>${st.words}</b><span>words learned</span></div><div><b>${st.mastered}</b><span>long-term</span></div><div><b>${st.due}</b><span>due today</span></div></div>
       <h3>Weak patterns</h3><ul class="list">${weak}</ul>
       <h3>Units · ${esc(IDX.section.cefr)}</h3><ul class="list">${units}</ul>
-      <h3>Parked words</h3><p class="muted small">Not a priority — skipped in lessons, practice, tests and reviews until you reach C2.</p><ul class="list" id="parked">${parked}</ul>
+      <h3>Parked words</h3>${recent.length ? `<p class="muted small recent-head"><b>Recently hidden</b> · newest first, one tap brings it back</p><ul class="list" id="recent-hidden">${recent.join('')}</ul>` : ''}<p class="muted small">Not a priority — skipped in lessons, practice, tests and reviews until you reach C2.</p><ul class="list" id="parked">${parked}</ul>
       <h3>📘 Grammar rules</h3><p class="muted small">Tap one to read its rule card again.</p><ul class="list rules-list">${Object.keys(C.patterns).filter(p => C.patterns[p].rule).map(p => `<li><button class="linklike" type="button" data-rule="${esc(p)}">${esc(C.patterns[p].rule.title)}</button></li>`).join('')}</ul>
       <h3>Grammar patterns</h3><ul class="list">${patterns}</ul>
       <h3>Settings</h3>
@@ -1307,6 +1456,7 @@
     bindSpeak(); bindVoiceSettings();
     document.getElementById('back').onclick = () => renderHome();
     app.querySelectorAll('.unpark').forEach(b => b.onclick = () => { unpark(b.dataset.id); renderProgress(); });
+    app.querySelectorAll('.unhide').forEach(b => b.onclick = () => { const h = rh[+b.dataset.k]; if (h) { undoHide(h); renderProgress(); toast(`${hiddenLabel(h.id)} is back in rotation`); } });
     document.getElementById('rate').onchange = e => { S.settings.rate = +e.target.value; save(); speak(RATE_TEST); };
     document.getElementById('snd').onchange = e => { S.settings.sound = e.target.checked; save(); if (e.target.checked) FX.sounds.correct(); };
     document.getElementById('anim').onchange = e => { S.settings.anim = e.target.checked; save(); FX.applyClasses(); };
@@ -1373,16 +1523,87 @@
   }
   function bindSpeak() { app.querySelectorAll('.speak').forEach(b => b.onclick = e => { e.preventDefault(); speak(b.dataset.say, false, b.dataset.spk != null ? storyVoice(b.dataset.spk) : null); }); }
 
+  // v9.5: Undo after hiding a word (Not a priority, Too easy · hide for months, I already know this). A snackbar with a big
+  // Undo button sits just above the footer buttons (never over them) for 7 s; Undo restores the word's SRS state, its parked
+  // entry (g:<word> too) and any cards the hide took out of the current lesson. Progress keeps a "Recently hidden" list.
+  let lastHide = null;
+  const UNDO_MS = 7000;
+  function hiddenLabel(id) { if (id.startsWith('p:')) { const p = C.patterns[id.slice(2)]; return p ? p.name : id.slice(2); } const k = id.startsWith('w:') ? id.slice(2) : id; return wordInfo(k).es || k; }
+  function logHide(rec) { S.hidden = [rec].concat((S.hidden || []).filter(h => !(h.id === rec.id && h.kind === rec.kind))).slice(0, 30); save(); }
+  function hideEasy(id, prev, removed) {
+    const rec = { id, kind: 'easy', at: S.items[id].last, prev: prev ? Object.assign({}, prev) : null };
+    logHide(rec); lastHide = { rec, run, removed: removed || [] };
+    undoToast(`${hiddenLabel(id)} hidden for months`, () => undoHide(rec));
+  }
+  function hidePark(key, word, removed) {
+    const rec = { id: key, kind: 'park', at: S.parked[key].at, word: word || undefined, prev: S.items[wid(key)] ? Object.assign({}, S.items[wid(key)]) : null };
+    logHide(rec); lastHide = { rec, run, removed: removed || [] };
+  }
+  function stillHidden(h) {
+    if (h.kind === 'park') return !!S.parked[h.id] && !S.parked[h.id].applied;
+    const it = S.items[h.id]; return !!(it && it.known && it.last === h.at);
+  }
+  // restore exactly what was there before the hide; if the card was reviewed since, just make it due now
+  function undoHide(rec) {
+    if (rec.kind === 'park') {
+      delete S.parked[rec.id];
+      const iid = wid(rec.id); if (rec.prev) S.items[iid] = Object.assign({}, rec.prev);
+    } else if (stillHidden(rec)) { if (rec.prev) S.items[rec.id] = Object.assign({}, rec.prev); else delete S.items[rec.id]; }
+    else if (S.items[rec.id]) { S.items[rec.id].due = Date.now(); delete S.items[rec.id].known; }
+    S.hidden = (S.hidden || []).filter(h => !(h.id === rec.id && h.kind === rec.kind));
+    if (lastHide && lastHide.rec === rec && lastHide.run && lastHide.run === run && lastHide.removed.length) {
+      run.queue.splice(run.i + 1, 0, ...lastHide.removed.map(e => Object.assign({}, e)));
+    }
+    if (lastHide && lastHide.rec === rec) lastHide = null;
+    save();
+  }
+  function refreshAfterHide() {
+    if (app.querySelector('#parked')) renderProgress();
+    else if (!run && !story) renderHome();
+    else if (story) renderStory(false);
+    else if (run && run.queue[run.i] && run.queue[run.i].theme) renderTheme(run.queue[run.i]);
+  }
+  function undoToast(msg, onUndo) {
+    closeUndo();
+    const t = document.createElement('div'); t.id = 'undo-toast'; t.className = 'undo-toast'; t.setAttribute('role', 'status');
+    t.innerHTML = `<span class="undo-msg"></span><button class="undo-btn" type="button">Undo</button>`;
+    t.querySelector('.undo-msg').textContent = msg;
+    document.body.appendChild(t); placeUndo(t);
+    t.querySelector('.undo-btn').onclick = e => { e.stopPropagation(); closeUndo(); onUndo(); refreshAfterHide(); toast('Restored'); };
+    requestAnimationFrame(() => t.classList.add('show'));
+    t._h = setTimeout(closeUndo, UNDO_MS);
+  }
+  // keep the snackbar just above whatever footer is on screen (the footer re-renders between cards)
+  function placeUndo(t) {
+    t = t || document.getElementById('undo-toast'); if (!t) return;
+    const f = app.querySelector('footer'), r = f && f.getBoundingClientRect(), vh = window.innerHeight;
+    const above = r && r.height && r.top < vh ? vh - r.top : 0;
+    t.style.bottom = above ? `${Math.round(above + 10)}px` : 'calc(env(safe-area-inset-bottom, 0px) + 16px)';
+  }
+  function closeUndo() { const t = document.getElementById('undo-toast'); if (t) { clearTimeout(t._h); t.remove(); } }
+  if (typeof MutationObserver !== 'undefined') new MutationObserver(() => placeUndo()).observe(app, { childList: true, subtree: true });
+  window.addEventListener('resize', () => placeUndo());
+  // v9.5 "Also written: 150": the answer wrote the number another way (digits vs words) and both count
+  function alsoWritten(ex, correctForm, given) {
+    if (!ex.res || !ex.res.numbers) return '';
+    const g = Check.stripAcc(String(given || '').toLowerCase());
+    const spans = Check.numberSpans(correctForm).filter(sp => !g.includes(Check.stripAcc(sp.toLowerCase())));
+    return spans.length ? `<div class="muted small spelled also-written">Also written: ${esc(spans.join(', '))}</div>` : '';
+  }
+
   // ---------- parking ("Not a priority") via long-press ----------
   function park(w) {
     S.parked[w] = { at: Date.now() }; save();
+    const removed = [];
     if (run && run.mode !== 'placement') {
       const curId = run.queue[run.i] && run.queue[run.i].id;
+      run.queue.forEach((e, k) => { if (k > run.i && e.id === wid(w)) removed.push(e); });
       run.queue = run.queue.filter((e, k) => k <= run.i || e.id !== wid(w));
-      if (curId === wid(w) && !run.answered) { run.i++; nextCard(); }
+      if (curId === wid(w) && !run.answered) { removed.unshift(Object.assign({}, run.queue[run.i])); hidePark(w, null, removed); run.i++; nextCard(); return; }
     }
+    hidePark(w, null, removed);
   }
-  function unpark(w) { delete S.parked[w]; save(); }
+  function unpark(w) { delete S.parked[w]; S.hidden = (S.hidden || []).filter(h => !(h.kind === 'park' && h.id === w)); save(); }
   const lp = { timer: null, fired: false, x: 0, y: 0 };
   // v9.2: a word that isn't a course word yet is parked as 'g:<word>' (same parked list; if a later unit teaches it, it starts parked)
   function wordInfo(id, word) {
@@ -1394,9 +1615,11 @@
     closeWordMenu();
     const w = wordInfo(id, word); if (!w || !w.es) return;
     const parked = !!S.parked[id];
+    const easyRec = !parked && (S.hidden || []).find(h => h.kind === 'easy' && h.id === wid(id) && stillHidden(h)); // v9.5
     const m = document.createElement('div'); m.className = 'wmenu-backdrop';
     m.innerHTML = `<div class="wmenu" role="menu"><div class="wmenu-word">${esc(w.es)}</div><div class="muted small">${esc(w.en)}</div>
-      <button class="btn ${parked ? 'secondary' : 'primary'}" id="wm-act">${parked ? 'Unpark (bring back)' : 'Not a priority'}</button>
+      ${easyRec ? '<button class="btn primary" id="wm-unhide">Unhide (was hidden for months)</button>' : ''}
+      <button class="btn ${parked || easyRec ? 'secondary' : 'primary'}" id="wm-act">${parked ? 'Unhide (bring back)' : 'Not a priority'}</button>
       ${parked ? '' : w.loose ? '<div class="muted small">Not a course word yet. If a later unit teaches it, it starts out parked.</div>' : '<div class="muted small">Skips this word in lessons, practice, tests and reviews until C2.</div>'}
       <button class="btn secondary" id="wm-cancel">Cancel</button></div>`;
     document.body.appendChild(m);
@@ -1405,14 +1628,14 @@
     box.style.top = Math.max(10, Math.min(window.innerHeight - r.height - 10, y + 16)) + 'px';
     m.addEventListener('click', e => { if (e.target === m) closeWordMenu(); });
     m.querySelector('#wm-cancel').onclick = closeWordMenu;
+    if (easyRec) m.querySelector('#wm-unhide').onclick = () => { closeWordMenu(); undoHide(easyRec); refreshAfterHide(); setTimeout(() => toast(`${w.es} is back in rotation`), 30); };
     m.querySelector('#wm-act').onclick = () => {
       closeWordMenu();
-      if (parked) unpark(id); else if (w.loose) { S.parked[id] = { at: Date.now(), word: w.es }; save(); } else park(id);
-      if (app.querySelector('#parked')) renderProgress();
-      else if (!run && !story) renderHome();
-      else if (story) renderStory(false);
-      else if (run && run.queue[run.i] && run.queue[run.i].theme) renderTheme(run.queue[run.i]);
-      setTimeout(() => toast(parked ? `${w.es} is back in rotation` : w.loose ? `${w.es} marked not a priority` : `${w.es} parked until C2`), 30);
+      if (parked) unpark(id); else if (w.loose) { S.parked[id] = { at: Date.now(), word: w.es }; save(); hidePark(id, w.es, []); } else park(id);
+      const rec = !parked && lastHide && lastHide.rec;
+      refreshAfterHide();
+      setTimeout(() => parked ? toast(`${w.es} is back in rotation`)
+        : undoToast(w.loose ? `${w.es} marked not a priority` : `${w.es} parked until C2`, () => rec && undoHide(rec)), 30);
     };
   }
   function closeWordMenu() { document.querySelectorAll('.wmenu-backdrop').forEach(n => n.remove()); }
@@ -1523,7 +1746,7 @@
     const p2 = Rec.lookup(Rec.man, VOICE2_TEST, Rec.man.second); if (p2) out.add(p2);
     return [...out];
   }
-  window.__app = { version: APP_VERSION, get state() { return S; }, get ex() { return run && run.ex; }, get entry() { return run && (run.ruleStep ? Object.assign({}, run.queue[run.i], { rule: true }) : run.queue[run.i]); }, get run() { return run; }, get story() { return story; },
+  window.__app = { version: APP_VERSION, counts: () => runCounts(), openWordMenu: (id, x, y, word) => openWordMenu(id, x, y, word), get state() { return S; }, get ex() { return run && run.ex; }, get entry() { return run && (run.ruleStep ? Object.assign({}, run.queue[run.i], { rule: true }) : run.queue[run.i]); }, get run() { return run; }, get story() { return story; },
     makeExercise: e => makeExercise(e), nextCard: () => nextCard(), openRule: p => openRule(p), get content() { return C; }, importBackup: (t) => importBackup(t, true), openStone: (u, i) => openStone(u, i), testQueue: u => testQueue(C.units[IDX.unitIdx[u]]), practiceQueue: u => practiceQueue(C.units[IDX.unitIdx[u]]), dueIds: () => dueIds(Date.now()), currentPos: () => currentPos(),
     introQueue: u => introQueue(C.units[IDX.unitIdx[u]]), withTiles: (w, t) => withTiles(w, t), pickStoryTile: u => pickStoryTile(C.units[IDX.unitIdx[u]].story),
     forceEx: (type, sent) => { if (!run || run.answered) return; run.ruleStep = null; const e = run.queue[run.i] = Object.assign({}, run.queue[run.i], { ex: type }, sent ? { sent } : {}); run.ex = makeExercise(e); renderExercise(e, run.ex); },

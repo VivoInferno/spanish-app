@@ -46,8 +46,8 @@ async def main():
         pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto(URL); await pg.wait_for_selector('.stone'); await pg.wait_for_timeout(500)
         s = await pg.evaluate("__app.state")
-        check(await pg.evaluate("__app.version") == 'v9.4' and s['items'] == V91['items'] and s['path'] == V91['path'] and s['daily'] == V91['daily'] and s['streak'] == V91['streak'] and s['settings']['voiceMode'] == 'recorded',
-              'v9.1 data → v9.4 losslessly')
+        check(await pg.evaluate("__app.version") == 'v9.5' and s['items'] == V91['items'] and s['path'] == V91['path'] and s['daily'] == V91['daily'] and s['streak'] == V91['streak'] and s['settings']['voiceMode'] == 'recorded',
+              'v9.1 data → v9.5 losslessly')
         LONG = await pg.evaluate("__app.content.units.flatMap(u => u.sentences).sort((a, b) => b.es.length - a.es.length)[0]")
         print('   longest sentence:', LONG['es'])
 
@@ -132,7 +132,7 @@ async def main():
         if ENGINE == 'webkit': await pg.screenshot(path=f'{OUT}/v92-longpress.png')
         await pg.click('#wm-act'); await pg.wait_for_timeout(150)
         keys = await pg.evaluate("Object.keys(__app.state.parked).filter(k => k.startsWith('g:'))")
-        toast = await pg.evaluate("(document.getElementById('toast') || {}).textContent || ''")
+        toast = await pg.evaluate("(document.getElementById('undo-toast') || document.getElementById('toast') || {}).textContent || ''")  # v9.5: Undo snackbar
         check(len(keys) == 1 and 'not a priority' in toast, f'Not a priority saves it as {keys} ({toast})')
         await fresh(pg, LONG['k'], 'build', LONG); await pg.wait_for_selector('#tiles .tile[data-lp]')
         await long_press(pg, pg.locator('#tiles .tile').first)

@@ -11,15 +11,15 @@
      "o": [
       "se los enviaré",
       "le los enviaré",
-      "se lo enviaré",
+      "me los enviaré",
       "los se enviaré"
      ],
      "en": "Are you going to send the documents to the notary? — Yes, I'll send them to him tomorrow.",
      "n": "Se los enviaré: le (to the notary) became se because los follows it. Los = los documentos.",
      "w": {
       "le los enviaré": "Le lo / le la never happen: le turns into se before lo, la, los or las.",
-      "se lo enviaré": "Lo is one thing; los documentos is plural, so los.",
-      "los se enviaré": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las)."
+      "los se enviaré": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
+      "me los enviaré": "Me los enviaré would mean they go to you (me); they go to the notary, so le → se."
      },
      "easy": true
     },
@@ -28,15 +28,15 @@
      "o": [
       "se la daré",
       "le la daré",
-      "se lo daré",
+      "me la daré",
       "la le daré"
      ],
      "en": "Who's going to give the key to the lady? — I'll give it to her when I get there.",
      "n": "Se la daré: le (to the lady) became se because la follows it. La = la llave.",
      "w": {
       "le la daré": "Le lo / le la never happen: le turns into se before lo, la, los or las.",
-      "se lo daré": "Lo would be a masculine thing; la llave is feminine, so la.",
-      "la le daré": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las)."
+      "la le daré": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
+      "me la daré": "Me la daré would mean you give it to yourself; the key goes to the señora, so le → se."
      },
      "easy": true
     },
@@ -61,15 +61,15 @@
      "o": [
       "nos las traerán",
       "se las traerán",
-      "nos los traerán",
+      "te las traerán",
       "las nos traerán"
      ],
      "en": "Will they bring us the invoices today? — Yes, they'll bring them to us this afternoon.",
      "n": "Nos las traerán: nos (to us) + las (las facturas). Only le/les turn into se.",
      "w": {
       "se las traerán": "Nos never changes to se; only le and les do.",
-      "nos los traerán": "Las facturas is feminine plural, so las.",
-      "las nos traerán": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las)."
+      "las nos traerán": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
+      "te las traerán": "Te las traerán means they’ll bring them to you (one friend); the question is about us, so nos."
      }
     },
     {
@@ -77,15 +77,15 @@
      "o": [
       "se lo explicaré",
       "les lo explicaré",
-      "se la explicaré",
+      "te lo explicaré",
       "lo les explicaré"
      ],
      "en": "Are you going to explain the problem to your clients? — Yes, I'll explain it to them in the meeting.",
      "n": "Se lo explicaré: les (to your clients) became se because lo follows it. Lo = el problema.",
      "w": {
       "les lo explicaré": "Les lo never happens: les turns into se before lo.",
-      "se la explicaré": "El problema is masculine (even though it ends in -a), so lo.",
-      "lo les explicaré": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las)."
+      "lo les explicaré": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
+      "te lo explicaré": "Te lo explicaré is “I’ll explain it to you” (a friend); it’s for your clients, so les → se."
      },
      "easy": true
     },
@@ -93,16 +93,16 @@
      "q": "¿Me mandarás la ubicación? — Sí, ___ en cuanto salga.",
      "o": [
       "te la mandaré",
-      "te lo mandaré",
+      "me la mandaré",
       "se la mandaré",
       "la te mandaré"
      ],
      "en": "Will you send me the location? — Yes, I'll send it to you as soon as I leave.",
      "n": "Te la mandaré: te (to you, a friend) + la (la ubicación).",
      "w": {
-      "te lo mandaré": "La ubicación is feminine, so la.",
       "se la mandaré": "He asked with me (to me), so the answer is te (to you), not se.",
-      "la te mandaré": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las)."
+      "la te mandaré": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
+      "me la mandaré": "Me la mandaré means you send it to yourself; they asked for it, so te (to you)."
      }
     },
     {
@@ -110,15 +110,15 @@
      "o": [
       "te lo mando",
       "se lo mando",
-      "te la mando",
+      "me lo mando",
       "me lo mandas"
      ],
      "en": "Will you send me the contract? — Yes, I'll send it to you today.",
      "n": "Te lo mando: a friend asks with me, you answer with te. Lo = el contrato.",
      "w": {
       "se lo mando": "Se lo is for a client (usted) or him/her. A friend who says ¿me mandas? gets te lo.",
-      "te la mando": "El contrato is masculine, so lo.",
-      "me lo mandas": "That means 'you send it to me', the opposite of what you're promising."
+      "me lo mandas": "That means 'you send it to me', the opposite of what you're promising.",
+      "me lo mando": "Me lo mando means you send it to yourself; the other person asked, so te lo."
      }
     },
     {
@@ -126,15 +126,15 @@
      "o": [
       "se las voy a dar",
       "le las voy a dar",
-      "se los voy a dar",
-      "se la voy a dar"
+      "me las voy a dar",
+      "te las voy a dar"
      ],
      "en": "Are you going to give the keys to the buyer? — Yes, I'm going to give them to him at the signing.",
      "n": "Se las voy a dar: le (to the buyer) became se because las follows it. Las = las llaves.",
      "w": {
       "le las voy a dar": "Le lo / le la never happen: le turns into se before lo, la, los or las.",
-      "se los voy a dar": "Las llaves is feminine plural, so las.",
-      "se la voy a dar": "Las llaves is plural, so las, not la."
+      "me las voy a dar": "Me las voy a dar would mean you give them to yourself; they go to the buyer, so le → se.",
+      "te las voy a dar": "Te las voy a dar is “to you”; the keys go to the buyer, so le → se."
      },
      "easy": true
     }
@@ -173,15 +173,15 @@
      "o": [
       "se la pagué",
       "le la pagué",
-      "se lo pagué",
+      "me la pagó",
       "la le pagué"
      ],
      "en": "Did you already pay the landlord the rent? — Yes, I already paid it to him.",
      "n": "Se la pagué: le (to the owner) became se because la follows it. La = la renta.",
      "w": {
       "le la pagué": "Le lo / le la never happen: le turns into se before lo, la, los or las.",
-      "se lo pagué": "La renta is feminine, so la.",
-      "la le pagué": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las)."
+      "la le pagué": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
+      "me la pagó": "Me la pagó means he paid it to you; you’re the one who paid the owner: se la pagué."
      },
      "easy": true
     },
@@ -189,16 +189,16 @@
      "q": "¿Quién te dio esas flores? — Mi hermana ___.",
      "o": [
       "me las dio",
-      "me los dio",
+      "te las dio",
       "se las dio",
       "las me dio"
      ],
      "en": "Who gave you those flowers? — My sister gave them to me.",
      "n": "Me las dio: me (to me) + las (las flores). Me doesn't change.",
      "w": {
-      "me los dio": "Las flores is feminine plural, so las.",
       "se las dio": "Se las would mean she gave them to someone else; the flowers were given to you, so me.",
-      "las me dio": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las)."
+      "las me dio": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
+      "te las dio": "Te las dio means she gave them to the other person; you’re answering about yourself, so me."
      }
     },
     {
@@ -206,15 +206,15 @@
      "o": [
       "se los devolví",
       "le los devolví",
-      "se las devolví",
+      "me los devolvió",
       "los le devolví"
      ],
      "en": "Did you return the books to the library? — No, I haven't returned them yet.",
      "n": "Se los devolví: le (to the library) became se because los follows it. Los = los libros.",
      "w": {
       "le los devolví": "Le lo / le la never happen: le turns into se before lo, la, los or las.",
-      "se las devolví": "Los libros is masculine plural, so los.",
-      "los le devolví": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las)."
+      "los le devolví": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
+      "me los devolvió": "Me los devolvió means someone returned them to you; you’re the one returning them to the library: se los devolví."
      },
      "easy": true
     },
@@ -238,16 +238,16 @@
      "q": "¿Te explicaron las reglas? — Sí, ___ ayer.",
      "o": [
       "me las explicaron",
-      "me los explicaron",
+      "te las explicaron",
       "se las explicaron",
       "las me explicaron"
      ],
      "en": "Did they explain the rules to you? — Yes, they explained them to me yesterday.",
      "n": "Me las explicaron: me (to me) + las (las reglas).",
      "w": {
-      "me los explicaron": "Las reglas is feminine plural, so las.",
       "se las explicaron": "They explained them to you, so me, not se.",
-      "las me explicaron": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las)."
+      "las me explicaron": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
+      "te las explicaron": "Te las explicaron means they explained them to the other person; you’re talking about yourself, so me."
      }
     },
     {
@@ -270,7 +270,7 @@
    ],
    "rule": {
     "title": "Two pronouns in the past (se la pagué)",
-    "rule": "Exactly the same rule in the past: 'to whom' + 'what' go before the verb, and le/les become se in front of lo/la/los/las. Pick lo/la/los/las to match the thing: la renta → la, los papeles → los.",
+    "rule": "Exactly the same rule in the past: 'to whom' + 'what' go before the verb, and le/les become se in front of lo/la/los/las. The part that changes the meaning is who receives it: se la pagué (to him / her) vs me la pagó (to me).",
     "formula": [
      "le + la → se la pagué",
      "me/te/nos + lo/la/los/las stay as they are: me las dio"
@@ -289,7 +289,7 @@
       "Who gave you the plans? — The architect gave them to me."
      ]
     ],
-    "trap": "Lo/la/los/las follow the thing, not the person: las fotos → se las, even if the client is a man."
+    "trap": "Me / te / se tell you who got it, so listen for that: me las dio = she gave them to me, se las dio = she gave them to him / her. Lo vs la is a detail; nobody will misunderstand you."
    }
   },
   "clitic_imperative": {
@@ -301,15 +301,15 @@
      "o": [
       "Mándamelo",
       "Mándalome",
-      "Mándamela",
+      "Mándaselo",
       "Mándamele"
      ],
      "en": "I need the contract. Send it to me, please.",
      "n": "Mándamelo: a 'do it' command, so me (to me) + lo (el contrato) go on the end as one word.",
      "w": {
       "Mándalome": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
-      "Mándamela": "El contrato is masculine, so lo.",
-      "Mándamele": "Le isn't 'it'. The contract is the thing, so lo."
+      "Mándamele": "Le isn't 'it'. The contract is the thing, so lo.",
+      "Mándaselo": "Mándaselo means “send it to him / her”; you need it, so me: mándamelo."
      },
      "easy": true
     },
@@ -318,15 +318,15 @@
      "o": [
       "Dáselas",
       "Dálelas",
-      "Dáselos",
+      "Dámelas",
       "Se las da"
      ],
      "en": "The keys are Ana's. Give them to her today.",
      "n": "Dáselas: da + le (to Ana) + las (las llaves); le turns into se before las.",
      "w": {
       "Dálelas": "Le lo / le la never happen: le turns into se before lo, la, los or las.",
-      "Dáselos": "Las llaves is feminine plural, so las.",
-      "Se las da": "That's 'he gives them to her', a statement, not a command."
+      "Se las da": "That's 'he gives them to her', a statement, not a command.",
+      "Dámelas": "Dámelas means “give them to me”; the keys are for Ana, so le → se: dáselas."
      },
      "easy": true
     },
@@ -353,14 +353,14 @@
       "envíemela",
       "envíamela",
       "envíelame",
-      "envíemelo"
+      "envíesela"
      ],
      "en": "Sir, if you have the invoice, send it to me by email, please.",
      "n": "Envíemela: usted command (envíe) + me + la (la factura) on the end.",
      "w": {
       "envíamela": "Envía is the tú form. You called him señor, so usted: envíe.",
       "envíelame": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
-      "envíemelo": "La factura is feminine, so la."
+      "envíesela": "Envíesela means “send it to him / her”; you want it, so me: envíemela."
      }
     },
     {
@@ -369,14 +369,14 @@
       "Enséñenselas",
       "Enséñenlesas",
       "Enséñaselas",
-      "Enséñenselos"
+      "Enséñenmelas"
      ],
      "en": "The kids want to see the photos. Show them to them, please.",
      "n": "Enséñenselas: ustedes command (enseñen) + se (les → se) + las (las fotos).",
      "w": {
       "Enséñenlesas": "Les turns into se before las.",
       "Enséñaselas": "Enseña is for one person (tú); you're talking to ustedes: enseñen.",
-      "Enséñenselos": "Las fotos is feminine plural, so las."
+      "Enséñenmelas": "Enséñenmelas means “show them to me”; it’s the children who want to see them, so les → se."
      }
     },
     {
@@ -1677,15 +1677,15 @@
      "o": [
       "ha roto",
       "ha rompido",
-      "ha rota",
+      "rompía",
       "haya rompido"
      ],
      "en": "The window is broken; someone has broken it.",
      "n": "Ha roto: someone has broken it; roto is the irregular participle of romper.",
      "w": {
       "ha rompido": "Rompido doesn't exist; it's roto.",
-      "ha rota": "After haber the participle never changes: ha roto.",
-      "haya rompido": "Rompido doesn't exist, and no subjunctive trigger."
+      "haya rompido": "Rompido doesn't exist, and no subjunctive trigger.",
+      "rompía": "Rompía means “used to break / was breaking”; the window is broken now, a result: ha roto."
      },
      "easy": true
     },
@@ -1903,14 +1903,14 @@
       "se la",
       "le la",
       "la se",
-      "se lo"
+      "te la"
      ],
      "en": "The quote? I’ll gladly share it with you today.",
      "n": "Se la: le (to you, the client) became se because la follows it. La = la cotización.",
      "w": {
       "le la": "Le lo / le la never happen: le turns into se before lo, la, los or las.",
       "la se": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
-      "se lo": "La cotización is feminine, so la."
+      "te la": "Te la is for people you call tú; with a client it’s se la."
      },
      "easy": true
     },
@@ -1918,16 +1918,16 @@
      "q": "¿Le mando las fotos del terreno? — Sí, ___, por favor.",
      "o": [
       "mándemelas",
-      "mándemelos",
+      "mándamelas",
       "mándeselas",
       "me las manda"
      ],
      "en": "Shall I send you the photos of the land? — Yes, send them to me, please.",
      "n": "Mándemelas: usted command (mande) + me (to me) + las (las fotos).",
      "w": {
-      "mándemelos": "Las fotos is feminine plural (la foto), so las.",
       "mándeselas": "Mándeselas means 'send them to him/her'; he wants them for himself: me.",
-      "me las manda": "That's a statement ('you send them to me'), not the polite request."
+      "me las manda": "That's a statement ('you send them to me'), not the polite request.",
+      "mándamelas": "Mándamelas is the tú command; you and the client use usted, so mándemelas."
      }
     },
     {
@@ -1936,14 +1936,14 @@
       "se lo",
       "le lo",
       "lo le",
-      "se la"
+      "te lo"
      ],
      "en": "I don’t have the contract here, but tomorrow I’ll bring it to your office.",
      "n": "Se lo: le (to you) became se because lo follows it. Lo = el contrato.",
      "w": {
       "le lo": "Le lo / le la never happen: le turns into se before lo, la, los or las.",
       "lo le": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
-      "se la": "El contrato is masculine, so lo."
+      "te lo": "Te lo is for tú; it’s su oficina (usted), so se lo."
      },
      "easy": true
     },
@@ -1967,16 +1967,16 @@
      "q": "¿Me puede mandar la información? — Claro, ___ ahorita.",
      "o": [
       "se la mando",
-      "se lo mando",
+      "me la manda",
       "te la mando",
       "le la mando"
      ],
      "en": "Can you send me the information? — Sure, I'll send it to you right now.",
      "n": "Se la mando: the client asked with me, so you answer with le → se (to you, usted) + la (la información).",
      "w": {
-      "se lo mando": "La información is feminine, so la.",
       "te la mando": "Te is for people you call tú. With a client (¿me puede…?) use se.",
-      "le la mando": "Le lo / le la never happen: le turns into se before lo, la, los or las."
+      "le la mando": "Le lo / le la never happen: le turns into se before lo, la, los or las.",
+      "me la manda": "Me la manda means “you send it to me”; the client asked you to send it to them: se la mando."
      }
     },
     {
@@ -1985,14 +1985,14 @@
       "se las",
       "les las",
       "las les",
-      "se los"
+      "me las"
      ],
      "en": "Gentlemen, the quotes? I already sent them to both of you.",
      "n": "Se las: les (to both of you) became se because las follows it. Las = las cotizaciones.",
      "w": {
       "les las": "Les las never happens: les turns into se before las.",
       "las les": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
-      "se los": "Las cotizaciones is feminine plural, so las."
+      "me las": "Me las envié would mean you sent them to yourself; they went to both of you (les → se)."
      }
     },
     {
@@ -2017,14 +2017,14 @@
       "explíquemelo",
       "explíqueselo",
       "me lo explica",
-      "explíquemela"
+      "explícamelo"
      ],
      "en": "Shall I explain how to get there? — Yes, explain it to me, please.",
      "n": "Explíquemelo: usted command + me (to me) + lo (how to get there, the whole idea).",
      "w": {
       "explíqueselo": "Explíqueselo means 'explain it to him/her'; you want it explained to you.",
       "me lo explica": "That's a statement, not the polite command.",
-      "explíquemela": "An idea (cómo llegar) uses lo."
+      "explícamelo": "Explícamelo is the tú command; with usted it’s explíquemelo."
      }
     },
     {
@@ -2032,15 +2032,15 @@
      "o": [
       "se lo",
       "te lo",
-      "se la",
+      "me lo",
       "le lo"
      ],
      "en": "Will you send me the contract? — Yes, I'll send it to you right now.",
      "n": "Se lo: the client asked ¿me manda?, so you reply le → se (to you) + lo (el contrato).",
      "w": {
       "te lo": "Te lo is for a friend (tú). A client who says ¿me manda? gets se lo.",
-      "se la": "El contrato is masculine, so lo.",
-      "le lo": "Le lo / le la never happen: le turns into se before lo, la, los or las."
+      "le lo": "Le lo / le la never happen: le turns into se before lo, la, los or las.",
+      "me lo": "Me lo mando means you send it to yourself; it’s for the client (usted), so se lo."
      },
      "easy": true
     },
@@ -2048,32 +2048,32 @@
      "q": "Las escrituras están en la notaría. ¿Quiere que ___ traiga?",
      "o": [
       "se las",
-      "se los",
+      "te las",
       "le las",
       "me las"
      ],
      "en": "The deeds are at the notary's office. Do you want me to bring them to you?",
      "n": "Se las: le (to you) became se because las follows it. Las = las escrituras.",
      "w": {
-      "se los": "Las escrituras is feminine plural, so las.",
       "le las": "Le lo / le la never happen: le turns into se before lo, la, los or las.",
-      "me las": "Me las would be 'bring them to me'; you're offering to bring them to the client."
+      "me las": "Me las would be 'bring them to me'; you're offering to bring them to the client.",
+      "te las": "Te las is for people you call tú; with a client it’s se las."
      }
     },
     {
      "q": "¿Les enseño los lotes a sus papás? — Sí, ___ el sábado, por favor.",
      "o": [
       "enséñeselos",
-      "enséñeselas",
+      "enséñaselos",
       "enséñemelos",
       "se los enseña"
      ],
      "en": "Shall I show the lots to your parents? — Yes, show them to them on Saturday, please.",
      "n": "Enséñeselos: usted command (enseñe) + se (les → se, to your parents) + los (los lotes).",
      "w": {
-      "enséñeselas": "Los lotes is masculine plural, so los.",
       "enséñemelos": "Enséñemelos means 'show them to me'; they're for his parents.",
-      "se los enseña": "That's a statement, not the polite command."
+      "se los enseña": "That's a statement, not the polite command.",
+      "enséñaselos": "Enséñaselos is the tú command; with usted it’s enséñeselos."
      }
     }
    ],
@@ -2127,16 +2127,16 @@
      "q": "¿La playa queda lejos? — No, queda a cinco minutos ___ fraccionamiento.",
      "o": [
       "del",
-      "de la",
+      "por el",
       "al",
       "en el"
      ],
      "en": "Is the beach far? — No, it's five minutes from the development.",
      "n": "Del: a cinco minutos de + el fraccionamiento → del.",
      "w": {
-      "de la": "Fraccionamiento is masculine, so del.",
       "al": "Al means 'to the', not 'from the'.",
-      "en el": "The distance is measured from it: del."
+      "en el": "The distance is measured from it: del.",
+      "por el": "Por el fraccionamiento means “through / around it”; a distance is measured from somewhere: del."
      }
     },
     {
@@ -2271,16 +2271,14 @@
      "q": "Los lotes de la primera fila ya están ___.",
      "o": [
       "vendidos",
-      "vendidas",
-      "vendido",
+      "por vender",
       "vendiendo"
      ],
      "en": "The front-row lots are already sold.",
-     "n": "Vendidos: the participle matches los lotes (masculine plural).",
+     "n": "Vendidos: estar + participle describes the result (they’re sold). Ya tells you it already happened.",
      "w": {
-      "vendidas": "Lotes is masculine, so vendidos.",
-      "vendido": "Lotes is plural, so vendidos.",
-      "vendiendo": "Están vendiendo means 'are selling', not 'are sold'."
+      "vendiendo": "Están vendiendo means 'are selling', not 'are sold'.",
+      "por vender": "Están por vender means they’re still to be sold; ya (already) tells you it’s done: vendidos."
      }
     },
     {
@@ -2338,48 +2336,46 @@
      "q": "La cotización ya está ___; ahorita se la mando.",
      "o": [
       "hecha",
-      "hecho",
+      "por hacer",
       "haciendo",
       "hace"
      ],
      "en": "The quote is done; I’ll send it to you right now.",
-     "n": "Hecha: the participle matches la cotización (feminine).",
+     "n": "Hecha: estar + participle = a finished result (the quote is done), so you can send it right away.",
      "w": {
-      "hecho": "La cotización is feminine, so hecha.",
       "haciendo": "Está haciendo is 'is making', still in progress.",
-      "hace": "Está hace isn't Spanish."
+      "hace": "Está hace isn't Spanish.",
+      "por hacer": "Está por hacer means it still has to be done; ya + “ahorita se la mando” mean it’s finished: hecha."
      }
     },
     {
      "q": "El contrato ya está ___ por los dos.",
      "o": [
       "firmado",
-      "firmada",
+      "por firmar",
       "firmando",
       "firmó"
      ],
      "en": "The contract is already signed by both of them.",
-     "n": "Firmado: matches el contrato (masculine singular), a finished state.",
+     "n": "Firmado: estar + participle = a finished state (already signed by both).",
      "w": {
-      "firmada": "El contrato is masculine, so firmado.",
       "firmando": "Está firmando means 'is signing' (in progress).",
-      "firmó": "Firmó is 'signed (past)', and it can't follow está."
+      "firmó": "Firmó is 'signed (past)', and it can't follow está.",
+      "por firmar": "Está por firmar means it’s still waiting to be signed; ya … por los dos means both already signed: firmado."
      }
     },
     {
      "q": "Las dos casas de la esquina están ___ hasta el viernes.",
      "o": [
       "apartadas",
-      "apartados",
-      "apartada",
+      "apartan",
       "apartando"
      ],
      "en": "The two corner houses are on hold until Friday.",
-     "n": "Apartadas: matches las dos casas (feminine plural).",
+     "n": "Apartadas: estar + participle = the state they’re in (on hold until Friday).",
      "w": {
-      "apartados": "Casas is feminine, so apartadas.",
-      "apartada": "Two houses, so plural: apartadas.",
-      "apartando": "Están apartando means 'are reserving'."
+      "apartando": "Están apartando means 'are reserving'.",
+      "apartan": "Apartan is a plain verb (“they reserve”); after están you need the -ado form for the state: apartadas."
      }
     },
     {
@@ -2401,11 +2397,11 @@
    ],
    "rule": {
     "title": "Estar + -ado (está apartado) and quedan",
-    "rule": "Estar + participle describes a result or state (está apartado, está firmado), and the ending matches the thing like an adjective: lote apartado, casas apartadas. Queda / quedan means 'there is / there are … left'.",
+    "rule": "Estar + an -ado / -ido word describes a finished result or state: está apartado (it’s on hold), está firmado (it’s signed). Están + -ando / -iendo is still happening, and queda / quedan means 'there is / there are … left'.",
     "formula": [
-     "estar + -ado/-ada/-ados/-adas (matches the thing)",
-     "queda (one left) · quedan (several left)",
-     "está firmado (state) vs. está firmando (in progress)"
+     "está apartado / firmado / vendido = done, a state",
+     "está firmando / vendiendo = happening right now",
+     "está por firmar = still to be signed · queda uno / quedan cinco = left"
     ],
     "ex": [
      [
@@ -2421,7 +2417,7 @@
       "There are still five ocean-view lots left."
      ]
     ],
-    "trap": "Match the thing, not you: la cotización está hecha, el contrato está hecho. And está vendiendo means 'is selling', not 'is sold'."
+    "trap": "Está vendiendo means 'is selling', not 'is sold'. The -o / -a ending just follows the thing; if you mix it up, people still understand you."
    }
   },
   "habitual": {
@@ -2926,14 +2922,14 @@
       "q": "Complete: “Cuando la tenga, ___ y hacemos el trámite.”",
       "o": [
        "tráigamela",
-       "tráigamelo",
+       "tráigasela",
        "tráemela"
       ],
       "p": "clitic_imperative",
-      "n": "Tráigamela: usted command (traiga) + me + la, because la = la carta del dueño.",
+      "n": "Tráigamela: usted command (traiga) + me (to me) + la (la carta del dueño).",
       "w": {
-       "tráigamelo": "The thing is feminine (la), so tráigamela.",
-       "tráemela": "Tráemela is the tú form; at the bank they use usted: tráigamela."
+       "tráemela": "Tráemela is the tú form; at the bank they use usted: tráigamela.",
+       "tráigasela": "Tráigasela means “bring it to him / her”; the banker wants it brought to her: tráigamela."
       }
      },
      {
@@ -6220,14 +6216,14 @@
       "q": "Complete: “Ese lote está ___ desde ayer.”",
       "o": [
        "apartado",
-       "apartada",
-       "apartados"
+       "apartando",
+       "por apartar"
       ],
       "p": "estar_participio",
-      "n": "Apartado: matches ese lote (masculine singular), a state.",
+      "n": "Apartado: estar + participle = a state (on hold since yesterday).",
       "w": {
-       "apartada": "Lote is masculine, so apartado.",
-       "apartados": "One lot, so singular."
+       "apartando": "Está apartando means “is reserving” (in progress); since yesterday it’s in a reserved state: apartado.",
+       "por apartar": "Está por apartar means it still has to be reserved; desde ayer says it already is: apartado."
       }
      },
      {

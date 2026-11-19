@@ -236,9 +236,9 @@ t('one deletion passes: mojonera → mojnera', () => assert.equal(R('mojnera', '
 t('one insertion and one adjacent swap pass', () => { assert.equal(R('mercaddo', 'mercado'), 'typo'); assert.equal(R('trámtie', 'el trámite'), 'typo'); assert.equal(R('cotizacoin', 'cotización'), 'typo'); });
 t('two typos in one word fail', () => { assert.equal(R('mojnra', 'mojonera'), 'wrong'); assert.equal(R('cotisaciom', 'cotización'), 'wrong'); });
 t('3-letter words must be exact', () => { assert.equal(R('lso', 'los'), 'wrong'); assert.equal(R('al', 'el'), 'wrong'); assert.equal(R('mra', 'mar'), 'wrong'); });
-t('clitic swaps fail: se los → se las, se lo → se la', () => { assert.equal(R('se las', 'se los'), 'wrong'); assert.equal(R('se la enviaré', 'se lo enviaré'), 'wrong'); });
+t('v9.5 clitic gender / number is not graded: se los → se las, se lo → se la count (agree)', () => { assert.equal(R('se las', 'se los'), 'agree'); assert.equal(R('se la enviaré', 'se lo enviaré'), 'agree'); });
 t('verb-ending changes fail: envió → envíe, aprueben → aprueban, hablan → habla', () => { assert.equal(R('envíe', 'envió'), 'wrong'); assert.equal(R('envie', 'envió'), 'wrong'); assert.equal(R('aprueban', 'aprueben'), 'wrong'); assert.equal(R('habla', 'hablan'), 'wrong'); });
-t('gender / number changes fail: interesado → interesada, vendido → vendidos', () => { assert.equal(R('interesada', 'interesado'), 'wrong'); assert.equal(R('vendidos', 'vendido'), 'wrong'); });
+t('v9.5 gender / number agreement counts (agree): interesado → interesada, vendido → vendidos', () => { assert.equal(R('interesada', 'interesado'), 'agree'); assert.equal(R('vendidos', 'vendido'), 'agree'); });
 t('a typo that makes another real course word fails (quedan → queden is a different form)', () => { assert.equal(R('esta', 'eso'), 'wrong'); assert.equal(R('quedan', 'queden'), 'wrong'); });
 t('each word in a multi-word answer gets its own allowance', () => {
   assert.equal(R('el comprobnte de domicillio', 'el comprobante de domicilio'), 'typo');
@@ -306,8 +306,9 @@ t('v8 speech grading: best of several alternatives; one dropped word in a long l
   assert.equal(Speech.grade(['pagué quinientos pesos por consulta'], 'Pagué 500 pesos por la consulta.').result, 'close');
   assert.equal(Speech.grade(['me lo mandas mañana'], '¿Me lo puedes mandar mañana?').result, 'wrong', 'short line: no slack');
 });
-t('v8 speech grading: a clitic slip is never "close" (se lo vs se los)', () => {
-  assert.equal(Speech.grade(['si te pide el dinero no se lo des todavía'], 'Si te pide el dinero, no se los des todavía.').result, 'wrong');
+t('v8/v9.5 speech grading: lo vs los is not graded any more, but a person slip is never "close" (me lo vs se lo)', () => {
+  assert.equal(Speech.grade(['si te pide el dinero no se lo des todavía'], 'Si te pide el dinero, no se los des todavía.').result, 'exact');
+  assert.equal(Speech.grade(['si te pide el dinero no me lo des todavía'], 'Si te pide el dinero, no se los des todavía.').result, 'wrong');
   assert.equal(Speech.grade([''], 'Hola.').result, 'wrong'); assert.equal(Speech.grade([], 'Hola.').result, 'wrong');
 });
 t('v8 speech feature check + blocking errors', () => {
@@ -393,13 +394,13 @@ t('v9.3 accent / ñ / ü-only differences are a full pass (the app grades "accen
     .forEach(([a, b]) => assert.ok(['exact', 'accent'].includes(R(a, b)), `${a} for ${b}`));
   assert.equal(R('Cuánto cuesta el trámite', 'cuanto cuesta el tramite'), 'accent', 'extra accents are fine too');
   const app = require('fs').readFileSync(require('path').join(__dirname, '../app.js'), 'utf8');
-  assert.ok(app.includes("result === 'exact' || result === 'accent' || result === 'typo' || result === 'alt' ? 3"), 'accent answers grade Good (3), not Hard');
+  assert.ok(app.includes("result === 'exact' || result === 'accent' || result === 'typo' || result === 'alt' || result === 'agree' ? 3"), 'accent (and v9.5 agreement) answers grade Good (3), not Hard');
   assert.ok(app.includes('Spelled: ') && !app.includes('Watch the accents'), 'quiet "Spelled:" note, no accent warning');
 });
 t('v9.3 accents never use up the one-letter typo allowance; meaning changes still fail', () => {
   assert.equal(R('comprobánte de domicillio', 'el comprobante de domicilio'), 'typo', 'accent + one slip in another word');
   assert.equal(R('cotizacíom', 'la cotización'), 'typo', 'accent moved + one slip in the same word');
-  assert.equal(R('se los mando', 'se las mando'), 'wrong', 'se las vs se los');
+  assert.equal(R('se los mando', 'se las mando'), 'agree', 'v9.5: se las vs se los is agreement, not graded');
   assert.equal(R('te lo mando', 'se lo mando'), 'wrong', 'te vs se');
   assert.equal(R('envie', 'envió'), 'wrong', 'envíe vs envió is a different verb form even without accents');
 });
@@ -451,5 +452,115 @@ t('v9.4 every grammar item (patterns + story grammar questions) has a why and a 
 });
 t('v9.4 every pattern has easy one-contrast items for pacing after its rule card', () => {
   Object.entries(C.patterns).forEach(([k, p]) => { const e = p.items.filter(it => it.easy); assert.ok(e.length >= 3, k); e.forEach(it => assert.ok(it.o.length >= 2 && it.w[it.o[1]], k)); });
+});
+
+// ---- v9.5 numbers: digits and Spanish number words are the same answer, both ways, inside sentences too ----
+const N = s => Check.numify(s).text;
+t('v9.5 number words -> digits: basics, y-joins, veinti-, accents', () => {
+  [['cero', '0'], ['uno', '1'], ['quince', '15'], ['veinte', '20'], ['veintiuno', '21'], ['veintiún lotes', '21 lotes'], ['veintiuna casas', '21 casas'],
+   ['veintidós', '22'], ['veintidos', '22'], ['treinta y dos', '32'], ['noventa y nueve', '99'], ['cuarenta y cinco', '45']].forEach(([a, b]) => assert.equal(N(a), b, a));
+});
+t('v9.5 number words: cien/ciento, -cientos/-cientas, mil, millones', () => {
+  [['cien', '100'], ['ciento uno', '101'], ['ciento cincuenta', '150'], ['ciento cincuenta y dos', '152'], ['doscientos', '200'], ['doscientas casas', '200 casas'],
+   ['quinientas', '500'], ['novecientos noventa y nueve', '999'], ['mil', '1000'], ['mil quinientos', '1500'], ['dos mil', '2000'], ['dos mil veintiséis', '2026'],
+   ['cien mil', '100000'], ['quinientos mil', '500000'], ['novecientos noventa y nueve mil novecientos noventa y nueve', '999999'], ['un millón', '1000000'],
+   ['un millón de pesos', '1000000 de pesos'], ['dos millones trescientos mil', '2300000'], ['un millón doscientos mil cuatrocientos', '1200400'],
+   ['mil millones', '1000000000'], ['2 mil', '2000']].forEach(([a, b]) => assert.equal(N(a), b, a));
+});
+t('v9.5 digits: thousands separators, $ prices, ordinals', () => {
+  [['1,500', '1500'], ['1.500', '1500'], ['1 500 000', '1500000'], ['1,250,000', '1250000'], ['$150', '150 pesos'], ['$ 1,500 MXN', '1500 pesos'], ['150 pesos', '150 pesos'],
+   ['primero', 'ord1'], ['1.º', 'ord1'], ['1º', 'ord1'], ['el 1er piso', 'el ord1 piso'], ['la 3.ª casa', 'la ord3 casa'], ['tercer', 'ord3']].forEach(([a, b]) => assert.equal(N(a), b, a));
+});
+t('v9.5 numbers: a lone un/una stays a word (article), "y" between two numbers is "and"', () => {
+  assert.equal(N('un lote'), 'un lote'); assert.equal(N('una casa'), 'una casa'); assert.equal(N('dos y tres'), '2 y 3'); assert.equal(N('tres mil y dos'), '3000 y 2');
+  assert.equal(R('un lote', 'un lote'), 'exact'); assert.equal(R('1 lote', 'un lote'), 'wrong');
+});
+t('v9.5 check(): words for digits and digits for words, alone and inside sentences', () => {
+  assert.equal(R('ciento cincuenta', '150'), 'exact'); assert.equal(R('150', 'ciento cincuenta'), 'exact');
+  assert.equal(R('Pagué ciento cincuenta pesos', 'Pagué 150 pesos'), 'exact'); assert.equal(R('Pagué 150 pesos', 'Pagué ciento cincuenta pesos'), 'exact');
+  assert.equal(R('El lote cuesta mil quinientos dólares', 'El lote cuesta 1,500 dólares'), 'exact'); assert.equal(R('1.500', 'mil quinientos'), 'exact');
+  assert.equal(R('1500', '1,500'), 'exact'); assert.equal(R('$150', '150 pesos'), 'exact'); assert.equal(R('ciento cincuenta pesos', '$150'), 'exact');
+  assert.equal(R('veintiún lotes', '21 lotes'), 'exact'); assert.equal(R('el primer piso', 'el 1.er piso'), 'exact'); assert.equal(R('2,026', 'dos mil veintiséis'), 'exact');
+  const r = Check.check('Pagué ciento cincuenta pesos', ['Pagué 150 pesos']); assert.equal(r.numbers, true); assert.equal(r.answer, 'Pagué 150 pesos');
+  assert.ok(!Check.check('Pagué 150 pesos', ['Pagué 150 pesos']).numbers, 'no note when written the same way');
+});
+t('v9.5 check(): a different number is still wrong (no typo credit on digits)', () => {
+  assert.equal(R('151', 'ciento cincuenta'), 'wrong'); assert.equal(R('1501', '1500'), 'wrong'); assert.equal(R('mil quinientos uno', '1,500'), 'wrong');
+  assert.equal(R('ciento cincuenta', '15'), 'wrong'); assert.equal(R('quince', '50'), 'wrong'); assert.equal(R('15,00', '1500'), 'wrong');
+});
+t('v9.5 numbers stack with accents, typos and synonyms', () => {
+  assert.equal(R('Pague 150 pesos', 'Pagué ciento cincuenta pesos'), 'accent'); // accents never graded since v9.3, but still noted
+  assert.equal(R('Pagé $150', 'Pagué 150 pesos'), 'typo'); // a slip in another word
+  assert.equal(R('ciento cincuneta', '150'), 'typo'); // a slip inside a long number word
+  assert.equal(R('trienta y dos', '32'), 'typo');
+  assert.equal(R('veintidos', '22'), 'exact'); // accent-free number words read the same
+  Check.setSynonyms(C.synonyms);
+  const sy = (C.synonyms || []).find(d => !d.wordOnly && (d.forms || []).some(f => !f[2] && !f[0].includes(' ')));
+  if (sy) { const [a, m] = sy.forms.find(f => !f[2] && !f[0].includes(' ')); const r = Check.checkAlt(`${a} 150`, [`${m} ciento cincuenta`], { lang: 'es' }, []); assert.equal(r.result, 'alt', a); }
+});
+t('v9.5 English answers: 1,500 = 1500 = $1,500 digits only', () => {
+  assert.equal(Check.check('1500 dollars', ['1,500 dollars'], { lang: 'en' }).result, 'exact'); assert.equal(Check.check('I paid once', ['I paid once'], { lang: 'en' }).result, 'exact');
+  assert.equal(Check.check('I paid 11', ['I paid once'], { lang: 'en' }).result, 'wrong');
+});
+t('v9.5 numberSpans: the number as written, for the "Also written" note', () => {
+  assert.deepEqual(Check.numberSpans('Pagué ciento cincuenta pesos, gracias.'), ['ciento cincuenta']); assert.deepEqual(Check.numberSpans('Cuesta $1,500 y tiene un lote.'), ['$1,500']);
+  assert.deepEqual(Check.numberSpans('Son treinta y dos lotes'), ['treinta y dos']); assert.deepEqual(Check.numberSpans('Un millón de pesos'), ['Un millón']);
+  assert.deepEqual(Check.numberSpans('Tengo una casa'), []);
+});
+
+// ---- v9.5 voice build: recognised words -> bank tiles in spoken order ----
+t('v9.5 mapToTiles: spoken order, accents/case/punctuation ignored, distractors left alone', () => {
+  const m = Speech.mapToTiles('Se lo mando mañana.', ['mañana', 'lo', 'se', 'mando', 'le']);
+  assert.deepEqual(m.order, [2, 1, 3, 0]); assert.deepEqual(m.unmatched, []);
+  assert.deepEqual(Speech.mapToTiles('SE LO MANDO MANANA', ['mañana', 'lo', 'se', 'mando']).order, [2, 1, 3, 0]);
+});
+t('v9.5 mapToTiles: digits and number words both ways, repeated tiles used once each', () => {
+  assert.deepEqual(Speech.mapToTiles('Pagamos ciento cincuenta pesos', ['pesos', 'Pagamos', '150']).order, [1, 2, 0]);
+  assert.deepEqual(Speech.mapToTiles('pagamos 150 pesos', ['pesos', 'Pagamos', 'ciento', 'cincuenta']).order, [1, 2, 3, 0]);
+  assert.deepEqual(Speech.mapToTiles('la casa y la playa', ['la', 'playa', 'la', 'casa', 'y']).order, [0, 3, 4, 2, 1]);
+  assert.deepEqual(Speech.mapToTiles('la la la', ['la']).order, [0]);
+});
+t('v9.5 mapToTiles: one-letter slips in longer words match; short words and extra words do not', () => {
+  const m = Speech.mapToTiles('se lo mande ayer bueno', ['se', 'lo', 'mandé', 'ayer']);
+  assert.deepEqual(m.order, [0, 1, 2, 3]); assert.deepEqual(m.unmatched, ['bueno']);
+  assert.deepEqual(Speech.mapToTiles('cotisacion', ['cotización']).order, [0]);
+  assert.deepEqual(Speech.mapToTiles('le', ['lo']).order, []); // lo/le is the point of the drill: never fuzzy
+  assert.deepEqual(Speech.mapToTiles('mandé', ['mando', 'mandé']).order, [1]); // exact beats fuzzy
+  assert.deepEqual(Speech.mapToTiles('', ['a']).order, []);
+  Check.setKnown(Check.knownFromContent(C)); assert.deepEqual(Speech.mapToTiles('este', ['está']).order, [], 'este is a real word, not a slip for está');
+});
+t('v9.5 mapToTiles: English tiles', () => {
+  assert.deepEqual(Speech.mapToTiles('I sent it to him.', ['him', 'it', 'sent', 'I', 'to', 'her'], 'en').order, [3, 2, 1, 4, 0]);
+});
+
+// ---- v9.5 gender / number agreement: correct with a "Natural" note; person and meaning stay strict ----
+t('v9.5 agreement slips are correct (agree): articles, adjectives, participles, clitics, possessives', () => {
+  [['la casa está listo', 'la casa está lista'], ['tengo un mesa grande', 'tengo una mesa grande'], ['de la fraccionamiento', 'del fraccionamiento'],
+   ['Los lotes ya están vendidas', 'Los lotes ya están vendidos'], ['La ventana está rota; alguien la ha rota', 'La ventana está rota; alguien la ha roto'],
+   ['se las mando mañana', 'se los mando mañana'], ['te lo mandaré', 'te la mandaré'], ['Mándamela', 'Mándamelo'], ['envíemelo', 'envíemela'],
+   ['Dáselos hoy', 'Dáselas hoy'], ['sus documento', 'su documento'], ['esta contrato', 'este contrato'], ['El contrato está firmada', 'El contrato está firmado'],
+   ['mandarla mañana', 'mandarlo mañana'], ['creo que la terreno es muy bonita', 'creo que el terreno es muy bonito']].forEach(([a, b]) => assert.equal(R(a, b), 'agree', a));
+});
+t('v9.5 person / meaning stay strict: se vs me vs te, le vs lo, envié vs envió, tú vs usted, noun number', () => {
+  [['me lo mando', 'se lo mando'], ['te lo mando', 'se lo mando'], ['le lo mando', 'se lo mando'], ['se lo envió', 'se lo envié'], ['Siéntate', 'Siéntese'],
+   ['mándamelas', 'mándemelas'], ['las casas', 'la casa'], ['mando', 'manda'], ['pido una cotización', 'pida una cotización'], ['llegues', 'llegue'],
+   ['decido', 'decida'], ['nos lo dio', 'me lo dio'], ['está', 'esté'], ['es', 'está']].forEach(([a, b]) => assert.notEqual(R(a, b), 'agree', a));
+  assert.equal(R('me lo mando', 'se lo mando'), 'wrong'); assert.equal(R('se lo envió', 'se lo envié'), 'wrong');
+});
+t('v9.5 agreement stacks with numbers and typos, and the Spanish speech grader accepts it', () => {
+  assert.equal(R('las ciento cincuenta casas están vendidos', 'las 150 casas están vendidas'), 'agree');
+  assert.equal(Speech.grade(['se las mando mañana'], 'Se los mando mañana.').result, 'exact');
+  assert.equal(Check.check('the house is ready', ['the house is ready'], { lang: 'en' }).result, 'exact');
+});
+t('v9.5 no grammar item or story question has a distractor that differs only in gender / number', () => {
+  const k = x => Check.agreeKey(Check.clean(x)).split(' ').map(w => Check.stripAcc(w)).join(' ');
+  const bad = [];
+  Object.entries(C.patterns).forEach(([pk, p]) => p.items.forEach((it, i) => it.o.slice(1).forEach(o => { if (k(o) === k(it.o[0]) && Check.stripAcc(o) !== Check.stripAcc(it.o[0])) bad.push(`${pk}[${i}] ${o}`); })));
+  C.units.forEach(u => ((u.story || {}).qs || []).filter(q => q.p).forEach(q => q.o.slice(1).forEach(o => { if (k(o) === k(q.o[0])) bad.push(`${u.id} ${o}`); })));
+  assert.deepEqual(bad, []);
+});
+t('v9.5 every distractor still has its reason, and no rule card teaches gender agreement', () => {
+  Object.entries(C.patterns).forEach(([pk, p]) => { p.items.forEach(it => it.o.slice(1).forEach(o => assert.ok(it.w && it.w[o], `${pk}: ${o}`)));
+    const r = JSON.stringify(p.rule); assert.ok(!/masculine|feminine|matches the thing like an adjective|follow the thing, not the person/i.test(r), pk); });
 });
 console.log(`\n${n} tests passed`);

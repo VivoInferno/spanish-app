@@ -25,7 +25,8 @@
   // object pronouns (se los, me lo): me/te/se/nos/le/les/lo always; la/los/las only after another pronoun, "no" or "ya", or first
   // in the line, since otherwise they are usually articles (por la consulta)
   const ALWAYS = new Set(['me', 'te', 'se', 'nos', 'le', 'les', 'lo']), ART = new Set(['la', 'los', 'las']), BEFORE = new Set(['me', 'te', 'se', 'nos', 'no', 'ya']);
-  const cl = ws => ws.filter((w, k) => ALWAYS.has(w) || (ART.has(w) && (k === 0 || BEFORE.has(ws[k - 1])))).join(' ');
+  // v9.5: lo/la/los/las gender & number isn't graded, so they compare as one 'L'; person (me/te/se/nos/le) stays strict
+  const cl = ws => ws.filter((w, k) => ALWAYS.has(w) || (ART.has(w) && (k === 0 || BEFORE.has(ws[k - 1])))).map(w => /^l(o|a|os|as)$/.test(w) ? 'L' : w).join(' ');
   const sameClitics = (tw, hw) => cl(tw) === cl(hw);
   /**
    * grade(alternatives, target) -> {result:'exact'|'accent'|'typo'|'close'|'wrong', heard}
@@ -40,7 +41,7 @@
     const rank = { exact: 4, accent: 3, typo: 2, close: 1, wrong: 0 };
     for (const a of alts) {
       const r = C().check(norm(a), [norm(target)], { lang: 'es', sentence: true });
-      let res = r.result === 'exact' ? 'exact' : r.result === 'typo' ? 'typo' : r.result === 'accent' ? 'accent' : 'wrong';
+      let res = r.result === 'exact' || r.result === 'agree' ? 'exact' : r.result === 'typo' ? 'typo' : r.result === 'accent' ? 'accent' : 'wrong';
       const hw = norm(a).split(' ').filter(Boolean), l = lcs(tw, hw);
       // one dropped / misheard word is fine in a long sentence, but never a clitic (se los vs se lo is the point of the drill)
       if (res === 'wrong' && tw.length >= 5 && l >= tw.length - 1 && hw.length <= tw.length + 1 && sameClitics(tw, hw)) res = 'close';
@@ -50,9 +51,37 @@
     if (best.result === 'accent') best.result = 'exact';
     return best;
   }
+
+  // v9.5 voice build: put the recognised words onto the bank tiles in spoken order. Accents, case and punctuation are ignored,
+  // digits read as number words (the recogniser writes "150", a tile may say "ciento cincuenta", or the reverse), multi-word
+  // tiles match a run of heard words, and a one-letter slip in a word of 5+ letters (not itself a course word) still finds its tile. Each tile is used
+  // once (two "la" tiles need two heard "la"). Words with no tile are returned as unmatched; nothing is guessed.
+  function mapToTiles(heard, tiles, lang) {
+    const nz = lang === 'en' ? (x => C().stripAcc(C().clean(String(x).replace(/(\d)[,.](\d{3})\b/g, '$1$2')))) : norm;
+    const hw = nz(heard || '').split(' ').filter(Boolean);
+    const tw = (tiles || []).map(t => nz(t).split(' ').filter(Boolean));
+    const used = new Set(), order = [], unmatched = [], words = [];
+    // fuzzy only for 5+ letter words, and never when the heard word is itself a real course word (este ≠ está)
+    const near = (a, b) => a === b || (b.length >= 5 && a.length >= 4 && !(C().isKnown && C().isKnown(a)) && !!C().oneEdit(a, b));
+    let i = 0;
+    while (i < hw.length) {
+      let best = -1, bestLen = 0, bestExact = false;
+      tw.forEach((w, k) => {
+        if (used.has(k) || !w.length || i + w.length > hw.length) return;
+        let exact = true, ok = true;
+        for (let j = 0; j < w.length; j++) { if (hw[i + j] === w[j]) continue; exact = false; if (!near(hw[i + j], w[j])) { ok = false; break; } }
+        if (!ok) return;
+        // longest run first, then an exact match over a fuzzy one, then the first such tile
+        if (w.length > bestLen || (w.length === bestLen && exact && !bestExact)) { best = k; bestLen = w.length; bestExact = exact; }
+      });
+      if (best < 0) { unmatched.push(hw[i]); words.push({ w: hw[i], ok: false }); i++; continue; }
+      used.add(best); order.push(best); for (let j = 0; j < bestLen; j++) words.push({ w: hw[i + j], ok: true }); i += bestLen;
+    }
+    return { order, unmatched, words, heard: hw.join(' ') };
+  }
   // errors that mean "this device can't do speech here": stop offering speaking drills for this session
   const BLOCKING = ['not-allowed', 'service-not-allowed', 'audio-capture', 'network', 'language-not-supported', 'bad-grammar'];
   const isBlocking = err => BLOCKING.includes(err);
-  const Speech = { sameClitics, ctor, available, grade, norm, numWords, isBlocking, BLOCKING };
+  const Speech = { sameClitics, ctor, available, grade, norm, numWords, isBlocking, BLOCKING, mapToTiles };
   if (typeof module !== 'undefined') module.exports = Speech; else root.Speech = Speech;
 })(typeof window !== 'undefined' ? window : globalThis);

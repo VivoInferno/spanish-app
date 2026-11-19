@@ -23,8 +23,8 @@ async def main():
         pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto(URL); await pg.wait_for_selector('.stone'); await pg.wait_for_timeout(400)
         s = await pg.evaluate("__app.state")
-        check(await pg.evaluate("__app.version") == 'v9.4' and s['items'] == V9['items'] and s['path'] == V9['path'] and s['daily'] == V9['daily'] and s['streak'] == V9['streak']
-              and s['rulesSeen'] == {} and s['pace'] == {}, 'v9.x data → v9.4 losslessly (no rule cards seen yet)')
+        check(await pg.evaluate("__app.version") == 'v9.5' and s['items'] == V9['items'] and s['path'] == V9['path'] and s['daily'] == V9['daily'] and s['streak'] == V9['streak']
+              and s['rulesSeen'] == {} and s['pace'] == {}, 'v9.x data → v9.5 losslessly (no rule cards seen yet)')
         n_rules = await pg.evaluate("Object.values(__app.content.patterns).filter(p => p.rule).length")
         n_pat = await pg.evaluate("Object.keys(__app.content.patterns).length")
         check(n_rules == n_pat, f'{n_rules} rule cards for {n_pat} grammar patterns')
