@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const APP_VERSION = 'v9.5'; // keep in sync with CACHE in sw.js (espanol-v9-5)
+  const APP_VERSION = 'v9.6'; // keep in sync with CACHE in sw.js (espanol-v9-5)
   const KEY = 'spanish-app-state-v1'; // unchanged since v1 — never rename
   const DAY = SRS.DAY;
   const STONES = [
@@ -16,7 +16,7 @@
   // ---------- state + migration ----------
   const defaults = () => ({ v: 1, schema: 5, placementDone: false, created: Date.now(), items: {}, pstats: {}, recent: {},
     settings: { newPerSession: 5, rate: 0.9, autoAdvance: false, sound: true, anim: true, goalMin: Daily.GOAL_MIN, voice: '', voice2: '', voiceMode: 'recorded' }, sessions: 0,
-    path: { done: {}, tests: {}, testedOut: {} }, parked: {}, daily: {}, streak: Daily.seed(), parkedDefaults: {}, listenPauseUntil: 0, speakPauseUntil: 0, rulesSeen: {}, pace: {} });
+    path: { done: {}, tests: {}, testedOut: {} }, parked: {}, daily: {}, streak: Daily.seed(), parkedDefaults: {}, listenPauseUntil: 0, speakPauseUntil: 0, rulesSeen: {}, pace: {}, focusLog: [] });
   function load() {
     let raw = null;
     try { raw = JSON.parse(localStorage.getItem(KEY)); } catch (e) { /* fresh */ }
@@ -54,6 +54,9 @@
     // Optional additions; schema stays 5. Patterns already studied still get their card once, the next time they come up.
     s.rulesSeen = raw.rulesSeen && typeof raw.rulesSeen === 'object' ? raw.rulesSeen : {};
     s.pace = raw.pace && typeof raw.pace === 'object' ? raw.pace : {};
+    // v9.6: focusLog = the grammar pattern each practice / review session focused on, newest first (max 10), for rotation.
+    // Optional addition; schema stays 5.
+    s.focusLog = Array.isArray(raw.focusLog) ? raw.focusLog.filter(x => typeof x === 'string').slice(0, 10) : [];
     s.schema = 5;
     return s;
   }
@@ -118,8 +121,16 @@
     C.units.forEach(u => u.sentences.forEach(s => { const k = strip(s.f); if (!k.includes(' ')) IDX.forms[k] = IDX.forms[k] || s.k; }));
     IDX.section = C.sections.find(s => s.units) || null;
     IDX.glossFold = {}; Object.entries(C.glosses || {}).forEach(([k, v]) => { IDX.glossFold[strip(k)] = IDX.glossFold[strip(k)] || v; });
+    // v9.6: other natural word orders (content.json "alts", from tools/gen_word_orders.py), keyed by the preferred text
+    IDX.orders = new Map(); const addO = (t, a) => { if (t && a && a.length) IDX.orders.set(okey(t), a); };
+    C.units.forEach(u => { u.sentences.forEach(s => addO(s.es, s.alts)); u.story.lines.forEach(l => addO(l.es, l.alts)); });
+    Object.values(C.patterns).forEach(p => p.items.forEach(it => { const full = it.q.replace('___', it.o[0]).replace(/\s*\([^)]*\)\s*$/, ''), parts = full.split(' — '); addO(parts.length === 2 ? parts[1] : full, it.alts); }));
     IDX.sectionWords = (IDX.section ? IDX.section.units : C.units.map(u => u.id)).flatMap(uid => C.units[IDX.unitIdx[uid]].words.map(w => w.id));
   }
+  const okey = t => Check.stripAcc(Check.clean(t));
+  const ordersFor = t => (IDX.orders && IDX.orders.get(okey(t))) || [];
+  // v9.6: "Also common: <preferred order>" when the learner's (valid) order differs from the course's
+  const orderNote = ex => ex.res && ex.res.order && ex.res.result !== 'agree' ? `<div class="muted small spelled also-common">Also common: ${tokenize(ex.res.order)}</div>` : '';
   // wrap Spanish text: every word can be tapped for a hint (v8); tracked vocabulary words can also be long-pressed to park them.
   // Words new to the learner in this lesson get the "new" highlight.
   function tokenize(text) {
@@ -454,9 +465,10 @@
       if (kind === 'ptiles' && t) {
         const have = new Set(tileTokens(t.es).map(strip)); // distractors come from the wrong options: different pronouns / forms, never accent-only twins
         const ds = shuffle(noTwins([...new Set(it.o.slice(1).flatMap(tileTokens).filter(x => !have.has(strip(x))))], tileTokens(t.es), true)).slice(0, 2);
-        return Object.assign({ kind: 'build', label: name + ' · build it', pk: p, item: it, tiles: shuffle(tileTokens(t.es).concat(ds)), answers: [t.es], opts: { lang: 'es' }, reveal, speakAfter, pattern: true },
+        return Object.assign({ kind: 'build', label: name + ' · build it', pk: p, item: it, tiles: shuffle(tileTokens(t.es).concat(ds)), answers: [t.es], orders: ordersFor(t.es), opts: { lang: 'es' }, reveal, speakAfter, pattern: true },
           t.ctxEs ? { bigEs: t.ctxEs, hintEn: 'Reply: ' + t.en } : { big: t.en });
       }
+      if (kind === 'ptype') return Object.assign({ kind: 'type', label: name + ' · type it', clozeEs: it.q.replace('___', '_____'), sub: it.en, answers: [it.o[0]], opts: { lang: 'es' }, placeholder: 'Type the missing part', reveal, speakAfter, pattern: true }, base); // v9.6
       if (kind === 'pspeak' && t) return { pk: p, item: it, kind: 'speak', label: name + ' · say it', sayEs: t.es, hintEn: t.en, answers: [t.es], opts: { lang: 'es', sentence: true }, reveal, speakAfter, tries: 0, pattern: true };
       return Object.assign({ kind: 'mc', label: run && run.mode === 'placement' ? 'Grammar' : name, prompt: it.q, options: shuffle(it.o), answer: it.o[0], reveal, speakAfter }, base);
     }
@@ -540,7 +552,7 @@
     const tokens = tileTokens(target), lower = new Set(tokens.map(strip)); // v9.3: accent-insensitive, so no está/esta twins
     const others = shuffle(otherTexts).slice(0, 4).flatMap(tileTokens);
     const distract = shuffle(noTwins([...new Set(others.filter(t => t.length > 2 && !lower.has(strip(t))))], lang === 'es' ? tokens : [])).slice(0, 2);
-    return Object.assign({ kind: 'build', tiles: shuffle(tokens.concat(distract)), answers: [target], opts: { lang } }, extra);
+    return Object.assign({ kind: 'build', tiles: shuffle(tokens.concat(distract)), answers: [target], orders: lang === 'es' ? ordersFor(target) : [], opts: { lang } }, extra);
   }
   const TILE_SHARE = 0.25; // about 1 in 4 word items with a short example sentence becomes a tile drill
   function withTiles(wordId, type) {
@@ -600,7 +612,7 @@
     };
     tiles.onclick = e => { const t = e.target.closest('.tile'); if (!t || isLocked() || ex.order.includes(+t.dataset.k)) return; ex.order.push(+t.dataset.k); sync(+t.dataset.k, true); };
     line.onclick = e => { const t = e.target.closest('.tile'); if (!t || isLocked() || !ex.order.includes(+t.dataset.k)) return; ex.order = ex.order.filter(k => k !== +t.dataset.k); sync(+t.dataset.k, false); };
-    const read = () => { if (!ex.order.length) return null; const v = ex.order.map(k => ex.tiles[k]).join(' '); const res = Check.check(v, ex.answers, { lang: ex.opts.lang, typo: false }).result; return { v, res, ok: res === 'exact' || res === 'accent' || res === 'agree' }; }; // v9.5: agreement slips count
+    const read = () => { if (!ex.order.length) return null; const v = ex.order.map(k => ex.tiles[k]).join(' '); const full = Check.checkOrder(v, ex.answers, { lang: ex.opts.lang, typo: false }, ex.orders), res = full.result; return { v, res, full, ok: res === 'exact' || res === 'accent' || res === 'agree' }; }; // v9.6: other valid word orders count // v9.5: agreement slips count
     // v9.5 voice build: clear the answer, then glide the matched tiles in one after another (same FLIP glide as a tap)
     let placeT = [];
     read.place = ks => {
@@ -632,7 +644,7 @@
     if (mode !== 'placement' && mode !== 'test') {
       const seen = new Set();
       for (let k = 0; k < queue.length; k++) {
-        const e = queue[k]; if (!isDrill(e) || !e.id.startsWith('p:')) continue;
+        const e = queue[k]; if (!isDrill(e) || !e.id.startsWith('p:') || e.focus) continue; // v9.6 focus drills already open with 2 contrasts
         const pk = e.id.slice(2); if (seen.has(pk)) continue; seen.add(pk);
         if (S.rulesSeen[pk] || !IDX.patterns[pk] || !IDX.patterns[pk].rule) continue;
         let n = 0; while (k + n < queue.length && queue[k + n].id === e.id && !queue[k + n].intro) n++;
@@ -657,7 +669,11 @@
     if (ex && ex.item && entry.id.startsWith('p:')) { const ix = IDX.patterns[entry.id.slice(2)].items.indexOf(ex.item); if (ix >= 0) copy.itemIdx = ix; }
     run.queue.push(copy);
   }
-  function startRun(queue, mode, meta) { sessionStart(); run = Object.assign({ queue: planRun(queue, mode), i: 0, mode, results: [], firstDone: {}, score: 0, total: 0, misses: [], done: new Set() }, meta || {}); run.newIds = mode === 'placement' ? new Set() : newIdsFor(queue); nextCard(); }
+  function startRun(queue, mode, meta) { sessionStart(); run = Object.assign({ queue: planRun(queue, mode), i: 0, mode, results: [], firstDone: {}, score: 0, total: 0, misses: [], done: new Set() }, meta || {}); run.newIds = mode === 'placement' ? new Set() : newIdsFor(queue);
+    const f = queue.find(e => e.focus); // v9.6: the session's one grammar pattern
+    try { window.scrollTo(0, 0); } catch (e) {}
+    if (f) { run.focus = f.id.slice(2); run.focusCard = !S.rulesSeen[run.focus]; S.focusLog = [run.focus].concat((S.focusLog || []).filter(x => x !== run.focus)).slice(0, 10); save(); }
+    nextCard(); }
   function nextCard() {
     while (run.i < run.queue.length && run.queue[run.i].id && run.queue[run.i].id.startsWith('w:') && isParked(run.queue[run.i].id) && run.mode !== 'placement') run.i++;
     if (run.i >= run.queue.length) return finishRun();
@@ -702,10 +718,15 @@
   }
   function renderRuleStep(pk, from, after) {
     const p = IDX.patterns[pk];
-    app.innerHTML = progressBar() + `<main class="card rule-step"><div class="label"><span class="badge new">NEW</span> Grammar rule · ${esc(p.name.replace(/\s*\(.*\)\s*$/, ''))}</div>${ruleCardHtml(pk)}</main><footer><button class="btn primary" id="go">Continue</button></footer>`;
-    bindQuit(); bindSpeak(); setBar(runFrac());
+    app.innerHTML = progressBar() + `<main class="card rule-step">${run.focus === pk ? focusHead(pk, false) : ''}<div class="label"><span class="badge new">NEW</span> Grammar rule · ${esc(p.name.replace(/\s*\(.*\)\s*$/, ''))}</div>${ruleCardHtml(pk)}</main><footer><button class="btn primary" id="go">Continue</button></footer>`;
+    bindQuit(); bindSpeak(); setBar(runFrac()); try { window.scrollTo(0, 0); } catch (e) {} // v9.6: a rule card always opens at its top
     run.answered = false; run.ruleStep = pk; // (debug surface: __app.entry reports rule: true while the card is up)
-    document.getElementById('go').onclick = step(() => { run.ruleStep = null; startPacing(pk, from); after(); });
+    document.getElementById('go').onclick = step(() => { run.ruleStep = null; if (run.focus === pk) run.focusShown = true; startPacing(pk, from); after(); });
+  }
+  // v9.6: "Today's grammar" header at the start of a focus session (with the one-line reminder when the card was seen before)
+  function focusHead(pk, remind) {
+    const p = IDX.patterns[pk], r = p.rule || {}, title = r.title || p.name;
+    return `<div class="focus-head" data-focus="${esc(pk)}"><div class="focus-title"><span>Today’s grammar: <b>${esc(title)}</b></span>${p.rule ? `<button class="rule-btn" type="button" data-rule="${esc(pk)}">📘 Rule</button>` : ''}</div>${remind && (r.line || r.rule) ? `<div class="focus-line">${esc(r.line || r.rule)}</div>` : ''}</div>`;
   }
   function openRule(pk) {
     closeRule(); closeHint();
@@ -797,12 +818,13 @@
     else input = `<form id="f" autocomplete="off"><textarea id="ans" class="ans" rows="2" lang="${ex.opts.lang}" placeholder="${esc(ex.placeholder)}" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" enterkeyhint="done"></textarea></form>`;
     const cant = ex.audio ? '<button class="cant-listen" id="cantListen" type="button">🔇 No puedo escuchar ahora <span class="muted">· Can’t listen now</span></button>'
       : ex.kind === 'speak' ? '<button class="cant-listen" id="cantSpeak" type="button">🤐 No puedo hablar ahora <span class="muted">· Can’t speak now</span></button>' : '';
-    const ruleBtn = ex.pk && ruleOk() && IDX.patterns[ex.pk].rule ? `<button class="rule-btn" id="ruleBtn" type="button" data-rule="${esc(ex.pk)}">📘 Rule</button>` : ''; // v9.4
+    const fh = run.focus && ex.pk === run.focus && !run.focusShown ? focusHead(ex.pk, !run.focusCard) : ''; if (fh) run.focusShown = true; // v9.6 header (has its own 📘)
+    const ruleBtn = !fh && ex.pk && ruleOk() && IDX.patterns[ex.pk].rule ? `<button class="rule-btn" id="ruleBtn" type="button" data-rule="${esc(ex.pk)}">📘 Rule</button>` : ''; // v9.4
     const label = `<div class="label${ruleBtn ? ' with-rule' : ''}"><span>${run.mode === 'test' ? 'Test · ' : ''}${esc(ex.label)}</span>${ruleBtn}</div>`;
     const vm = ex.kind === 'mc' || ex.kind === 'speak' ? '' : vmicHtml(); // v9.5: say it instead of typing / tapping tiles
     const foot = ex.kind === 'mc' ? '' : ex.flip ? `<button class="btn secondary" id="skip" aria-label="Flip the card to see the answer">↻ Flip</button>${vm}<button class="btn primary" id="check">Check</button>`
       : ex.kind === 'speak' ? '<button class="btn secondary" id="skip">I don\'t know</button>' : `<button class="btn secondary" id="skip">I don\'t know</button>${vm}<button class="btn primary" id="check">Check</button>`;
-    app.innerHTML = progressBar() + `<main class="card ex-${ex.kind}${ex.flip ? ' ex-flip' : ''}${hintsOff() ? ' hints-off' : ''}">${newLabel(prompt)}${label}${prompt}${input}${vm ? '<div class="vheard muted small" id="vheard" aria-live="polite"></div>' : ''}${cant}<div id="fb"></div></main><footer${vm ? ' class="has-vmic"' : ''}>${foot}</footer>`;
+    app.innerHTML = progressBar() + `<main class="card ex-${ex.kind}${ex.flip ? ' ex-flip' : ''}${hintsOff() ? ' hints-off' : ''}">${fh}${newLabel(prompt)}${label}${prompt}${input}${vm ? '<div class="vheard muted small" id="vheard" aria-live="polite"></div>' : ''}${cant}<div id="fb"></div></main><footer${vm ? ' class="has-vmic"' : ''}>${foot}</footer>`;
     bindQuit(); bindSpeak(); setBar(runFrac());
     if (ex.audio) document.getElementById('cantListen').onclick = e => cantListen(entry, e.currentTarget);
     if (ex.listen) {
@@ -825,7 +847,7 @@
       const read = mountTiles(ex, () => run.answered);
       if (ex.bigEs) autoSpeak(ex.bigEs);
       voiceTiles(ex, read, () => run.answered);
-      const doCheck = () => { stopRec(); const r = read(); if (!r) return; answer(entry, ex, r.ok ? (r.res === 'agree' ? 'agree' : 'exact') : 'wrong', r.v); };
+      const doCheck = () => { stopRec(); const r = read(); if (!r) return; ex.res = r.full; answer(entry, ex, r.ok ? (r.res === 'agree' ? 'agree' : 'exact') : 'wrong', r.v); };
       document.getElementById('check').onclick = () => run.answered ? advance() : doCheck();
       document.getElementById('skip').onclick = () => { if (!run.answered) { stopRec(); answer(entry, ex, 'wrong', ''); } };
       return;
@@ -845,7 +867,7 @@
     const inp = document.getElementById('ans'); setTimeout(() => inp.focus(), 50);
     mountAnswerBox(inp, () => { if (run.answered) return advance(); doCheck(); });
     voiceType(inp, ex.opts.lang, () => run.answered);
-    const doCheck = () => { stopRec(); const v = inp.value.replace(/[\r\n]+/g, ' '); if (!v.trim()) return; const r = ex.alts ? Check.checkAlt(v, ex.answers, ex.opts, ex.alts) : Check.check(v, ex.answers, ex.opts); ex.matched = r.result === 'alt' ? null : r.answer; ex.res = r; answer(entry, ex, r.result, v); };
+    const doCheck = () => { stopRec(); const v = inp.value.replace(/[\r\n]+/g, ' '); if (!v.trim()) return; let r = ex.alts ? Check.checkAlt(v, ex.answers, ex.opts, ex.alts) : Check.check(v, ex.answers, ex.opts); if (r.result === 'wrong' && ex.orders && ex.orders.length) r = Check.checkOrder(v, ex.answers, ex.opts, ex.orders); ex.matched = r.result === 'alt' ? null : r.answer; ex.res = r; answer(entry, ex, r.result, v); };
     document.getElementById('f').onsubmit = e => { e.preventDefault(); if (run.answered) return advance(); doCheck(); };
     document.getElementById('check').onclick = () => run.answered ? advance() : doCheck();
     document.getElementById('skip').onclick = () => {
@@ -1077,8 +1099,8 @@
     const cf = ansEs ? tokenize(correctForm) : esc(correctForm);
     const head = result === 'alt' ? `<div class="ok">✓ Correct</div><p class="alt-note"><span aria-hidden="true">ℹ️</span> ${esc((ex.res.note || '').replace(/^Correct! /, ''))}${strip(ex.res.answer) !== strip(given) ? ` <span class="muted">Course word: <b>${esc(ex.res.answer)}</b></span>` : ''}</p>`
       : result === 'close' ? `<div class="ok warn">✓ Close. Full line: <b>${esc(ex.answers[0])}</b>${ex.heard ? `<div class="muted small">Heard: “${esc(ex.heard)}”</div>` : ''}</div>`
-      : result === 'exact' ? `<div class="ok">✓ Correct</div>${alsoWritten(ex, correctForm, given)}`
-      : result === 'accent' ? `<div class="ok">✓ Correct</div><div class="muted small spelled">Spelled: ${cf}</div>${alsoWritten(ex, correctForm, given)}`
+      : result === 'exact' ? `<div class="ok">✓ Correct</div>${orderNote(ex)}${alsoWritten(ex, correctForm, given)}`
+      : result === 'accent' ? `<div class="ok">✓ Correct</div>${ex.res && ex.res.order ? orderNote(ex) : `<div class="muted small spelled">Spelled: ${cf}</div>`}${alsoWritten(ex, correctForm, given)}`
       : result === 'agree' ? `<div class="ok">✓ Correct</div><div class="muted small spelled natural">Natural: ${cf}</div>${alsoWritten(ex, correctForm, given)}`
       : result === 'typo' ? `<div class="ok typo">✓ Correct, watch the spelling: <b class="fixed">${Check.markFixes(correctForm, ex.res)}</b></div>${alsoWritten(ex, correctForm, given)}`
       : ex.flipped ? `<div class="bad">↻ Flipped: <b>${cf}</b></div>`
@@ -1093,6 +1115,7 @@
     if (rv.ex && !ok) more += `<div class="example" data-en="${esc(rv.ex.en)}"><div>${tokenize(rv.ex.es)}</div><div class="muted">${esc(rv.ex.en)}</div></div>`;
     fb.innerHTML = `<div class="feedback ${ok ? 'good' : 'miss'}">${head}${more}</div>`;
     bindSpeak();
+    if (ex.kind === 'build') setTimeout(() => { try { fb.scrollIntoView({ block: 'nearest', behavior: S.settings.anim === false ? 'auto' : 'smooth' }); } catch (e) {} }, 40); // v9.6: the verdict + note is in view under a tall word bank
     const inp = document.getElementById('ans'); if (inp) inp.readOnly = true;
     setBar(runFrac()); { const c = document.querySelector('.topbar .count'), rc = runCounts(); if (c) c.textContent = `${rc.done}/${rc.n}`; }
     const chosen = ex.kind === 'mc' ? app.querySelector(ok ? '.opt.right' : '.opt.wrong') : ex.kind === 'build' ? document.getElementById('line') : ex.kind === 'speak' ? document.getElementById('mic') : inp;
@@ -1130,20 +1153,69 @@
     shuffle(fresh).forEach(w => q.push({ id: wid(w.id), ex: withTiles(w.id, pick(['en2es', 'cloze', 'listen', 'flip', 'speak', 'es2en'])), practice: true }));
     return q;
   }
+  // ---------- v9.6 grammar focus: one pattern per practice / review session, about 8 drills on it ----------
+  const FOCUS_N = 8;
+  // how shaky a pattern is: FSRS lapse rate, or the miss rate once it has a few answers (whichever is higher)
+  function patWeak(pk) {
+    const c = S.items[pid(pk)], st = S.pstats[pk];
+    const lr = c ? (c.lapses || 0) / Math.max(1, c.reps || 0) : 0, mr = st && st.seen >= 3 ? 1 - st.correct / st.seen : 0;
+    return Math.max(lr, mr);
+  }
+  // order: this unit's patterns first, then due today, then weakest; never the same as last session unless clearly weakest
+  function chooseFocus(cands, first) {
+    const eod = endOfToday(), last = (S.focusLog || [])[0];
+    const due = pk => { const c = S.items[pid(pk)]; return c && c.due <= eod ? 0 : 1; };
+    const ranked = [...new Set(cands)].filter(pk => IDX.patterns[pk]).map(pk => ({ pk, t: first.includes(pk) ? 0 : 1, d: due(pk), w: patWeak(pk), r: Math.random() }))
+      .sort((a, b) => a.t - b.t || a.d - b.d || b.w - a.w || a.r - b.r);
+    if (!ranked.length) return null;
+    let top = ranked[0];
+    if (top.pk === last && ranked.length > 1) {
+      const other = Math.max(...ranked.slice(1).map(x => x.w));
+      if (!(top.w >= 0.34 && top.w - other >= 0.2)) top = ranked[1]; // rotate
+    }
+    return top.pk;
+  }
+  // 2 easy one-contrast drills first (they count toward the 8), then mixed formats. Items are spread out; a pattern with
+  // fewer items than drills reuses an item in a different format rather than pulling in another pattern.
+  function focusDrills(pk, n) {
+    n = n || FOCUS_N;
+    const items = IDX.patterns[pk].items, id = pid(pk), out = [];
+    const easy = shuffle(items.map((it, i) => it.easy ? i : -1).filter(i => i >= 0));
+    const lead = easy.slice(0, 2); for (const i of shuffle(items.map((_, i) => i))) if (lead.length < 2 && !lead.includes(i)) lead.push(i);
+    lead.forEach(i => out.push({ id, itemIdx: i, ex: 'paced', practice: true, focus: true }));
+    const order = shuffle(items.map((_, i) => i).filter(i => !lead.includes(i)));
+    const fmts = shuffle(['mc', 'ptiles', 'ptype', 'pspeak', 'mc', 'ptiles']);
+    const used = {}; lead.forEach(i => { used[i] = ['paced']; });
+    for (let k = 0; out.length < n; k++) {
+      const i = order.length ? order[k % order.length] : lead[k % lead.length];
+      const it = items[i], tOk = !!patternTarget(it);
+      let opts = [fmts[k % fmts.length]].concat(['mc', 'ptype', 'ptiles', 'pspeak']).filter(f => tOk || (f !== 'ptiles' && f !== 'pspeak'));
+      const f = opts.find(x => !(used[i] || []).includes(x)) || opts[0];
+      (used[i] = used[i] || []).push(f);
+      out.push({ id, itemIdx: i, ex: f, focus: true });
+    }
+    return out;
+  }
+  // grammar block first (4 in a row so the rule sinks in), then grammar and vocab alternate
+  function weave(g, v) {
+    const q = g.slice(0, 4), rg = g.slice(4), rv = v.slice();
+    while (rg.length || rv.length) { if (rv.length) q.push(rv.shift()); if (rg.length) q.push(rg.shift()); }
+    return q;
+  }
   function practiceQueue(u, n) {
     n = n || 14; const now = Date.now();
     const units = unitsUpTo(u.id);
-    const pool = [];
-    units.forEach(x => { x.words.forEach(w => { if (!S.parked[w.id] && S.items[wid(w.id)]) pool.push(wid(w.id)); }); x.focus.forEach(p => { if (S.items[pid(p)] && !pool.includes(pid(p))) pool.push(pid(p)); }); });
+    const pool = [], pats = [];
+    units.forEach(x => { x.words.forEach(w => { if (!S.parked[w.id] && S.items[wid(w.id)]) pool.push(wid(w.id)); }); x.focus.forEach(p => { if (S.items[pid(p)] || u.focus.includes(p)) pats.push(p); }); });
     const eod = endOfToday();
     const score = id => { const c = S.items[id]; const due = c.due <= eod ? 0 : 1; const weak = (c.lapses || 0) > 0 || c.s < 7 ? 0 : 1; return due * 2 + weak + SRS.currentR(c, now) * 0.5 + Math.random() * 0.4; };
     const ranked = pool.sort((a, b) => score(a) - score(b));
-    let chosen = ranked.slice(0, n);
-    const pats = ranked.filter(id => id.startsWith('p:'));
-    if (chosen.filter(id => id.startsWith('p:')).length < 3) chosen = shuffle(chosen.filter(id => id.startsWith('w:')).slice(0, n - 3).concat(pats.slice(0, 3)));
-    // fresh sentences: words lean on cloze / sentence listening, patterns pick unseen items
-    // v8: flip cards, repeat-after-me and the picker join the mix (about 1 in 8 each)
-    return shuffle(chosen).map(id => id.startsWith('w:') ? { id, ex: withTiles(id.slice(2), pick(['cloze', 'listenS', 'en2es', 'cloze', 'flip', 'speak', 'cloze', 'pickEn'])) } : { id });
+    // fresh sentences: words lean on cloze / sentence listening; flip cards, repeat-after-me and the picker join the mix
+    const vocab = id => ({ id, ex: withTiles(id.slice(2), pick(['cloze', 'listenS', 'en2es', 'cloze', 'flip', 'speak', 'cloze', 'pickEn'])) });
+    const fk = chooseFocus(pats, u.focus);
+    if (!fk) return shuffle(ranked.slice(0, n)).map(vocab);
+    const g = focusDrills(fk, Math.min(FOCUS_N, n));
+    return weave(g, shuffle(ranked.slice(0, Math.max(0, n - g.length))).map(vocab));
   }
   function testQueue(u) {
     const units = unitsUpTo(u.id).reverse(); // most recent first
@@ -1232,7 +1304,7 @@
     const grade = (r) => {
       story.tile.checked = true; lastStep = performance.now();
       const ok = r && r.ok; story.tile.retry = !ok; // v9.5: a missed rebuild comes back at the end
-      document.getElementById('fb').innerHTML = `<div class="feedback ${ok ? 'good' : 'miss'}">${ok ? '<div class="ok">✓ Correct</div>' : `<div class="bad">✗ Correct answer: <b>${esc(line.es)}</b></div>`}</div>`;
+      document.getElementById('fb').innerHTML = `<div class="feedback ${ok ? 'good' : 'miss'}">${ok ? `<div class="ok">✓ Correct</div>${orderNote({ res: r.full })}` : `<div class="bad">✗ Correct answer: <b>${esc(line.es)}</b></div>`}</div>`;
       if (ok) FX.correct([document.getElementById('line')]); else FX.miss([document.getElementById('line')]);
       if (ok) autoSpeak(line.es, storyVoice(line.s));
       document.getElementById('fb').scrollIntoView({ block: 'nearest' });
@@ -1347,7 +1419,13 @@
   }
 
   // ---------- review (spaced repetition outside the path) ----------
-  function reviewQueue() { return dueIds(Date.now()).slice(0, 60).map(id => ({ id })); }
+  function reviewQueue() { // v9.6: words that are due, plus ~8 drills on ONE due grammar pattern (the other due patterns wait their turn)
+    const due = dueIds(Date.now()), pats = due.filter(id => id.startsWith('p:')).map(id => id.slice(2)), words = due.filter(id => id.startsWith('w:'));
+    const cur = currentPos(), first = cur ? C.units[IDX.unitIdx[cur.uid]].focus : [];
+    const fk = pats.length ? chooseFocus(pats, first) : null;
+    if (!fk) return words.slice(0, 60).map(id => ({ id }));
+    return weave(focusDrills(fk), words.slice(0, 60 - FOCUS_N).map(id => ({ id })));
+  }
   function startReview() { persist(); const q = reviewQueue(); if (!q.length) return renderHome(); startRun(q, 'review'); }
   function finishReview() {
     S.sessions = (S.sessions || 0) + 1; S.lastSession = Date.now(); save();
@@ -1747,7 +1825,7 @@
     return [...out];
   }
   window.__app = { version: APP_VERSION, counts: () => runCounts(), openWordMenu: (id, x, y, word) => openWordMenu(id, x, y, word), get state() { return S; }, get ex() { return run && run.ex; }, get entry() { return run && (run.ruleStep ? Object.assign({}, run.queue[run.i], { rule: true }) : run.queue[run.i]); }, get run() { return run; }, get story() { return story; },
-    makeExercise: e => makeExercise(e), nextCard: () => nextCard(), openRule: p => openRule(p), get content() { return C; }, importBackup: (t) => importBackup(t, true), openStone: (u, i) => openStone(u, i), testQueue: u => testQueue(C.units[IDX.unitIdx[u]]), practiceQueue: u => practiceQueue(C.units[IDX.unitIdx[u]]), dueIds: () => dueIds(Date.now()), currentPos: () => currentPos(),
+    makeExercise: e => makeExercise(e), nextCard: () => nextCard(), openRule: p => openRule(p), get content() { return C; }, importBackup: (t) => importBackup(t, true), openStone: (u, i) => openStone(u, i), testQueue: u => testQueue(C.units[IDX.unitIdx[u]]), practiceQueue: u => practiceQueue(C.units[IDX.unitIdx[u]]), reviewQueue: () => reviewQueue(), chooseFocus: (c, f) => chooseFocus(c, f || []), patWeak: pk => patWeak(pk), startReview: () => startReview(), dueIds: () => dueIds(Date.now()), currentPos: () => currentPos(),
     introQueue: u => introQueue(C.units[IDX.unitIdx[u]]), withTiles: (w, t) => withTiles(w, t), pickStoryTile: u => pickStoryTile(C.units[IDX.unitIdx[u]].story),
     forceEx: (type, sent) => { if (!run || run.answered) return; run.ruleStep = null; const e = run.queue[run.i] = Object.assign({}, run.queue[run.i], { ex: type }, sent ? { sent } : {}); run.ex = makeExercise(e); renderExercise(e, run.ex); },
     speakPaused: () => speakPaused(), speakOk: () => speakOk(), cantSpeak: () => { const b = document.getElementById('cantSpeak'); if (b) b.click(); }, get voice() { return voice; }, get voice2() { return voice2; }, storyVoice: s => { const v = storyVoice(s); return v && { voice: v.voice && v.voice.name, pitch: v.pitch }; }, pickVoice: () => pickVoice(), gloss: w => gloss(w), pickExercise: (id, rev) => pickExercise(IDX.words[id], rev), unblockSpeech: () => unblockSpeech(), get micFails() { return micFails; }, get recActive() { return !!rec; }, get speechBlocked() { return speechBlocked; }, normalize: raw => normalize(raw), keepFooterVisible: () => keepFooterVisible(), speakables: () => speakables(), speak: (t, slow, spk) => speak(t, slow, spk != null ? storyVoice(spk) : null), unitAudio: u => unitAudio(C.units[IDX.unitIdx[u]]), get recorded() { return useRecorded(); }, recStory: s => storyVoice(s) && storyVoice(s).rec, offlineAudio: () => offlineAudio(),

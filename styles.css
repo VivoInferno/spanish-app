@@ -267,3 +267,9 @@ footer.has-vmic .btn{min-width:0}
 .vlisten{color:var(--accent);font-weight:600}
 footer.has-vmic .btn{padding:14px 10px;font-size:16px;white-space:nowrap}
 #easy{font-size:15px;padding-left:8px;padding-right:8px;white-space:normal;line-height:1.2}
+/* v9.6 grammar focus: one pattern per practice / review session */
+.focus-head{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);border-radius:12px;padding:10px 12px;margin:0 0 14px}
+.focus-title{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:15px;line-height:1.35}
+.focus-title b{color:var(--accent)}
+.focus-head .rule-btn{flex:0 0 auto}
+.focus-line{margin-top:6px;font-size:15px;line-height:1.4;color:var(--fg)}

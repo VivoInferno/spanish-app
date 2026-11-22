@@ -54,7 +54,7 @@ async def main():
         pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto(URL); await pg.wait_for_selector('.stone'); await pg.wait_for_timeout(400)
         s = await pg.evaluate("__app.state")
-        check(await pg.evaluate("__app.version") == 'v9.5' and s['items'] == V9['items'] and s['path'] == V9['path'] and s['daily'] == V9['daily']
+        check(await pg.evaluate("__app.version") == 'v9.6' and s['items'] == V9['items'] and s['path'] == V9['path'] and s['daily'] == V9['daily']
               and s['streak'] == V9['streak'] and s['parked'] == V9['parked'] and s['hidden'] == [], 'v9.x data → v9.5 losslessly (items, path, daily, streak, g: parks; hidden = [])')
 
         # ---------- 1. numbers ----------
@@ -234,6 +234,8 @@ async def main():
         for mode, stone in (('practice', 2), ('test', 3)):
             await pg.evaluate(f"__app.openStone('u5', {stone})"); await pg.wait_for_selector('.card'); await pg.wait_for_timeout(200)
             while await pg.evaluate("!!(__app.entry && (__app.entry.theme || __app.entry.intro || __app.entry.rule))"): await answer(pg)
+            if mode == 'practice':  # v9.6: practice opens with the grammar focus block (its 2 contrasts are practice-only); miss a graded vocab drill
+                await pg.evaluate("(() => { const r = __app.run, q = r.queue, j = q.findIndex((e, k) => k > r.i && e.id.startsWith('w:')); const t = q[r.i]; q[r.i] = q[j]; q[j] = t; __app.nextCard(); })()"); await pg.wait_for_timeout(150)
             c0 = await pg.evaluate("__app.counts()"); q0 = await pg.evaluate("__app.run.queue.map(e => e.key)")
             first = await pg.evaluate("({ id: __app.entry.id, key: __app.entry.key, i: __app.run.i, item: __app.ex.item ? __app.content.patterns[__app.entry.id.slice(2)].items.indexOf(__app.ex.item) : null })")
             srs_before = await pg.evaluate(f"JSON.stringify(__app.state.items[{json.dumps(first['id'])}] || null)")

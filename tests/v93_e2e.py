@@ -6,7 +6,7 @@ src = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'v8_e2e.py')
 exec(src)
 
 async def tap(pg, loc):
-    await loc.scroll_into_view_if_needed(); bb = await loc.bounding_box()
+    await loc.evaluate("e => e.scrollIntoView({ block: 'center' })"); await pg.wait_for_timeout(80); bb = await loc.bounding_box()  # center: a tile half under the fixed footer would eat the tap
     await pg.mouse.click(bb['x'] + bb['width'] / 2, bb['y'] + bb['height'] / 2); await pg.wait_for_timeout(120)
 
 FOLD = "s => s.normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase().replace(/[¿?¡!.,;:\"'()\\-\\s]/g, '')"
@@ -21,7 +21,7 @@ async def main():
         pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto(URL); await pg.wait_for_selector('.stone'); await pg.wait_for_timeout(500)
         s = await pg.evaluate("__app.state")
-        check(await pg.evaluate("__app.version") == 'v9.5' and s['items'] == V91['items'] and s['path'] == V91['path'] and s['daily'] == V91['daily']
+        check(await pg.evaluate("__app.version") == 'v9.6' and s['items'] == V91['items'] and s['path'] == V91['path'] and s['daily'] == V91['daily']
               and s['streak'] == V91['streak'] and 'g:costera' in s['parked'], 'v9.2 data → v9.5 losslessly (items, path, daily, streak, g: parks)')
 
         # ---------- 1. accent-insensitive grading in the app ----------
@@ -80,7 +80,8 @@ async def main():
             k = await pg.evaluate(f"__app.ex.tiles.findIndex((t, k) => t === {json.dumps(wd)} && !__app.ex.order.includes(k))")
             await tap(pg, pg.locator(f'#tiles .tile[data-k="{k}"]'))
         await pg.wait_for_timeout(300); await pg.click('#check'); await pg.wait_for_selector('#fb .feedback')
-        check(await pg.query_selector('#fb .feedback.good') is not None, 'tapping the reply in order is correct')
+        dbg = await pg.evaluate("({ order: __app.ex.order.map(k => __app.ex.tiles[k]), head: !!document.querySelector('.focus-head') })")
+        check(await pg.query_selector('#fb .feedback.good') is not None, f'tapping the reply in order is correct ({dbg})')
         if ENGINE == 'webkit': await pg.screenshot(path=f'{OUT}/v93-grammar-tiles.png')
         await pg.wait_for_timeout(500)
         # wrong pronoun tile → wrong

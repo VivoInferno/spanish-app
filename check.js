@@ -231,6 +231,16 @@
     }
     return best;
   }
+  /**
+   * v9.6 checkOrder(input, answers, opts, orders): same as check(), and when that says wrong, the item's other natural word
+   * orders (content.json "alts": same words, e.g. "no tiene fecha de entrega todavía") count too -> {…, order: preferred}.
+   */
+  function checkOrder(input, answers, opts, orders) {
+    const r = check(input, answers, opts);
+    if (r.result !== 'wrong' || !orders || !orders.length) return r;
+    const ro = check(input, orders, opts);
+    return ro.result === 'wrong' ? r : Object.assign(ro, { order: answers[0] });
+  }
   // ---- v8: synonym credit (reparar for arreglar, coche for carro, ...) with a note on what Mexicans say ----
   let SWAPS = new Map(); // accent-free alternate form -> {main form, note}; from content.json synonyms (sentence-safe rules only)
   function setSynonyms(list) {
@@ -274,6 +284,6 @@
       return esc(w.slice(0, p)) + '<mark>' + esc(w.slice(p, p + len)) + '</mark>' + esc(w.slice(p + len));
     }).join(' ');
   }
-  const api = { check, checkAlt, setSynonyms, clean, stripAcc, lev, oneEdit, setKnown, knownFromContent, markFixes, numify, numberSpans, agreeKey, isKnown: w => KNOWN.has(stripAcc(clean(w))) };
+  const api = { check, checkAlt, checkOrder, setSynonyms, clean, stripAcc, lev, oneEdit, setKnown, knownFromContent, markFixes, numify, numberSpans, agreeKey, isKnown: w => KNOWN.has(stripAcc(clean(w))) };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.Check = api;
 })(this);

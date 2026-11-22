@@ -21,7 +21,10 @@
       "los se enviaré": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
       "me los enviaré": "Me los enviaré would mean they go to you (me); they go to the notary, so le → se."
      },
-     "easy": true
+     "easy": true,
+     "alts": [
+      "Sí, mañana se los enviaré."
+     ]
     },
     {
      "q": "¿Quién le va a dar la llave a la señora? — Yo ___ cuando llegue.",
@@ -38,7 +41,11 @@
       "la le daré": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
       "me la daré": "Me la daré would mean you give it to yourself; the key goes to the señora, so le → se."
      },
-     "easy": true
+     "easy": true,
+     "alts": [
+      "Se la daré cuando llegue.",
+      "Se la daré yo cuando llegue."
+     ]
     },
     {
      "q": "¿Me vas a prestar tu carro el sábado? — Sí, ___.",
@@ -70,7 +77,10 @@
       "se las traerán": "Nos never changes to se; only le and les do.",
       "las nos traerán": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
       "te las traerán": "Te las traerán means they’ll bring them to you (one friend); the question is about us, so nos."
-     }
+     },
+     "alts": [
+      "Sí, esta tarde nos las traerán."
+     ]
     },
     {
      "q": "¿Les vas a explicar el problema a tus clientes? — Sí, ___ en la junta.",
@@ -119,7 +129,10 @@
       "se lo mando": "Se lo is for a client (usted) or him/her. A friend who says ¿me mandas? gets te lo.",
       "me lo mandas": "That means 'you send it to me', the opposite of what you're promising.",
       "me lo mando": "Me lo mando means you send it to yourself; the other person asked, so te lo."
-     }
+     },
+     "alts": [
+      "Sí, hoy te lo mando."
+     ]
     },
     {
      "q": "¿Le vas a dar las llaves al comprador? — Sí, ___ en la firma.",
@@ -161,7 +174,8 @@
       "Will you send me the location? — Yes, I'll send it to you."
      ]
     ],
-    "trap": "Only le and les turn into se. And se lo doesn't say who it's for; the conversation does (add a él / a usted if you need to be clear)."
+    "trap": "Only le and les turn into se. And se lo doesn't say who it's for; the conversation does (add a él / a usted if you need to be clear).",
+    "line": "le/les + lo/la/los/las → se lo, se la: ‘to whom’ comes first (se los enviaré)."
    }
   },
   "clitic_preterite": {
@@ -183,7 +197,10 @@
       "la le pagué": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
       "me la pagó": "Me la pagó means he paid it to you; you’re the one who paid the owner: se la pagué."
      },
-     "easy": true
+     "easy": true,
+     "alts": [
+      "Sí, se la pagué ya."
+     ]
     },
     {
      "q": "¿Quién te dio esas flores? — Mi hermana ___.",
@@ -199,7 +216,10 @@
       "se las dio": "Se las would mean she gave them to someone else; the flowers were given to you, so me.",
       "las me dio": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
       "te las dio": "Te las dio means she gave them to the other person; you’re answering about yourself, so me."
-     }
+     },
+     "alts": [
+      "Me las dio mi hermana."
+     ]
     },
     {
      "q": "¿Le devolviste los libros a la biblioteca? — No, todavía no ___.",
@@ -216,7 +236,10 @@
       "los le devolví": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
       "me los devolvió": "Me los devolvió means someone returned them to you; you’re the one returning them to the library: se los devolví."
      },
-     "easy": true
+     "easy": true,
+     "alts": [
+      "No, no se los devolví todavía."
+     ]
     },
     {
      "q": "¿Les mandaste las fotos a tus papás? — Sí, ___ anoche.",
@@ -232,7 +255,10 @@
       "les las mandé": "Les las never happens: les turns into se before las.",
       "se las mandó": "Mandó is 'he/she sent'. You're answering about yourself: mandé.",
       "las les mandé": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las)."
-     }
+     },
+     "alts": [
+      "Sí, anoche se las mandé."
+     ]
     },
     {
      "q": "¿Te explicaron las reglas? — Sí, ___ ayer.",
@@ -248,7 +274,10 @@
       "se las explicaron": "They explained them to you, so me, not se.",
       "las me explicaron": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
       "te las explicaron": "Te las explicaron means they explained them to the other person; you’re talking about yourself, so me."
-     }
+     },
+     "alts": [
+      "Sí, ayer me las explicaron."
+     ]
     },
     {
      "q": "¿Le dijiste la verdad a Carlos? — Sí, ya ___.",
@@ -265,7 +294,10 @@
       "la le dije": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
       "se le dije": "Le can't be the thing; la verdad is 'it', so se la."
      },
-     "easy": true
+     "easy": true,
+     "alts": [
+      "Sí, se la dije ya."
+     ]
     }
    ],
    "rule": {
@@ -289,7 +321,8 @@
       "Who gave you the plans? — The architect gave them to me."
      ]
     ],
-    "trap": "Me / te / se tell you who got it, so listen for that: me las dio = she gave them to me, se las dio = she gave them to him / her. Lo vs la is a detail; nobody will misunderstand you."
+    "trap": "Me / te / se tell you who got it, so listen for that: me las dio = she gave them to me, se las dio = she gave them to him / her. Lo vs la is a detail; nobody will misunderstand you.",
+    "line": "Same rule in the past: le + la → se la, both before the verb (se la pagué)."
    }
   },
   "clitic_imperative": {
@@ -418,7 +451,8 @@
       "Don't tell the client yet."
      ]
     ],
-    "trap": "Mándalome is backwards: 'to whom' (me) always comes before 'what' (lo). And the negative uses the other form: no se lo das ✗ → no se lo des ✓."
+    "trap": "Mándalome is backwards: 'to whom' (me) always comes before 'what' (lo). And the negative uses the other form: no se lo das ✗ → no se lo des ✓.",
+    "line": "Yes-commands glue the pronouns on (mándamelo); no-commands put them in front (no me lo mandes)."
    }
   },
   "pret_imp": {
@@ -457,7 +491,10 @@
       "era": "Era is from ser (to be); you need ir (to go): fui.",
       "fue": "Fue is 'he/she went'; you're talking about yourself (abrí): fui."
      },
-     "easy": true
+     "easy": true,
+     "alts": [
+      "Fui al banco ayer y abrí una cuenta."
+     ]
     },
     {
      "q": "Estaba manejando cuando me ___ mi jefe.",
@@ -522,7 +559,10 @@
       "íbamos": "Counted, finished trips use preterite: fuimos.",
       "vamos": "El año pasado is the past.",
       "iríamos": "Iríamos means 'we would go'."
-     }
+     },
+     "alts": [
+      "Fuimos tres veces a Oaxaca el año pasado."
+     ]
     },
     {
      "q": "Eran las diez y ___ mucho tráfico cuando salimos.",
@@ -563,7 +603,8 @@
       "I was in a meeting when the client called."
      ]
     ],
-    "trap": "Time words help: ayer, el año pasado, tres veces → preterite. De niño, siempre, todos los sábados, cuando era… → imperfect."
+    "trap": "Time words help: ayer, el año pasado, tres veces → preterite. De niño, siempre, todos los sábados, cuando era… → imperfect.",
+    "line": "Preterite for one finished event (fui); imperfect for background and habits (iba)."
    }
   },
   "subj": {
@@ -651,7 +692,11 @@
       "vino": "Vino is the past, and dudo que needs the subjunctive: venga.",
       "venir": "You need a conjugated verb after que."
      },
-     "easy": true
+     "easy": true,
+     "alts": [
+      "Dudo que hoy el plomero venga.",
+      "Dudo que el plomero hoy venga."
+     ]
     },
     {
      "q": "Creo que el banco ___ a las nueve.",
@@ -730,7 +775,8 @@
       "I'll call you when I get to the office."
      ]
     ],
-    "trap": "Creo que takes the normal form (creo que está listo), but no creo que flips to the subjunctive (no creo que esté listo). Cuando about habits or the past is normal too: cuando llego, cuando llegué."
+    "trap": "Creo que takes the normal form (creo que está listo), but no creo que flips to the subjunctive (no creo que esté listo). Cuando about habits or the past is normal too: cuando llego, cuando llegué.",
+    "line": "Fact → está. Wish, doubt, feeling or a future ‘cuando’ after que → esté."
    }
   },
   "por_para": {
@@ -748,7 +794,10 @@
      "w": {
       "por": "Por Guadalajara would mean passing through it."
      },
-     "easy": true
+     "easy": true,
+     "alts": [
+      "Mañana temprano salgo para Guadalajara."
+     ]
     },
     {
      "q": "Pagué 500 pesos ___ la consulta.",
@@ -822,7 +871,10 @@
      "n": "Por: by means of the phone.",
      "w": {
       "para": "Means of communication use por: por teléfono, por correo."
-     }
+     },
+     "alts": [
+      "Más tarde te llamo por teléfono."
+     ]
     },
     {
      "q": "___ ser extranjero, hablas muy bien.",
@@ -859,7 +911,8 @@
       "Thanks for your patience; I'll call you later by phone."
      ]
     ],
-    "trap": "Salgo para Guadalajara = heading there. Paso por Guadalajara = going through it. Por ser extranjero = because you're a foreigner."
+    "trap": "Salgo para Guadalajara = heading there. Paso por Guadalajara = going through it. Por ser extranjero = because you're a foreigner.",
+    "line": "Para = goal (where to, by when, for whom); por = path or reason (through, by, in exchange for)."
    }
   },
   "ser_estar": {
@@ -927,7 +980,10 @@
      "n": "Son: time always uses ser.",
      "w": {
       "están": "Telling time always uses ser: son las ocho."
-     }
+     },
+     "alts": [
+      "Son las ocho ya; vámonos."
+     ]
     },
     {
      "q": "Esta casa ___ de mi abuelo.",
@@ -963,7 +1019,11 @@
      "n": "Está: how the fish tastes today is a condition right now.",
      "w": {
       "es": "Es rico describes the dish in general; how it tastes today uses estar: está rico."
-     }
+     },
+     "alts": [
+      "Hoy el pescado está muy rico.",
+      "El pescado hoy está muy rico."
+     ]
     }
    ],
    "rule": {
@@ -988,7 +1048,8 @@
       "The signing is at ten at the notary."
      ]
     ],
-    "trap": "Location uses estar, except for events (juntas, fiestas, firmas), which use ser. Time always uses ser: son las ocho."
+    "trap": "Location uses estar, except for events (juntas, fiestas, firmas), which use ser. Time always uses ser: son las ocho.",
+    "line": "Ser = what something is (identity, origin, time); estar = where it is and how it is right now."
    }
   },
   "se_constructions": {
@@ -1042,7 +1103,10 @@
       "se hablan": "Inglés is one language, so singular: se habla.",
       "habla se": "Se goes before the verb: se habla.",
       "es hablado": "Grammatical in textbooks, but nobody says it; Mexicans say se habla."
-     }
+     },
+     "alts": [
+      "Se habla inglés aquí."
+     ]
     },
     {
      "q": "___ casas en esta colonia.",
@@ -1149,7 +1213,8 @@
       "How do you say \"deed\" in Spanish?"
      ]
     ],
-    "trap": "The verb follows the thing: se me olvidó el contrato, se me olvidaron los papeles. And it's always se me / se le, never me se."
+    "trap": "The verb follows the thing: se me olvidó el contrato, se me olvidaron los papeles. And it's always se me / se le, never me se.",
+    "line": "Se + verb for things in general (se vende); se me + verb for accidents (se me olvidó)."
    }
   },
   "conditional": {
@@ -1237,7 +1302,11 @@
       "sería": "Never -ría right after si: si fuera, not si sería.",
       "era": "Si era is for real past situations, not 'if I were you'.",
       "seré": "Future doesn't go after si here."
-     }
+     },
+     "alts": [
+      "Si fuera, hablaría con el dueño.",
+      "Si tú fuera, hablaría con el dueño."
+     ]
     },
     {
      "q": "Dijo que ___ a las cinco, pero no llegó.",
@@ -1294,7 +1363,8 @@
       "If I had more budget, I would buy the corner one."
      ]
     ],
-    "trap": "Never put -ría right after si: si tendría ✗ → si tuviera ✓."
+    "trap": "Never put -ría right after si: si tendría ✗ → si tuviera ✓.",
+    "line": "Would = -ía (podría); si + past subjunctive for what isn’t true (si tuviera…, compraría)."
    }
   },
   "commands": {
@@ -1316,7 +1386,10 @@
       "Se sienta": "That's a statement ('he sits down'), not a request.",
       "Siéntase": "Siéntase comes from sentirse: 'feel (welcome)', not 'sit down'."
      },
-     "easy": true
+     "easy": true,
+     "alts": [
+      "Aquí siéntese, por favor."
+     ]
     },
     {
      "q": "No ___ tarde mañana. (tú)",
@@ -1366,7 +1439,11 @@
       "Tiene": "Tiene is a statement ('she has').",
       "Tenía": "Tenía is the past."
      },
-     "easy": true
+     "easy": true,
+     "alts": [
+      "Tenga paciencia, señora; casi ya está.",
+      "Tenga paciencia, señora; casi está ya."
+     ]
     },
     {
      "q": "___ la tarea antes de salir. (tú)",
@@ -1455,7 +1532,8 @@
       "Turn right at the light."
      ]
     ],
-    "trap": "With clients always use the usted form (tenga, no ten). No llegas ✗ → no llegues ✓: 'don't' never uses the normal form."
+    "trap": "With clients always use the usted form (tenga, no ten). No llegas ✗ → no llegues ✓: 'don't' never uses the normal form.",
+    "line": "Tú: habla / no hables. Usted: hable. Ustedes: hablen. ‘No’ always uses the subjunctive form."
    }
   },
   "gustar_like": {
@@ -1558,7 +1636,10 @@
       "queda": "Esos zapatos is plural, so quedan.",
       "quedas": "The shoes are the subject, not you.",
       "quedo": "Quedo is 'I stay'."
-     }
+     },
+     "alts": [
+      "No te quedan esos zapatos; están muy grandes."
+     ]
     },
     {
      "q": "¿Les ___ la idea de ir a Puebla el sábado?",
@@ -1575,7 +1656,10 @@
       "gustas": "Gustas means 'you are liked'.",
       "gustamos": "Gustamos means 'we are liked'."
      },
-     "easy": true
+     "easy": true,
+     "alts": [
+      "¿El sábado les gusta la idea de ir a Puebla?"
+     ]
     }
    ],
    "rule": {
@@ -1599,7 +1683,8 @@
       "Do you like the idea of seeing it on Saturday?"
      ]
     ],
-    "trap": "Don't match the person: a mi papá le encantan los tacos (tacos = plural), not encanta. With an action (regatear) it's always singular: le encanta regatear."
+    "trap": "Don't match the person: a mi papá le encantan los tacos (tacos = plural), not encanta. With an action (regatear) it's always singular: le encanta regatear.",
+    "line": "The thing is the subject: me gusta la casa, me gustan las casas, le falta un papel."
    }
   },
   "perfect": {
@@ -1621,7 +1706,12 @@
       "haya hecho": "Haya is subjunctive; nothing triggers it.",
       "hecho": "You need the helper: he hecho."
      },
-     "easy": true
+     "easy": true,
+     "alts": [
+      "No he hecho el depósito todavía; lo hago mañana.",
+      "Todavía no he hecho el depósito; mañana lo hago.",
+      "No he hecho el depósito todavía; mañana lo hago."
+     ]
     },
     {
      "q": "Cuando llegué al banco, ya ___.",
@@ -1638,7 +1728,10 @@
       "hayan cerrado": "Hayan cerrado is subjunctive, and nothing here triggers it.",
       "cerrarán": "Cerrarán is future ('they will close'); this already happened."
      },
-     "easy": true
+     "easy": true,
+     "alts": [
+      "Cuando llegué al banco, habían cerrado ya."
+     ]
     },
     {
      "q": "¿Ya ___ el terreno en persona? — Todavía no, pero voy el sábado.",
@@ -1654,7 +1747,10 @@
       "hayas visto": "Hayas visto is subjunctive and needs a trigger like ojalá que.",
       "haber visto": "You need a conjugated helper: has.",
       "he visto": "He visto is 'I have seen'; you're asking him."
-     }
+     },
+     "alts": [
+      "Todavía no, pero el sábado voy."
+     ]
     },
     {
      "q": "Se me olvidó que ya te lo ___.",
@@ -1670,7 +1766,10 @@
       "había decido": "Decido is 'I decide'; the participle of decir is dicho.",
       "haya decido": "Wrong helper and wrong participle.",
       "dicho": "You need the helper: había dicho."
-     }
+     },
+     "alts": [
+      "Se me olvidó que te lo había dicho ya."
+     ]
     },
     {
      "q": "La ventana está rota; alguien la ___.",
@@ -1719,7 +1818,10 @@
       "has revisado": "Has is for tú; the hint says usted.",
       "haya revisado": "Subjunctive, no trigger.",
       "he revisado": "He revisado is 'I have checked'."
-     }
+     },
+     "alts": [
+      "¿Ha revisado el estado de cuenta ya?"
+     ]
     }
    ],
    "rule": {
@@ -1744,7 +1846,8 @@
       "When I got there, the bank had already closed."
      ]
     ],
-    "trap": "Hacido, rompido, decido (for dicho) don't exist. And in Mexico ¿ya viste…? is as common as ¿ya has visto…?"
+    "trap": "Hacido, rompido, decido (for dicho) don't exist. And in Mexico ¿ya viste…? is as common as ¿ya has visto…?",
+    "line": "he/ha/hemos + -ado: has done; había + -ado: had done before something else."
    }
   },
   "relative": {
@@ -1890,7 +1993,8 @@
       "That's the area where we're going to build."
      ]
     ],
-    "trap": "Don't start a 'what' sentence with que alone: Que más me preocupa ✗ → Lo que más me preocupa ✓."
+    "trap": "Don't start a 'what' sentence with que alone: Que más me preocupa ✗ → Lo que más me preocupa ✓.",
+    "line": "que for most links; quien after a preposition for people; lo que = what; donde = where."
    }
   },
   "clitic_usted": {
@@ -1945,7 +2049,12 @@
       "lo le": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
       "te lo": "Te lo is for tú; it’s su oficina (usted), so se lo."
      },
-     "easy": true
+     "easy": true,
+     "alts": [
+      "Aquí no tengo el contrato, pero mañana se lo llevo a su oficina.",
+      "No tengo el contrato aquí, pero se lo llevo a su oficina mañana.",
+      "Aquí no tengo el contrato, pero se lo llevo a su oficina mañana."
+     ]
     },
     {
      "q": "¿Ya le mandaron los recibos? No, todavía no ___ mandan.",
@@ -1961,7 +2070,12 @@
       "me les": "Les isn't 'them' for things; los recibos → los.",
       "los me": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
       "se los": "He's talking about himself (to me), so me, not se."
-     }
+     },
+     "alts": [
+      "¿Le mandaron los recibos ya? No, todavía no me los mandan.",
+      "¿Ya le mandaron los recibos? No, no me los mandan todavía.",
+      "¿Le mandaron los recibos ya? No, no me los mandan todavía."
+     ]
     },
     {
      "q": "¿Me puede mandar la información? — Claro, ___ ahorita.",
@@ -1977,7 +2091,10 @@
       "te la mando": "Te is for people you call tú. With a client (¿me puede…?) use se.",
       "le la mando": "Le lo / le la never happen: le turns into se before lo, la, los or las.",
       "me la manda": "Me la manda means “you send it to me”; the client asked you to send it to them: se la mando."
-     }
+     },
+     "alts": [
+      "Claro, ahorita se la mando."
+     ]
     },
     {
      "q": "Señores, ¿las cotizaciones? Ya ___ envié a los dos.",
@@ -1993,7 +2110,10 @@
       "les las": "Les las never happens: les turns into se before las.",
       "las les": "Wrong order: 'to whom' (me/te/se/nos) always comes before 'what' (lo/la/los/las).",
       "me las": "Me las envié would mean you sent them to yourself; they went to both of you (les → se)."
-     }
+     },
+     "alts": [
+      "Señores, ¿las cotizaciones? Se las envié a los dos ya."
+     ]
     },
     {
      "q": "___ comparto mi ubicación para que llegue sin problema.",
@@ -2042,7 +2162,10 @@
       "le lo": "Le lo / le la never happen: le turns into se before lo, la, los or las.",
       "me lo": "Me lo mando means you send it to yourself; it’s for the client (usted), so se lo."
      },
-     "easy": true
+     "easy": true,
+     "alts": [
+      "Sí, se lo mando ahorita."
+     ]
     },
     {
      "q": "Las escrituras están en la notaría. ¿Quiere que ___ traiga?",
@@ -2074,7 +2197,10 @@
       "enséñemelos": "Enséñemelos means 'show them to me'; they're for his parents.",
       "se los enseña": "That's a statement, not the polite command.",
       "enséñaselos": "Enséñaselos is the tú command; with usted it’s enséñeselos."
-     }
+     },
+     "alts": [
+      "Sí, el sábado enséñeselos, por favor."
+     ]
     }
    ],
    "rule": {
@@ -2099,7 +2225,8 @@
       "If you have the photos, send them to me on WhatsApp."
      ]
     ],
-    "trap": "Te lo is for people you call tú; with clients it's se lo. Le la / le lo never happen."
+    "trap": "Te lo is for people you call tú; with clients it's se lo. Le la / le lo never happen.",
+    "line": "For a client (usted), le + lo/la → se lo / se la: ¿se la comparto?"
    }
   },
   "quedar_distancia": {
@@ -2202,7 +2329,11 @@
       "quede": "A direct question uses queda.",
       "quedan": "El sábado is singular, so queda.",
       "quedo": "Quedo is 'I stay'."
-     }
+     },
+     "alts": [
+      "¿El sábado le queda bien a las diez?",
+      "¿Le queda bien a las diez el sábado?"
+     ]
     },
     {
      "q": "Entonces ___ el sábado en la entrada del fraccionamiento.",
@@ -2218,7 +2349,16 @@
       "quedemos": "Quedemos is 'let's agree'; you're confirming what's already agreed.",
       "quedan": "Quedan is 'they agree'.",
       "queda": "Queda is 'it is located / is left'."
-     }
+     },
+     "alts": [
+      "Quedamos el sábado en la entrada del fraccionamiento entonces.",
+      "El sábado entonces quedamos en la entrada del fraccionamiento.",
+      "Entonces el sábado quedamos en la entrada del fraccionamiento.",
+      "Entonces quedamos en la entrada del fraccionamiento el sábado.",
+      "El sábado quedamos en la entrada del fraccionamiento entonces.",
+      "Quedamos en la entrada del fraccionamiento entonces el sábado.",
+      "Quedamos en la entrada del fraccionamiento el sábado entonces."
+     ]
     },
     {
      "q": "Los lotes de la segunda fila quedan ___ cien metros del mar.",
@@ -2260,7 +2400,8 @@
       "Does Saturday at ten work for you?"
      ]
     ],
-    "trap": "De + el → del (del aeropuerto). Use a for the distance itself: a cien metros, not en cien metros."
+    "trap": "De + el → del (del aeropuerto). Use a for the distance itself: a cien metros, not en cien metros.",
+    "line": "Quedar a + time or distance + de: queda a 15 minutos de la playa."
    }
   },
   "estar_participio": {
@@ -2279,7 +2420,11 @@
      "w": {
       "vendiendo": "Están vendiendo means 'are selling', not 'are sold'.",
       "por vender": "Están por vender means they’re still to be sold; ya (already) tells you it’s done: vendidos."
-     }
+     },
+     "alts": [
+      "Ya los lotes de la primera fila están vendidos.",
+      "Los lotes de la primera fila están vendidos ya."
+     ]
     },
     {
      "q": "La oficina ___ cerrada los domingos.",
@@ -2330,7 +2475,10 @@
       "están": "Están would need a place or state; 'left' is quedan.",
       "es": "Es doesn't mean 'there are left'."
      },
-     "easy": true
+     "easy": true,
+     "alts": [
+      "Quedan cinco lotes con vista al mar todavía."
+     ]
     },
     {
      "q": "La cotización ya está ___; ahorita se la mando.",
@@ -2346,7 +2494,14 @@
       "haciendo": "Está haciendo is 'is making', still in progress.",
       "hace": "Está hace isn't Spanish.",
       "por hacer": "Está por hacer means it still has to be done; ya + “ahorita se la mando” mean it’s finished: hecha."
-     }
+     },
+     "alts": [
+      "Ya la cotización está hecha; ahorita se la mando.",
+      "La cotización está hecha ya; ahorita se la mando.",
+      "La cotización ya está hecha; se la mando ahorita.",
+      "Ya la cotización está hecha; se la mando ahorita.",
+      "La cotización está hecha ya; se la mando ahorita."
+     ]
     },
     {
      "q": "El contrato ya está ___ por los dos.",
@@ -2362,7 +2517,11 @@
       "firmando": "Está firmando means 'is signing' (in progress).",
       "firmó": "Firmó is 'signed (past)', and it can't follow está.",
       "por firmar": "Está por firmar means it’s still waiting to be signed; ya … por los dos means both already signed: firmado."
-     }
+     },
+     "alts": [
+      "Ya el contrato está firmado por los dos.",
+      "El contrato está firmado por los dos ya."
+     ]
     },
     {
      "q": "Las dos casas de la esquina están ___ hasta el viernes.",
@@ -2417,7 +2576,8 @@
       "There are still five ocean-view lots left."
      ]
     ],
-    "trap": "Está vendiendo means 'is selling', not 'is sold'. The -o / -a ending just follows the thing; if you mix it up, people still understand you."
+    "trap": "Está vendiendo means 'is selling', not 'is sold'. The -o / -a ending just follows the thing; if you mix it up, people still understand you.",
+    "line": "Estar + -ado for a state that’s already done (está apartado); quedan for what’s left."
    }
   },
   "habitual": {
@@ -2505,7 +2665,10 @@
       "acostumbras": "Acostumbras is 'you usually'.",
       "acostumbrado": "You need a conjugated verb after se.",
       "acostumbran": "Before an infinitive, se acostumbra stays singular."
-     }
+     },
+     "alts": [
+      "No se acostumbra llegar puntual a una fiesta aquí."
+     ]
     },
     {
      "q": "Cuando éramos niños, mi abuela nos ___ chocolate en las tardes.",
@@ -2578,7 +2741,8 @@
       "In Mexico it's customary to eat between two and four."
      ]
     ],
-    "trap": "Soler is stem-changing: suelo, sueles, suele, suelen, but solemos. Solen doesn't exist."
+    "trap": "Soler is stem-changing: suelo, sueles, suele, suelen, but solemos. Solen doesn't exist.",
+    "line": "Habits: solía / suelen + infinitive, imperfect for ‘used to’, se acostumbra for ‘people usually’."
    }
   },
   "comparatives": {
@@ -2739,7 +2903,8 @@
       "It's fifteen meters wide by thirty deep."
      ]
     ],
-    "trap": "Más de with numbers (más de 400), más que with comparisons (más grande que). Más mejor ✗ → mejor ✓."
+    "trap": "Más de with numbers (más de 400), más que with comparisons (más grande que). Más mejor ✗ → mejor ✓.",
+    "line": "más/menos + adjective + que; tan … como for equal; mide 20 de frente for measurements."
    }
   }
  },
@@ -2848,13 +3013,20 @@
      "en": "The proof of address? I gave it to the lawyer yesterday.",
      "k": "entregar",
      "f": "entregué",
-     "h": "entregar, preterite yo"
+     "h": "entregar, preterite yo",
+     "alts": [
+      "¿El comprobante de domicilio? Ayer se lo entregué a la licenciada."
+     ]
     },
     {
      "es": "Cuando tengas el recibo, dámelo y yo hago el trámite.",
      "en": "When you have the receipt, give it to me and I'll do the paperwork.",
      "k": "tramite",
-     "f": "trámite"
+     "f": "trámite",
+     "alts": [
+      "Cuando tengas el recibo, dámelo y hago el trámite.",
+      "Cuando tengas el recibo, dámelo y hago yo el trámite."
+     ]
     }
    ],
    "story": {
@@ -2873,12 +3045,19 @@
      {
       "s": "Laura",
       "es": "Traigo mi INE, pero el recibo de luz todavía llega a nombre del dueño.",
-      "en": "I have my INE, but the electric bill still comes in the landlord's name."
+      "en": "I have my INE, but the electric bill still comes in the landlord's name.",
+      "alts": [
+       "Traigo mi INE, pero todavía el recibo de luz llega a nombre del dueño.",
+       "Traigo mi INE, pero el recibo de luz llega a nombre del dueño todavía."
+      ]
      },
      {
       "s": "Ejecutiva",
       "es": "Entonces necesita una carta del dueño. Cuando la tenga, tráigamela y hacemos el trámite.",
-      "en": "Then you need a letter from the landlord. When you have it, bring it to me and we'll do the paperwork."
+      "en": "Then you need a letter from the landlord. When you have it, bring it to me and we'll do the paperwork.",
+      "alts": [
+       "Necesita una carta del dueño entonces. Cuando la tenga, tráigamela y hacemos el trámite."
+      ]
      },
      {
       "s": null,
@@ -2893,7 +3072,11 @@
      {
       "s": "Sr. Gómez",
       "es": "Claro. Se la mando hoy por correo y mañana le entrego el original.",
-      "en": "Of course. I'll email it to you today and hand you the original tomorrow."
+      "en": "Of course. I'll email it to you today and hand you the original tomorrow.",
+      "alts": [
+       "Claro. Hoy se la mando por correo y mañana le entrego el original.",
+       "Claro. Se la mando por correo hoy y mañana le entrego el original."
+      ]
      },
      {
       "s": null,
@@ -2903,7 +3086,14 @@
      {
       "s": "Ejecutiva",
       "es": "Perfecto, ya está todo. Tiene cita el viernes para recoger su tarjeta.",
-      "en": "Perfect, everything's ready. You have an appointment on Friday to pick up your card."
+      "en": "Perfect, everything's ready. You have an appointment on Friday to pick up your card.",
+      "alts": [
+       "Perfecto, está todo ya. Tiene cita el viernes para recoger su tarjeta.",
+       "Perfecto, ya está todo. El viernes tiene cita para recoger su tarjeta.",
+       "Perfecto, ya está todo. Tiene cita para recoger su tarjeta el viernes.",
+       "Perfecto, está todo ya. El viernes tiene cita para recoger su tarjeta.",
+       "Perfecto, está todo ya. Tiene cita para recoger su tarjeta el viernes."
+      ]
      }
     ],
     "qs": [
@@ -3103,6 +3293,12 @@
        "w": "fontanero",
        "for": "plomero"
       }
+     ],
+     "alts": [
+      "Ayer el plomero vino, pero no pudo arreglar la fuga.",
+      "El plomero ayer vino, pero no pudo arreglar la fuga.",
+      "Vino el plomero ayer, pero no pudo arreglar la fuga.",
+      "Ayer vino el plomero, pero no pudo arreglar la fuga."
      ]
     },
     {
@@ -3192,6 +3388,9 @@
        "w": "repararon",
        "for": "arreglaron"
       }
+     ],
+     "alts": [
+      "¿Te arreglaron la llave ya?"
      ]
     }
    ],
@@ -3211,7 +3410,11 @@
      {
       "s": "Andrés",
       "es": "¡No puede ser! Y el refri también está descompuesto.",
-      "en": "This can't be happening! And the fridge is broken too."
+      "en": "This can't be happening! And the fridge is broken too.",
+      "alts": [
+       "¡No puede ser! Y también el refri está descompuesto.",
+       "¡No puede ser! Y el refri está descompuesto también."
+      ]
      },
      {
       "s": null,
@@ -3226,7 +3429,12 @@
      {
       "s": "Andrés",
       "es": "Aquí, en la cocina. Ayer funcionaba bien, pero hoy amaneció así.",
-      "en": "Here, in the kitchen. Yesterday it was working fine, but this morning it was like this."
+      "en": "Here, in the kitchen. Yesterday it was working fine, but this morning it was like this.",
+      "alts": [
+       "Aquí, en la cocina. Funcionaba bien ayer, pero hoy amaneció así.",
+       "Aquí, en la cocina. Ayer funcionaba bien, pero amaneció así hoy.",
+       "Aquí, en la cocina. Funcionaba bien ayer, pero amaneció así hoy."
+      ]
      },
      {
       "s": "Plomero",
@@ -3246,7 +3454,10 @@
      {
       "s": "Plomero",
       "es": "Mi primo. Se lo mando mañana.",
-      "en": "My cousin. I'll send him over tomorrow."
+      "en": "My cousin. I'll send him over tomorrow.",
+      "alts": [
+       "Mi primo. Mañana se lo mando."
+      ]
      }
     ],
     "qs": [
@@ -3458,7 +3669,10 @@
      "es": "Mandé la propuesta, pero todavía no me contestan.",
      "en": "I sent the proposal, but they still haven't answered me.",
      "k": "propuesta",
-     "f": "propuesta"
+     "f": "propuesta",
+     "alts": [
+      "Mandé la propuesta, pero no me contestan todavía."
+     ]
     }
    ],
    "story": {
@@ -3472,7 +3686,10 @@
      {
       "s": "Jefe",
       "es": "El cliente quiere que le mandemos la propuesta antes del jueves.",
-      "en": "The client wants us to send the proposal before Thursday."
+      "en": "The client wants us to send the proposal before Thursday.",
+      "alts": [
+       "Quiere el cliente que le mandemos la propuesta antes del jueves."
+      ]
      },
      {
       "s": "Mariana",
@@ -3482,7 +3699,14 @@
      {
       "s": "Jefe",
       "es": "Lo cambiaron ayer. Necesito que el presupuesto esté listo mañana.",
-      "en": "They changed it yesterday. I need the budget to be ready tomorrow."
+      "en": "They changed it yesterday. I need the budget to be ready tomorrow.",
+      "alts": [
+       "Ayer lo cambiaron. Necesito que el presupuesto esté listo mañana.",
+       "Lo cambiaron ayer. Necesito que mañana el presupuesto esté listo.",
+       "Lo cambiaron ayer. Necesito que el presupuesto mañana esté listo.",
+       "Ayer lo cambiaron. Necesito que mañana el presupuesto esté listo.",
+       "Ayer lo cambiaron. Necesito que el presupuesto mañana esté listo."
+      ]
      },
      {
       "s": "Mariana",
@@ -3502,7 +3726,10 @@
      {
       "s": null,
       "es": "El jueves en la mañana llega un correo del cliente: “¡Aprobada!”",
-      "en": "On Thursday morning an email arrives from the client: “Approved!”"
+      "en": "On Thursday morning an email arrives from the client: “Approved!”",
+      "alts": [
+       "Llega un correo del cliente el jueves en la mañana: “¡Aprobada!”"
+      ]
      },
      {
       "s": "Jefe",
@@ -3828,12 +4055,19 @@
      {
       "s": "Itzel",
       "es": "¡Por fin! Mañana rentamos un carro para ir a Hierve el Agua.",
-      "en": "Finally! Tomorrow we'll rent a car to go to Hierve el Agua."
+      "en": "Finally! Tomorrow we'll rent a car to go to Hierve el Agua.",
+      "alts": [
+       "¡Por fin! Rentamos un carro para ir a Hierve el Agua mañana."
+      ]
      },
      {
       "s": "Rodrigo",
       "es": "Perfecto. Yo pago la renta del carro y tú la gasolina.",
-      "en": "Perfect. I'll pay for the car rental and you pay for the gas."
+      "en": "Perfect. I'll pay for the car rental and you pay for the gas.",
+      "alts": [
+       "Perfecto. Pago la renta del carro y tú la gasolina.",
+       "Perfecto. Pago yo la renta del carro y tú la gasolina."
+      ]
      }
     ],
     "qs": [
@@ -4058,7 +4292,10 @@
      {
       "s": "Elena",
       "es": "Sí, unas pastillas para la presión que me recetaron el mes pasado.",
-      "en": "Yes, some blood pressure pills they prescribed me last month."
+      "en": "Yes, some blood pressure pills they prescribed me last month.",
+      "alts": [
+       "Sí, unas pastillas para la presión que el mes pasado me recetaron."
+      ]
      },
      {
       "s": "Doctor",
@@ -4078,7 +4315,10 @@
      {
       "s": "Doctor",
       "es": "Sí, aquí tiene. Si sigue mareada el viernes, regrese al consultorio.",
-      "en": "Yes, here you go. If you're still dizzy on Friday, come back to the office."
+      "en": "Yes, here you go. If you're still dizzy on Friday, come back to the office.",
+      "alts": [
+       "Sí, aquí tiene. Si el viernes sigue mareada, regrese al consultorio."
+      ]
      }
     ],
     "qs": [
@@ -4216,7 +4456,11 @@
      "en": "These avocados aren't ripe yet.",
      "k": "maduro",
      "f": "maduros",
-     "h": "plural"
+     "h": "plural",
+     "alts": [
+      "Todavía estos aguacates no están maduros.",
+      "Estos aguacates no están maduros todavía."
+     ]
     },
     {
      "es": "¿Me puede pesar un kilo de jitomate?",
@@ -4319,7 +4563,10 @@
      {
       "s": "Doña Lupe",
       "es": "No se preocupe, aquí tengo. Tome: cuatrocientos de cambio.",
-      "en": "Don't worry, I have some. Here: four hundred in change."
+      "en": "Don't worry, I have some. Here: four hundred in change.",
+      "alts": [
+       "No se preocupe, tengo aquí. Tome: cuatrocientos de cambio."
+      ]
      },
      {
       "s": null,
@@ -4461,6 +4708,9 @@
        "w": "checa",
        "for": "revisa"
       }
+     ],
+     "alts": [
+      "Te hice la transferencia ya; revisa tu cuenta."
      ]
     },
     {
@@ -4486,7 +4736,10 @@
      "es": "Todavía no me ha llegado la transferencia del cliente.",
      "en": "The client's transfer still hasn't reached me.",
      "k": "transferencia",
-     "f": "transferencia"
+     "f": "transferencia",
+     "alts": [
+      "No me ha llegado la transferencia del cliente todavía."
+     ]
     },
     {
      "es": "Cuando revisé el estado de cuenta, ya me habían cobrado la comisión.",
@@ -4498,6 +4751,9 @@
        "w": "chequé",
        "for": "revisé"
       }
+     ],
+     "alts": [
+      "Cuando revisé el estado de cuenta, me habían cobrado la comisión ya."
      ]
     },
     {
@@ -4544,12 +4800,21 @@
      {
       "s": "Sofía",
       "es": "El martes saqué dinero de un cajero de otro banco y me cobraron la comisión dos veces.",
-      "en": "On Tuesday I took money out of another bank's ATM and they charged me the fee twice."
+      "en": "On Tuesday I took money out of another bank's ATM and they charged me the fee twice.",
+      "alts": [
+       "Saqué dinero de un cajero de otro banco el martes y me cobraron la comisión dos veces."
+      ]
      },
      {
       "s": "Ejecutivo",
       "es": "Déjeme ver... Sí, tiene razón. Ya hemos tenido otros casos así esta semana.",
-      "en": "Let me see... Yes, you're right. We've already had other cases like this this week."
+      "en": "Let me see... Yes, you're right. We've already had other cases like this this week.",
+      "alts": [
+       "Déjeme ver... Sí, tiene razón. Hemos tenido otros casos así esta semana ya.",
+       "Déjeme ver... Sí, tiene razón. Esta semana ya hemos tenido otros casos así.",
+       "Déjeme ver... Sí, tiene razón. Ya esta semana hemos tenido otros casos así.",
+       "Déjeme ver... Sí, tiene razón. Hemos tenido otros casos así ya esta semana."
+      ]
      },
      {
       "s": "Sofía",
@@ -4559,7 +4824,10 @@
      {
       "s": "Ejecutivo",
       "es": "Sí. Ya levanté la aclaración; el reembolso le llega en tres días hábiles.",
-      "en": "Yes. I've already filed the claim; the refund will reach you in three business days."
+      "en": "Yes. I've already filed the claim; the refund will reach you in three business days.",
+      "alts": [
+       "Sí. Levanté la aclaración ya; el reembolso le llega en tres días hábiles."
+      ]
      },
      {
       "s": "Sofía",
@@ -4706,13 +4974,20 @@
      "en": "If the noise keeps up, I'm going to complain to the building manager.",
      "k": "quejarse",
      "f": "quejar",
-     "h": "quejarse, infinitive after me voy a"
+     "h": "quejarse, infinitive after me voy a",
+     "alts": [
+      "Si sigue el ruido, me voy a quejar con el administrador."
+     ]
     },
     {
      "es": "Alguien dejó el portón abierto otra vez.",
      "en": "Someone left the gate open again.",
      "k": "porton",
-     "f": "portón"
+     "f": "portón",
+     "alts": [
+      "Otra vez alguien dejó el portón abierto.",
+      "Alguien otra vez dejó el portón abierto."
+     ]
     },
     {
      "es": "La vecina con quien hablé dice que el portón está descompuesto.",
@@ -4768,7 +5043,10 @@
      {
       "s": "Sra. Pérez",
       "es": "Hay gente que saca la basura cuando ya pasó el camión, y se queda toda la semana en la banqueta.",
-      "en": "Some people take out the trash after the truck has already come, and it sits on the sidewalk all week."
+      "en": "Some people take out the trash after the truck has already come, and it sits on the sidewalk all week.",
+      "alts": [
+       "Hay gente que saca la basura cuando pasó el camión ya, y se queda toda la semana en la banqueta."
+      ]
      },
      {
       "s": "Don Ramón",
@@ -4783,7 +5061,10 @@
      {
       "s": "Don Ramón",
       "es": "Ya hablé con un señor que arregla portones. Viene el jueves.",
-      "en": "I already talked to a man who fixes gates. He's coming on Thursday."
+      "en": "I already talked to a man who fixes gates. He's coming on Thursday.",
+      "alts": [
+       "Ya hablé con un señor que arregla portones. El jueves viene."
+      ]
      },
      {
       "s": "Sra. Pérez",
@@ -4793,7 +5074,11 @@
      {
       "s": "Carlos",
       "es": "Yo vivo en el cuatro... Perdón, no sabía que se oía tanto.",
-      "en": "I live in number four... Sorry, I didn't know you could hear it so much."
+      "en": "I live in number four... Sorry, I didn't know you could hear it so much.",
+      "alts": [
+       "Vivo en el cuatro... Perdón, no sabía que se oía tanto.",
+       "Vivo yo en el cuatro... Perdón, no sabía que se oía tanto."
+      ]
      },
      {
       "s": null,
@@ -4959,6 +5244,9 @@
        "w": "coche",
        "for": "carro"
       }
+     ],
+     "alts": [
+      "El lunes dejé el carro en el taller."
      ]
     },
     {
@@ -5112,7 +5400,12 @@
      {
       "s": "Mecánico",
       "es": "Ya quedó. Le recomiendo que también cambie el aceite; ya le toca.",
-      "en": "All done. I'd recommend changing the oil too; it's due."
+      "en": "All done. I'd recommend changing the oil too; it's due.",
+      "alts": [
+       "Quedó ya. Le recomiendo que también cambie el aceite; ya le toca.",
+       "Ya quedó. Le recomiendo que cambie el aceite también; ya le toca.",
+       "Quedó ya. Le recomiendo que cambie el aceite también; ya le toca."
+      ]
      },
      {
       "s": "Daniel",
@@ -5264,7 +5557,10 @@
      "es": "Ayer me escribió un prospecto de Oaxaca por WhatsApp.",
      "en": "Yesterday a lead from Oaxaca wrote to me on WhatsApp.",
      "k": "prospecto",
-     "f": "prospecto"
+     "f": "prospecto",
+     "alts": [
+      "Me escribió un prospecto de Oaxaca por WhatsApp ayer."
+     ]
     },
     {
      "es": "Cada prospecto nuevo quiere saber el precio primero.",
@@ -5295,7 +5591,10 @@
      "es": "¿Me puede mandar la cotización por correo también?",
      "en": "Can you send me the quote by email too?",
      "k": "cotizacion",
-     "f": "cotización"
+     "f": "cotización",
+     "alts": [
+      "¿También me puede mandar la cotización por correo?"
+     ]
     },
     {
      "es": "¿Le comparto la información por aquí?",
@@ -5315,7 +5614,11 @@
      "es": "Con gusto se la mando hoy en la tarde.",
      "en": "I’ll gladly send it to you this afternoon.",
      "k": "congusto",
-     "f": "Con gusto"
+     "f": "Con gusto",
+     "alts": [
+      "Hoy en la tarde con gusto se la mando.",
+      "Con gusto hoy en la tarde se la mando."
+     ]
     },
     {
      "es": "Con gusto le entrego el recibo en la oficina.",
@@ -5335,7 +5638,10 @@
      {
       "s": "Sr. Ortega",
       "es": "Buenas noches. Vi su anuncio de Tres Aguas. ¿Todavía tienen lotes?",
-      "en": "Good evening. I saw your Tres Aguas ad. Do you still have lots?"
+      "en": "Good evening. I saw your Tres Aguas ad. Do you still have lots?",
+      "alts": [
+       "Buenas noches. Vi su anuncio de Tres Aguas. ¿Tienen lotes todavía?"
+      ]
      },
      {
       "s": "Mariana",
@@ -5345,7 +5651,10 @@
      {
       "s": "Mariana",
       "es": "Sí, todavía tenemos lotes. ¿Le comparto la información del proyecto?",
-      "en": "Yes, we still have lots. Shall I share the project information with you?"
+      "en": "Yes, we still have lots. Shall I share the project information with you?",
+      "alts": [
+       "Sí, tenemos lotes todavía. ¿Le comparto la información del proyecto?"
+      ]
      },
      {
       "s": "Sr. Ortega",
@@ -5365,7 +5674,10 @@
      {
       "s": "Mariana",
       "es": "Perfecto. Ahorita se la preparo y se la mando con el plano.",
-      "en": "Perfect. I’ll put it together for you right now and send it to you with the map."
+      "en": "Perfect. I’ll put it together for you right now and send it to you with the map.",
+      "alts": [
+       "Perfecto. Se la preparo ahorita y se la mando con el plano."
+      ]
      },
      {
       "s": null,
@@ -5375,7 +5687,10 @@
      {
       "s": "Sr. Ortega",
       "es": "Muchas gracias. ¿Ya puedo agendar la cita de diciembre?",
-      "en": "Thank you very much. Can I already schedule the December appointment?"
+      "en": "Thank you very much. Can I already schedule the December appointment?",
+      "alts": [
+       "Muchas gracias. ¿Puedo agendar la cita de diciembre ya?"
+      ]
      },
      {
       "s": "Mariana",
@@ -5573,13 +5888,21 @@
      "es": "Ahorita estamos vendiendo la etapa Gold Plus.",
      "en": "Right now we’re selling the Gold Plus phase.",
      "k": "etapa",
-     "f": "etapa"
+     "f": "etapa",
+     "alts": [
+      "Estamos vendiendo la etapa Gold Plus ahorita."
+     ]
     },
     {
      "es": "La segunda etapa todavía no tiene fecha de entrega.",
      "en": "The second phase doesn’t have a delivery date yet.",
      "k": "etapa",
-     "f": "etapa"
+     "f": "etapa",
+     "alts": [
+      "Todavía la segunda etapa no tiene fecha de entrega.",
+      "La segunda etapa no tiene fecha de entrega todavía.",
+      "Todavía no tiene fecha de entrega la segunda etapa."
+     ]
     }
    ],
    "story": {
@@ -5608,12 +5931,18 @@
      {
       "s": "Laura",
       "es": "¿Y es un proyecto nuevo? ¿Ya están vendiendo todo?",
-      "en": "And is it a new project? Are you already selling all of it?"
+      "en": "And is it a new project? Are you already selling all of it?",
+      "alts": [
+       "¿Y es un proyecto nuevo? ¿Están vendiendo todo ya?"
+      ]
      },
      {
       "s": "Mariana",
       "es": "El proyecto va por etapas. Ahorita estamos vendiendo la etapa Gold Plus.",
-      "en": "The project goes in phases. Right now we’re selling the Gold Plus phase."
+      "en": "The project goes in phases. Right now we’re selling the Gold Plus phase.",
+      "alts": [
+       "El proyecto va por etapas. Estamos vendiendo la etapa Gold Plus ahorita."
+      ]
      },
      {
       "s": "Mariana",
@@ -5638,7 +5967,12 @@
      {
       "s": "Mariana",
       "es": "Claro, ahorita se lo mando. Y si quieren, mañana les enseño el terreno.",
-      "en": "Sure, I’ll send it to you right now. And if you like, tomorrow I’ll show you the land."
+      "en": "Sure, I’ll send it to you right now. And if you like, tomorrow I’ll show you the land.",
+      "alts": [
+       "Claro, se lo mando ahorita. Y si quieren, mañana les enseño el terreno.",
+       "Claro, ahorita se lo mando. Y si quieren, les enseño el terreno mañana.",
+       "Claro, se lo mando ahorita. Y si quieren, les enseño el terreno mañana."
+      ]
      },
      {
       "s": null,
@@ -5864,7 +6198,10 @@
      {
       "s": "Sr. Ortega",
       "es": "Mariana, buenos días. Ya salí del aeropuerto. ¿Para dónde voy?",
-      "en": "Mariana, good morning. I just left the airport. Which way do I go?"
+      "en": "Mariana, good morning. I just left the airport. Which way do I go?",
+      "alts": [
+       "Mariana, buenos días. Salí del aeropuerto ya. ¿Para dónde voy?"
+      ]
      },
      {
       "s": "Mariana",
@@ -5904,17 +6241,27 @@
      {
       "s": "Mariana",
       "es": "Ahora la desviación le queda a la derecha. Ahorita le comparto mi ubicación.",
-      "en": "Now the turnoff will be on your right. I’ll share my location with you right now."
+      "en": "Now the turnoff will be on your right. I’ll share my location with you right now.",
+      "alts": [
+       "La desviación ahora le queda a la derecha. Ahorita le comparto mi ubicación.",
+       "La desviación le queda a la derecha ahora. Ahorita le comparto mi ubicación."
+      ]
      },
      {
       "s": "Sr. Ortega",
       "es": "Ya la vi. ¡Qué bonito camino para llegar al mar!",
-      "en": "I see it now. What a beautiful road down to the sea!"
+      "en": "I see it now. What a beautiful road down to the sea!",
+      "alts": [
+       "La vi ya. ¡Qué bonito camino para llegar al mar!"
+      ]
      },
      {
       "s": "Mariana",
       "es": "Aquí lo espero, en la entrada. Bienvenido a Tres Aguas.",
-      "en": "I’m waiting for you here at the entrance. Welcome to Tres Aguas."
+      "en": "I’m waiting for you here at the entrance. Welcome to Tres Aguas.",
+      "alts": [
+       "Lo espero aquí, en la entrada. Bienvenido a Tres Aguas."
+      ]
      }
     ],
     "qs": [
@@ -6064,7 +6411,11 @@
      "es": "Ese lote todavía está disponible.",
      "en": "That lot is still available.",
      "k": "disponible",
-     "f": "disponible"
+     "f": "disponible",
+     "alts": [
+      "Todavía ese lote está disponible.",
+      "Ese lote está disponible todavía."
+     ]
     },
     {
      "es": "Hay doce lotes disponibles en esta etapa.",
@@ -6096,20 +6447,31 @@
      "en": "We’ll hold it for you today if you send us the proof of payment.",
      "k": "apartado",
      "f": "apartamos",
-     "h": "apartar, nosotros"
+     "h": "apartar, nosotros",
+     "alts": [
+      "Hoy se lo apartamos si nos manda el comprobante de pago."
+     ]
     },
     {
      "es": "Lo siento, ese lote ya está vendido.",
      "en": "Sorry, that lot is already sold.",
      "k": "vendido",
-     "f": "vendido"
+     "f": "vendido",
+     "alts": [
+      "Lo siento, ya ese lote está vendido.",
+      "Lo siento, ese lote está vendido ya."
+     ]
     },
     {
      "es": "Los tres lotes de esa fila ya están vendidos.",
      "en": "The three lots in that row are already sold.",
      "k": "vendido",
      "f": "vendidos",
-     "h": "plural"
+     "h": "plural",
+     "alts": [
+      "Ya los tres lotes de esa fila están vendidos.",
+      "Los tres lotes de esa fila están vendidos ya."
+     ]
     },
     {
      "es": "¿Me da la clave del lote para buscarlo en el plano?",
@@ -6162,7 +6524,12 @@
      {
       "s": "Mariana",
       "es": "El de al lado ya está vendido, igual que los otros de esa fila.",
-      "en": "The one next to it is already sold, like the others in that row."
+      "en": "The one next to it is already sold, like the others in that row.",
+      "alts": [
+       "Ya el de al lado está vendido, igual que los otros de esa fila.",
+       "El de al lado está vendido ya, igual que los otros de esa fila.",
+       "Está vendido el de al lado ya, igual que los otros de esa fila."
+      ]
      },
      {
       "s": "Sofía",
@@ -6172,7 +6539,14 @@
      {
       "s": "Mariana",
       "es": "Hoy quedan diecisiete disponibles, pero eso cambia cada semana.",
-      "en": "Today there are seventeen available, but that changes every week."
+      "en": "Today there are seventeen available, but that changes every week.",
+      "alts": [
+       "Quedan diecisiete disponibles hoy, pero eso cambia cada semana.",
+       "Hoy quedan diecisiete disponibles, pero cada semana eso cambia.",
+       "Hoy quedan diecisiete disponibles, pero eso cada semana cambia.",
+       "Quedan diecisiete disponibles hoy, pero cada semana eso cambia.",
+       "Quedan diecisiete disponibles hoy, pero eso cada semana cambia."
+      ]
      },
      {
       "s": "Sofía",
@@ -6182,7 +6556,10 @@
      {
       "s": "Mariana",
       "es": "Claro, ahorita se las mando con la cotización de cada uno.",
-      "en": "Sure, I’ll send them to you right now with the quote for each one."
+      "en": "Sure, I’ll send them to you right now with the quote for each one.",
+      "alts": [
+       "Claro, se las mando con la cotización de cada uno ahorita."
+      ]
      },
      {
       "s": null,
@@ -6375,7 +6752,10 @@
      "es": "Aquí se acostumbra brindar antes de comer.",
      "en": "Here it’s customary to make a toast before eating.",
      "k": "brindar",
-     "f": "brindar"
+     "f": "brindar",
+     "alts": [
+      "Se acostumbra brindar antes de comer aquí."
+     ]
     },
     {
      "es": "Brindamos por los novios y por toda la familia.",
@@ -6404,7 +6784,10 @@
      {
       "s": null,
       "es": "Mark lleva un año en Puerto Escondido. Su vecino, don Rafa, lo invita a comer el domingo.",
-      "en": "Mark has been in Puerto Escondido for a year. His neighbor, Don Rafa, invites him to Sunday lunch."
+      "en": "Mark has been in Puerto Escondido for a year. His neighbor, Don Rafa, invites him to Sunday lunch.",
+      "alts": [
+       "Mark lleva un año en Puerto Escondido. Su vecino, don Rafa, el domingo lo invita a comer."
+      ]
      },
      {
       "s": "Mark",
@@ -6449,7 +6832,10 @@
      {
       "s": "Mark",
       "es": "¿Siempre se quedan tanto tiempo en la mesa?",
-      "en": "Do you always stay at the table this long?"
+      "en": "Do you always stay at the table this long?",
+      "alts": [
+       "¿Se quedan tanto tiempo en la mesa siempre?"
+      ]
      },
      {
       "s": "Doña Chela",
@@ -6730,7 +7116,11 @@
      {
       "s": "Mariana",
       "es": "Claro, se las mando hoy con el plano del lote.",
-      "en": "Sure, I’ll send them to you today with the lot map."
+      "en": "Sure, I’ll send them to you today with the lot map.",
+      "alts": [
+       "Claro, hoy se las mando con el plano del lote.",
+       "Claro, se las mando con el plano del lote hoy."
+      ]
      }
     ],
     "qs": [

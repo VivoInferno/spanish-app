@@ -56,7 +56,7 @@ async def main():
         page.on('console', lambda m: errors.append(m.text) if m.type == 'error' else None)
         page.on('pageerror', lambda e: errors.append(str(e)))
         await page.goto(URL); await page.wait_for_selector('#go')
-        check(await page.evaluate("__app.version") == 'v9.5', 'app version is v9.5')
+        check(await page.evaluate("__app.version") == 'v9.6', 'app version is v9.6')
         # --- placement
         await page.click('#go'); k = 0
         while not await page.query_selector('h1:has-text("Placement results")'):

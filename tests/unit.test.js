@@ -563,4 +563,61 @@ t('v9.5 every distractor still has its reason, and no rule card teaches gender a
   Object.entries(C.patterns).forEach(([pk, p]) => { p.items.forEach(it => it.o.slice(1).forEach(o => assert.ok(it.w && it.w[o], `${pk}: ${o}`)));
     const r = JSON.stringify(p.rule); assert.ok(!/masculine|feminine|matches the thing like an adjective|follow the thing, not the person/i.test(r), pk); });
 });
+t('v9.6 every rule card has a one-line reminder for the "Today\'s grammar" header', () => {
+  Object.entries(C.patterns).forEach(([pk, p]) => { assert.ok(p.rule && typeof p.rule.line === 'string' && p.rule.line.length >= 20 && p.rule.line.length <= 120, `${pk}: ${p.rule && p.rule.line}`);
+    assert.ok(!/palmarito|crocodil|cocodrilo|guarantee/i.test(p.rule.line), pk); });
+});
+t('v9.6 every pattern has at least 2 easy items for the opening contrasts and 6+ items overall', () => {
+  Object.entries(C.patterns).forEach(([pk, p]) => { assert.ok(p.items.filter(i => i.easy).length >= 2, pk); assert.ok(p.items.length >= 6, pk); });
+});
+// ---- v9.6 word order: other natural orders of the same words get the mark ("Also common: …") ----
+{
+  const all = []; C.units.forEach(u => { u.sentences.forEach(x => all.push([x.es, x.alts])); u.story.lines.forEach(x => all.push([x.es, x.alts])); });
+  Object.values(C.patterns).forEach(p => p.items.forEach(it => { const full = it.q.replace('___', it.o[0]).replace(/\s*\([^)]*\)\s*$/, ''), parts = full.split(' — '); all.push([parts.length === 2 ? parts[1] : full, it.alts]); }));
+  const W = s => Check.clean(s).split(' ').filter(Boolean);
+  const SUBJ = new Set(['yo', 'tú', 'usted', 'él', 'ella', 'nosotros', 'nosotras', 'ustedes', 'ellos', 'ellas']);
+  const CL = new Set(['me', 'te', 'se', 'lo', 'la', 'los', 'las', 'le', 'les', 'nos']);
+  const MOV = new Set(['todavía', 'ya', 'también', 'hoy', 'mañana', 'ahora', 'ahorita', 'aquí', 'ahí', 'ayer', 'siempre', 'nunca', 'después', 'luego', 'pronto', 'entonces', 'anoche']);
+  const ITEM = 'La segunda etapa todavía no tiene fecha de entrega.';
+  const orders = (all.find(([es]) => es === ITEM) || [])[1] || [];
+  const O = (input, flags) => Check.checkOrder(input, [ITEM], Object.assign({ lang: 'es', typo: false }, flags || {}), orders);
+  t('v9.6 Colby\'s tile build: "no tiene fecha de entrega todavía" gets the mark, preferred order noted', () => {
+    const r = O('La segunda etapa no tiene fecha de entrega todavía');
+    assert.equal(r.result, 'exact'); assert.equal(r.order, ITEM);
+    assert.equal(O('Todavía la segunda etapa no tiene fecha de entrega').result, 'exact');
+    assert.equal(O('La segunda etapa todavía no tiene fecha de entrega').order, undefined, 'the preferred order itself has no note');
+  });
+  t('v9.6 word order stays strict on meaning: no + verb, a dropped no, clitic order, extra / missing words', () => {
+    assert.equal(O('La segunda etapa tiene no fecha de entrega todavía').result, 'wrong');
+    assert.equal(O('La segunda etapa tiene fecha de entrega todavía').result, 'wrong');
+    assert.equal(O('La segunda etapa no tiene fecha todavía').result, 'wrong');
+    assert.equal(O('Todavía no la segunda etapa tiene fecha de entrega').result, 'wrong');
+    const it = all.find(([es]) => es === 'Sí, se los enviaré mañana.');
+    assert.ok(it && it[1].length, 'se los enviaré mañana has alternatives');
+    assert.equal(Check.checkOrder('Sí, mañana se los enviaré', [it[0]], { lang: 'es', typo: false }, it[1]).result, 'exact');
+    assert.equal(Check.checkOrder('Sí, mañana los se enviaré', [it[0]], { lang: 'es', typo: false }, it[1]).result, 'wrong');
+    assert.equal(Check.checkOrder('Sí, se mañana los enviaré', [it[0]], { lang: 'es', typo: false }, it[1]).result, 'wrong');
+  });
+  t('v9.6 subject pronouns: dropped or after the verb', () => {
+    const it = all.find(([es]) => es === 'Yo se la daré cuando llegue.');
+    assert.ok(it && it[1].includes('Se la daré cuando llegue.') && it[1].includes('Se la daré yo cuando llegue.'), JSON.stringify(it));
+  });
+  t('v9.6 every generated order uses the same words (a dropped subject pronoun aside) and keeps no / clitic + verb blocks', () => {
+    let items = 0, alts = 0;
+    all.forEach(([es, list]) => { if (!list) return; items++; alts += list.length;
+      const a = W(es).sort().join(' ');
+      list.forEach(x => {
+        const b = W(x); const same = b.slice().sort().join(' ') === a;
+        const dropped = W(es).filter(w => SUBJ.has(w)).some(p => { const k = W(es); k.splice(k.indexOf(p), 1); return k.sort().join(' ') === b.slice().sort().join(' '); });
+        assert.ok(same || dropped, `${es} → ${x}`);
+        assert.notEqual(Check.clean(x), Check.clean(es), `${es}: duplicate`);
+        const pw = W(es); for (let i = 0; i < pw.length - 1; i++) if ((pw[i] === 'no' || CL.has(pw[i])) && (CL.has(pw[i + 1]) || /(é|ó|o|a|e|an|en|amos|emos|imos|aron|ieron|ré|rá|rán)$/.test(pw[i + 1]))) {
+          const big = pw[i] + ' ' + pw[i + 1]; const cnt = s => (' ' + s.join(' ') + ' ').split(' ' + big + ' ').length - 1;
+          if (!SUBJ.has(pw[i + 1]) && !MOV.has(pw[i + 1])) assert.ok(cnt(b) >= Math.min(1, cnt(pw)), `${es} → ${x}: "${big}" split`);
+        }
+      }); });
+    assert.ok(items >= 90 && alts >= 150, `${items} items / ${alts} orders`);
+  });
+  t('v9.6 no generated order breaks the content rules', () => all.forEach(([es, list]) => (list || []).forEach(x => assert.ok(!/palmarito|cocodril|garantiz/i.test(x), x))));
+}
 console.log(`\n${n} tests passed`);
