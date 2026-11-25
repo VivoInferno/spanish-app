@@ -56,7 +56,7 @@ async def main():
         page.on('console', lambda m: errors.append(m.text) if m.type == 'error' else None)
         page.on('pageerror', lambda e: errors.append(str(e)))
         await page.goto(URL); await page.wait_for_selector('#go')
-        check(await page.evaluate("__app.version") == 'v9.6', 'app version is v9.6')
+        check(await page.evaluate("__app.version") == 'v9.7', 'app version is v9.7')
         # --- placement
         await page.click('#go'); k = 0
         while not await page.query_selector('h1:has-text("Placement results")'):
@@ -74,7 +74,13 @@ async def main():
         await page.wait_for_selector('.stone.just-done')
         check(await page.evaluate("__app.state.path.done.u1[0]") is True, 'stone 1 (intro) completed')
         await page.wait_for_timeout(250); await page.screenshot(path=f'{OUT}/v5-{ENGINE}-stone-done.png')
-        # --- stone 2: story
+        # --- v9.7 stone 2: Word practice (14 drills, no grammar)
+        await page.click('.stone.current'); await page.wait_for_timeout(200)
+        check(await page.evaluate("__app.run && __app.run.mode") == 'words', 'v9.7: Word practice comes right after New words')
+        while await answer(page): pass
+        await page.wait_for_selector('.stone.just-done')
+        check(await page.evaluate("!!__app.state.wordPractice.u1"), 'Word practice completed')
+        # --- stone 3: story
         await page.click('.stone.current'); await page.wait_for_selector('.story')
         shot = False; steps = 0
         while await page.evaluate("!!__app.story") and steps < 60:

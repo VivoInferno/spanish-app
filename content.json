@@ -3084,6 +3084,21 @@
       "en": "The next day, Laura goes back to the bank with the letter and the bill."
      },
      {
+      "s": "Laura",
+      "es": "Aquí está la carta del señor Gómez y el comprobante de domicilio.",
+      "en": "Here's Mr. Gómez's letter and the proof of address."
+     },
+     {
+      "s": "Ejecutiva",
+      "es": "Gracias. Me entrega también el recibo de luz, por favor.",
+      "en": "Thank you. Please hand me the electricity bill too."
+     },
+     {
+      "s": "Laura",
+      "es": "Sí, aquí está. ¿Necesito hacer otra cita?",
+      "en": "Yes, here it is. Do I need to make another appointment?"
+     },
+     {
       "s": "Ejecutiva",
       "es": "Perfecto, ya está todo. Tiene cita el viernes para recoger su tarjeta.",
       "en": "Perfect, everything's ready. You have an appointment on Friday to pick up your card.",
@@ -3133,7 +3148,7 @@
       "k": "entregar"
      },
      {
-      "after": 8,
+      "after": 11,
       "q": "Why does Laura have an appointment on Friday?",
       "o": [
        "To pick up her card",
@@ -3458,6 +3473,16 @@
       "alts": [
        "Mi primo. Mañana se lo mando."
       ]
+     },
+     {
+      "s": "Andrés",
+      "es": "Perfecto. El refri lleva dos días descompuesto y ya no enfría.",
+      "en": "Perfect. The fridge has been broken for two days and it doesn't get cold anymore."
+     },
+     {
+      "s": "Plomero",
+      "es": "No se preocupe. Mi primo se lo arregla rápido.",
+      "en": "Don't worry. My cousin will fix it for you quickly."
      }
     ],
     "qs": [
@@ -3719,6 +3744,16 @@
       "en": "Use last month's. The important thing is that they approve it this week."
      },
      {
+      "s": "Mariana",
+      "es": "Entonces mando el presupuesto con la propuesta para que lo aprueben juntos.",
+      "en": "Then I'll send the budget with the proposal so they approve it all together."
+     },
+     {
+      "s": "Jefe",
+      "es": "Sí, y no se te olvide el plazo: el jueves a primera hora.",
+      "en": "Yes, and don't forget the deadline: Thursday first thing."
+     },
+     {
       "s": null,
       "es": "Mariana trabaja hasta tarde. El miércoles en la noche, manda la propuesta.",
       "en": "Mariana works late. On Wednesday night, she sends the proposal."
@@ -3774,7 +3809,7 @@
       "k": "presupuesto"
      },
      {
-      "after": 7,
+      "after": 9,
       "q": "What did the client say?",
       "o": [
        "The proposal was approved",
@@ -4068,6 +4103,21 @@
        "Perfecto. Pago la renta del carro y tú la gasolina.",
        "Perfecto. Pago yo la renta del carro y tú la gasolina."
       ]
+     },
+     {
+      "s": "Itzel",
+      "es": "Va. Y las casetas las pagamos entre los dos.",
+      "en": "Okay. And we'll split the tolls."
+     },
+     {
+      "s": "Rodrigo",
+      "es": "Trato hecho. ¿Cuánto cuesta cada caseta?",
+      "en": "Deal. How much is each toll?"
+     },
+     {
+      "s": "Itzel",
+      "es": "Unos cien pesos. Y la próxima vez, compra un boleto sin escala.",
+      "en": "About a hundred pesos. And next time, buy a ticket without a layover."
      }
     ],
     "qs": [
@@ -4319,6 +4369,16 @@
       "alts": [
        "Sí, aquí tiene. Si el viernes sigue mareada, regrese al consultorio."
       ]
+     },
+     {
+      "s": "Elena",
+      "es": "Gracias, doctor. ¿Me tomo la pastilla antes o después de comer?",
+      "en": "Thank you, doctor. Do I take the pill before or after eating?"
+     },
+     {
+      "s": "Doctor",
+      "es": "Después de desayunar. Y si quiere, la enfermera del consultorio le explica todo.",
+      "en": "After breakfast. And if you'd like, the nurse at the office will explain everything."
      }
     ],
     "qs": [
@@ -4512,8 +4572,8 @@
     "lines": [
      {
       "s": null,
-      "es": "Es sábado y Marco va al mercado con su lista.",
-      "en": "It's Saturday and Marco goes to the market with his list."
+      "es": "Es sábado y Marco va al puesto de doña Lupe en el mercado.",
+      "en": "It's Saturday and Marco goes to doña Lupe's stall at the market."
      },
      {
       "s": "Marco",
@@ -4566,6 +4626,19 @@
       "en": "Don't worry, I have some. Here: four hundred in change.",
       "alts": [
        "No se preocupe, tengo aquí. Tome: cuatrocientos de cambio."
+      ]
+     },
+     {
+      "s": "Marco",
+      "es": "Hasta el sábado, doña Lupe. Su puesto es el mejor del mercado.",
+      "en": "See you Saturday, doña Lupe. Your stall is the best one in the market."
+     },
+     {
+      "s": "Doña Lupe",
+      "es": "Gracias, joven. El sábado le aparto unos bien maduros y se los peso antes, para que no regatee tanto.",
+      "en": "Thanks, young man. On Saturday I'll set aside some really ripe ones and weigh them ahead of time, so you don't haggle so much.",
+      "alts": [
+       "Gracias, joven. Le aparto unos bien maduros el sábado y se los peso antes, para que no regatee tanto."
       ]
      },
      {
@@ -4840,6 +4913,24 @@
       "en": "From the app we don't charge you anything."
      },
      {
+      "s": "Sofía",
+      "es": "¿Y la transferencia llega el mismo día?",
+      "en": "And does the transfer arrive the same day?"
+     },
+     {
+      "s": "Ejecutivo",
+      "es": "Sí, en unos minutos. Y para no pagar comisión, use nuestros cajeros.",
+      "en": "Yes, in a few minutes. And to avoid fees, use our ATMs."
+     },
+     {
+      "s": "Sofía",
+      "es": "Perfecto. Voy a revisar mi estado de cuenta cada semana.",
+      "en": "Perfect. I'm going to check my bank statement every week.",
+      "alts": [
+       "Perfecto. Cada semana voy a revisar mi estado de cuenta."
+      ]
+     },
+     {
       "s": null,
       "es": "Sofía sale del banco más tranquila. Nunca había resuelto un problema tan rápido.",
       "en": "Sofía leaves the bank calmer. She had never solved a problem so quickly."
@@ -5084,6 +5175,11 @@
       "s": null,
       "es": "Todos se ríen. Carlos promete bajarle a la música después de las diez.",
       "en": "Everyone laughs. Carlos promises to turn the music down after ten."
+     },
+     {
+      "s": "Sra. Pérez",
+      "es": "Gracias, Carlos. No me quería quejar, pero con tanto ruido no dormía.",
+      "en": "Thank you, Carlos. I didn't want to complain, but with so much noise I couldn't sleep."
      },
      {
       "s": "Don Ramón",
@@ -5411,6 +5507,20 @@
       "s": "Daniel",
       "es": "Cámbielo de una vez, por favor. No quiero más sorpresas en la carretera.",
       "en": "Go ahead and change it now, please. I don't want any more surprises on the road."
+     },
+     {
+      "s": "Mecánico",
+      "es": "Con gusto. Y la llanta ponchada ya tiene parche; se la dejo en la cajuela.",
+      "en": "Sure. And the flat tire is patched now; I'll leave it in the trunk for you.",
+      "alts": [
+       "Con gusto. Y ya la llanta ponchada tiene parche; se la dejo en la cajuela.",
+       "Con gusto. Y la llanta ponchada tiene parche ya; se la dejo en la cajuela."
+      ]
+     },
+     {
+      "s": "Paola",
+      "es": "Qué buen taller. La próxima vez venimos aquí a cambiar el aceite.",
+      "en": "What a good shop. Next time we'll come here to change the oil."
      }
     ],
     "qs": [
@@ -5701,6 +5811,19 @@
       "s": "Sr. Ortega",
       "es": "El sábado 5. Gracias por contestar tan rápido.",
       "en": "Saturday the 5th. Thanks for answering so quickly."
+     },
+     {
+      "s": "Mariana",
+      "es": "Con gusto, señor Ortega. Lo espero el sábado.",
+      "en": "My pleasure, Mr. Ortega. I'll see you on Saturday.",
+      "alts": [
+       "Con gusto, señor Ortega. El sábado lo espero."
+      ]
+     },
+     {
+      "s": null,
+      "es": "Mariana sonríe: el prospecto nuevo está muy interesado en Tres Aguas.",
+      "en": "Mariana smiles: the new prospect is very interested in Tres Aguas."
      }
     ],
     "qs": [
@@ -5973,6 +6096,20 @@
        "Claro, ahorita se lo mando. Y si quieren, les enseño el terreno mañana.",
        "Claro, se lo mando ahorita. Y si quieren, les enseño el terreno mañana."
       ]
+     },
+     {
+      "s": "Javier",
+      "es": "¿Nos puede mandar también el plan maestro y la lotificación?",
+      "en": "Can you also send us the master plan and the lot layout?",
+      "alts": [
+       "¿También nos puede mandar el plan maestro y la lotificación?",
+       "¿Nos puede mandar el plan maestro también y la lotificación?"
+      ]
+     },
+     {
+      "s": "Mariana",
+      "es": "Claro. Así ven qué lotes quedan en esta etapa y cómo va a quedar el fraccionamiento.",
+      "en": "Of course. That way you'll see which lots are left in this phase and how the development will look."
      },
      {
       "s": null,
@@ -6262,6 +6399,16 @@
       "alts": [
        "Lo espero aquí, en la entrada. Bienvenido a Tres Aguas."
       ]
+     },
+     {
+      "s": "Sr. Ortega",
+      "es": "Gracias, Mariana. No sabía que quedaba tan cerca de la carretera costera.",
+      "en": "Thanks, Mariana. I didn't know it was so close to the coastal highway."
+     },
+     {
+      "s": "Mariana",
+      "es": "Sí, desde el entronque son unos minutos. Y la playa queda cerca, a pie.",
+      "en": "Yes, from the junction it's just a few minutes. And the beach is close, on foot."
      }
     ],
     "qs": [
@@ -6575,6 +6722,16 @@
       "s": "Mariana",
       "es": "Con gusto. En cuanto reciba su pago, se lo aparto y le mando el recibo.",
       "en": "Gladly. As soon as I receive your payment, I’ll put it on hold for you and send you the receipt."
+     },
+     {
+      "s": "Sofía",
+      "es": "Gracias. Le mando la clave del lote en el mensaje del pago.",
+      "en": "Thanks. I'll put the lot code in the payment message."
+     },
+     {
+      "s": "Mariana",
+      "es": "Perfecto. Con la clave del lote lo encuentro rápido en el sistema.",
+      "en": "Perfect. With the lot code I can find it quickly in the system."
      }
     ],
     "qs": [
@@ -6846,6 +7003,21 @@
       "s": "Mark",
       "es": "Creo que ya me acostumbré. ¡Se me pasó la tarde volando!",
       "en": "I think I’m already used to it. The afternoon flew by!"
+     },
+     {
+      "s": "Doña Chela",
+      "es": "¿Ves? La sobremesa es lo mejor de la comida.",
+      "en": "See? The sobremesa is the best part of the meal."
+     },
+     {
+      "s": "Don Rafa",
+      "es": "Aquí solemos quedarnos hasta que oscurece.",
+      "en": "Here we usually stay until it gets dark."
+     },
+     {
+      "s": "Mark",
+      "es": "Gracias por todo. Son unos anfitriones increíbles.",
+      "en": "Thank you for everything. You're amazing hosts."
      }
     ],
     "qs": [
@@ -7121,6 +7293,20 @@
        "Claro, hoy se las mando con el plano del lote.",
        "Claro, se las mando con el plano del lote hoy."
       ]
+     },
+     {
+      "s": "Sofía",
+      "es": "Gracias. Con la superficie y el frente ya puedo hablar con el arquitecto.",
+      "en": "Thanks. With the area and the frontage I can now talk to the architect.",
+      "alts": [
+       "Gracias. Con la superficie y ya el frente puedo hablar con el arquitecto.",
+       "Gracias. Con la superficie y el frente puedo hablar con el arquitecto ya."
+      ]
+     },
+     {
+      "s": "Mariana",
+      "es": "Exacto. Y con veinte metros de frente hay espacio para una casa con jardín.",
+      "en": "Exactly. And with twenty meters of frontage there is room for a house with a garden."
      }
     ],
     "qs": [
@@ -8170,7 +8356,39 @@
   "notaría": "notary's office",
   "traiga": "bring (que le traiga = that I bring you)",
   "sus": "your (usted); their",
-  "enséñeselos": "show them to him / her / them (usted)"
+  "enséñeselos": "show them to him / her / them (usted)",
+  "enfría": "gets cold (enfriarse)",
+  "juntos": "together",
+  "trato": "deal",
+  "cuesta": "costs (costar)",
+  "próxima": "next",
+  "compra": "purchase / shopping",
+  "tomo": "I take (tomar)",
+  "desayunar": "to have breakfast",
+  "enfermera": "nurse",
+  "regatee": "haggle (regatear)",
+  "pagar": "to pay",
+  "use": "use (usar)",
+  "nuestros": "our",
+  "quería": "wanted (querer)",
+  "dormía": "was sleeping (dormir)",
+  "parche": "patch",
+  "cajuela": "car trunk (Mexico)",
+  "venimos": "we come (venir)",
+  "cambiar": "to change",
+  "sonríe": "smiles (sonreír)",
+  "quedaba": "was left / remained (quedar)",
+  "pie": "foot",
+  "encuentro": "I find (encontrar)",
+  "sistema": "system",
+  "ves": "you see (ver)",
+  "quedarnos": "to stay (quedarse)",
+  "oscurece": "it gets dark (oscurecer)",
+  "increíbles": "incredible",
+  "hablar": "to speak",
+  "exacto": "exactly",
+  "espacio": "space",
+  "jardín": "garden"
  },
  "synonyms": [
   {

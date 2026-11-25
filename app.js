@@ -1,13 +1,16 @@
 (() => {
   'use strict';
-  const APP_VERSION = 'v9.6'; // keep in sync with CACHE in sw.js (espanol-v9-5)
+  const APP_VERSION = 'v9.7'; // keep in sync with CACHE in sw.js (espanol-v9-7)
   const KEY = 'spanish-app-state-v1'; // unchanged since v1 — never rename
   const DAY = SRS.DAY;
+  // v9.7: five stones per unit, in this order. `s` is the stone's storage slot: 0-3 are the original path.done[uid] booleans
+  // (New words, Story, Practice, Unit test, unchanged since v6), 'w' is the new Word practice stone (S.wordPractice[uid]).
   const STONES = [
-    { key: 'intro', label: 'New words', icon: 'Aa' },
-    { key: 'story', label: 'Story', icon: '❝' },
-    { key: 'practice', label: 'Practice', icon: '↻' },
-    { key: 'test', label: 'Unit test', icon: '✓' }
+    { key: 'intro', s: 0, label: 'New words', icon: 'Aa' },
+    { key: 'words', s: 'w', label: 'Word practice', icon: '⟳' },
+    { key: 'story', s: 1, label: 'Story', icon: '❝' },
+    { key: 'practice', s: 2, label: 'Practice', icon: '↻' },
+    { key: 'test', s: 3, label: 'Unit test', icon: '✓' }
   ];
   const PASS = 0.8;
   const app = document.getElementById('app');
@@ -16,7 +19,7 @@
   // ---------- state + migration ----------
   const defaults = () => ({ v: 1, schema: 5, placementDone: false, created: Date.now(), items: {}, pstats: {}, recent: {},
     settings: { newPerSession: 5, rate: 0.9, autoAdvance: false, sound: true, anim: true, goalMin: Daily.GOAL_MIN, voice: '', voice2: '', voiceMode: 'recorded' }, sessions: 0,
-    path: { done: {}, tests: {}, testedOut: {} }, parked: {}, daily: {}, streak: Daily.seed(), parkedDefaults: {}, listenPauseUntil: 0, speakPauseUntil: 0, rulesSeen: {}, pace: {}, focusLog: [] });
+    path: { done: {}, tests: {}, testedOut: {} }, parked: {}, daily: {}, streak: Daily.seed(), parkedDefaults: {}, listenPauseUntil: 0, speakPauseUntil: 0, rulesSeen: {}, pace: {}, focusLog: [], wordPractice: {}, wpMigrated: 1 });
   function load() {
     let raw = null;
     try { raw = JSON.parse(localStorage.getItem(KEY)); } catch (e) { /* fresh */ }
@@ -57,6 +60,12 @@
     // v9.6: focusLog = the grammar pattern each practice / review session focused on, newest first (max 10), for rotation.
     // Optional addition; schema stays 5.
     s.focusLog = Array.isArray(raw.focusLog) ? raw.focusLog.filter(x => typeof x === 'string').slice(0, 10) : [];
+    // v9.7: wordPractice = units whose new Word practice stone (between New words and Story) is done {uid: ms}. Optional; schema
+    // stays 5 and path.done is untouched. Once, on upgrade: every unit already past New words gets it marked done, so nobody is
+    // sent backward; a unit still on New words simply gets the new stone next.
+    s.wordPractice = raw.wordPractice && typeof raw.wordPractice === 'object' ? raw.wordPractice : {};
+    if (!raw.wpMigrated) { Object.entries(s.path.done || {}).forEach(([uid, d]) => { if (Array.isArray(d) && d[0] && !s.wordPractice[uid]) s.wordPractice[uid] = 1; }); }
+    s.wpMigrated = 1;
     s.schema = 5;
     return s;
   }
@@ -79,7 +88,7 @@
     delete S.needsPathMigration;
     C.units.forEach(u => {
       const words = u.words.filter(w => !S.parked[w.id]);
-      if (words.length && words.every(w => S.items[wid(w.id)])) setStone(u.id, 0, true);
+      if (words.length && words.every(w => S.items[wid(w.id)])) { setStone(u.id, 0, true); setStone(u.id, 'w', true); }
     });
     if (S.placementSummary) applyPlacementToPath(S.placementSummary);
     save();
@@ -89,7 +98,7 @@
     C.units.forEach(u => {
       const testedHere = u.words.filter(w => tested.has(w.id));
       const out = u.focus.every(p => strong.has(p)) && testedHere.length > 0 && testedHere.every(w => known.has(w.id));
-      if (out) { [0, 1, 2, 3].forEach(i => setStone(u.id, i, true)); S.path.testedOut[u.id] = true; }
+      if (out) { STONES.forEach(t => setStone(u.id, t.s, true)); S.path.testedOut[u.id] = true; }
     });
   }
   const save = () => localStorage.setItem(KEY, JSON.stringify(S));
@@ -425,18 +434,23 @@
 
   // ---------- path state ----------
   function stones(uid) { return S.path.done[uid] = S.path.done[uid] || [false, false, false, false]; }
-  function setStone(uid, i, v) { stones(uid)[i] = v; }
+  function setStone(uid, i, v) {
+    if (i === 'w') { S.wordPractice = S.wordPractice || {}; if (v) S.wordPractice[uid] = S.wordPractice[uid] || Date.now(); else delete S.wordPractice[uid]; return; }
+    stones(uid)[i] = v;
+  }
+  const stoneDone = (uid, i) => i === 'w' ? !!(S.wordPractice || {})[uid] : !!stones(uid)[i];
   const unitDone = uid => stones(uid)[3];
-  function currentPos() { // first unit (in order) with an unfinished stone
-    for (const uid of IDX.section.units) { const st = stones(uid); const i = st.indexOf(false); if (i >= 0) return { uid, stone: i }; }
+  function currentPos() { // first unit (in order) with an unfinished stone, stones in path order (New words, Word practice, …)
+    for (const uid of IDX.section.units) { const t = STONES.find(x => !stoneDone(uid, x.s)); if (t) return { uid, stone: t.s }; }
     return null;
   }
   function stoneState(uid, i) {
-    if (stones(uid)[i]) return 'done';
+    if (stoneDone(uid, i)) return 'done';
     const cur = currentPos();
     if (!cur) return 'done';
     const ui = IDX.section.units.indexOf(uid), ci = IDX.section.units.indexOf(cur.uid);
-    if (ui < ci) return stones(uid).slice(0, i).every(Boolean) ? 'open' : 'locked'; // earlier unit, skipped stone
+    const before = STONES.slice(0, STONES.findIndex(x => x.s === i));
+    if (ui < ci) return before.every(x => stoneDone(uid, x.s)) ? 'open' : 'locked'; // earlier unit, skipped stone
     if (ui === ci && i === cur.stone) return 'current';
     return 'locked';
   }
@@ -490,6 +504,8 @@
       if (sent) return { kind: 'speak', label: 'Repeat after me', sayEs: sent.es, answers: [sent.es], opts: { lang: 'es', sentence: true }, reveal: { es: sent.es, en: sent.en }, speakAfter: sent.es, tries: 0 };
       type = inTest ? 'flip' : 'build';
     }
+    if (type === 'pickListen' && (listenPaused() || !w)) type = 'pickEn';
+    if (type === 'pickListen') return pickExercise(w, 'listen');
     if (type === 'pick' || type === 'pickEn') return pickExercise(w, type === 'pickEn');
     if ((type === 'build' || type === 'buildEn') && sents.length) {
       const short = sents.filter(x => x.es.split(' ').length <= 10);
@@ -536,6 +552,7 @@
     const ds = pool.sort((a, b) => rank(a) - rank(b)).slice(0, 2);
     const text = x => reverse ? x.en : x.es;
     const options = shuffle([w].concat(ds).map(text));
+    if (reverse === 'listen') return { kind: 'mc', pick: true, listenPick: true, audio: true, listen: w.es, label: 'Listen and pick the meaning', options: shuffle([w].concat(ds).map(x => x.en)), answer: w.en, reveal: { es: w.es, en: w.en, note: w.note }, speakAfter: w.es }; // v9.7
     return reverse
       ? { kind: 'mc', pick: true, label: 'Select the correct meaning', bubbleEs: w.es, speakNow: w.es, options, answer: w.en, reveal: { es: w.es, en: w.en, note: w.note }, speakAfter: w.es }
       : { kind: 'mc', pick: true, label: 'Select the correct translation', bubbleEn: w.en, options, answer: w.es, reveal: { es: w.es, en: w.en, note: w.note }, speakAfter: w.es };
@@ -763,7 +780,7 @@
       <h3>New in this unit</h3><ul class="list">${fresh.map(w => `<li><span><span class="badge new">NEW</span> ${wordSpan(w.id, w.es)}</span><span class="muted">${esc(w.en)}</span></li>`).join('') || '<li class="muted">Nothing new — you already know these.</li>'}</ul>
       ${known.length ? `<p class="muted small">Already known: ${known.map(w => wordSpan(w.id, w.es)).join(', ')}</p>` : ''}
       ${parked.length ? `<p class="muted small">Parked: ${parked.map(w => wordSpan(w.id, w.es)).join(', ')}</p>` : ''}
-      <h3>Grammar focus</h3><ul class="list">${u.focus.map(p => `<li>${esc(C.patterns[p].name)}</li>`).join('')}</ul>
+      <p class="muted small">This stone is just the new words: meet each one, then drill them. Grammar (${u.focus.map(p => esc(C.patterns[p].name.replace(/\s*\(.*\)\s*$/, ''))).join(' · ')}) comes later, in Practice.</p>
       <p class="muted small">Tip: press and hold any word to mark it “Not a priority”.</p></main>
       <footer><button class="btn primary" id="go">Start</button></footer>`;
     bindQuit(); setBar(runFrac());
@@ -799,7 +816,8 @@
   function renderExercise(entry, ex) {
     closeHint(); document.querySelectorAll('.tile-ghost').forEach(n => n.remove());
     let prompt = '';
-    if (ex.kind === 'mc' && ex.pick) prompt = ex.bubbleEs ? bubble(ex.bubbleEs, 'es', ex.speakNow) : bubble(ex.bubbleEn, 'en');
+    if (ex.listenPick) prompt = `<div class="listen"><button class="btn play" id="play">🔊 Play</button><button class="btn secondary" id="slow">🐢 Slow</button></div>`;
+    else if (ex.kind === 'mc' && ex.pick) prompt = ex.bubbleEs ? bubble(ex.bubbleEs, 'es', ex.speakNow) : bubble(ex.bubbleEn, 'en');
     else if (ex.kind === 'mc') prompt = `<div class="prompt">${tokenize(ex.prompt).replace('___', '<span class="blank">___</span>')}</div>`;
     else if (ex.kind === 'speak') prompt = bubble(ex.sayEs, 'es', ex.sayEs);
     else if (ex.kind === 'build') prompt = ex.bigEs ? bubble(ex.bigEs, 'es', ex.bigEs) : bubble(ex.big, 'en');
@@ -1146,11 +1164,51 @@
     const fresh = u.words.filter(w => !S.parked[w.id] && !knownCard(S.items[wid(w.id)]));
     // first check right after each new word: the 3-choice picker (alternating directions)
     fresh.forEach((w, k) => { q.push({ id: wid(w.id), intro: true }); q.push({ id: wid(w.id), ex: k % 2 ? 'pick' : 'pickEn' }); });
-    u.focus.forEach(p => {
-      if (!S.items[pid(p)]) { q.push({ id: pid(p), intro: true }); q.push({ id: pid(p) }); q.push({ id: pid(p), practice: true }); }
-      else q.push({ id: pid(p) });
-    });
-    shuffle(fresh).forEach(w => q.push({ id: wid(w.id), ex: withTiles(w.id, pick(['en2es', 'cloze', 'listen', 'flip', 'speak', 'es2en'])), practice: true }));
+    // v9.7: no grammar in this stone (rule cards and pattern drills moved to Practice). After the intros, 12-18 drills on the
+    // new words only: every new word comes back at least 3 more times, each time in a different format, recognition first
+    // (picker, listen-and-pick), then short production (tiles, flip, translate), then sentence level (say it, tiles, cloze).
+    const ws = fresh.length ? fresh : u.words.filter(w => !S.parked[w.id]);
+    q.push(...wordDrills(ws, Math.min(18, Math.max(12, 3 * ws.length)), true));
+    return q;
+  }
+  const WD_ROUNDS = [['pickListen', 'pickEn', 'pick'], ['build', 'flip', 'es2en', 'buildEn'], ['speak', 'build', 'cloze', 'en2es', 'listen']];
+  const shortSent = id => (IDX.sentByWord[id] || []).some(x => x.es.split(' ').length <= 10);
+  const hasSent = id => (IDX.sentByWord[id] || []).length > 0;
+  function fmtOk(f, id) { return (f === 'build' || f === 'buildEn') ? shortSent(id) : (f === 'cloze' || f === 'listenS' || f === 'speak') ? hasSent(id) : true; }
+  // n drills over the words ws in rounds (each word once per round, different format each time, never the same word twice in a row)
+  function wordDrills(ws, n, rounds) {
+    const out = [], used = {};
+    for (let r = 0; out.length < n && ws.length; r++) {
+      let order = shuffle(ws.slice());
+      for (let t = 0; t < 10 && out.length && order.length > 1 && order[0].id === out[out.length - 1].id.slice(2); t++) order = shuffle(order);
+      const R = rounds ? WD_ROUNDS[Math.min(r, WD_ROUNDS.length - 1)] : WP_FMTS, off = Math.floor(Math.random() * R.length);
+      for (const [j, w] of order.entries()) {
+        if (out.length >= n) break;
+        // formats rotate across the words of a round, so every format of the round shows up
+        const fmts = R.slice((off + j) % R.length).concat(R.slice(0, (off + j) % R.length)).concat(rounds ? shuffle(WD_ROUNDS.flat()) : []);
+        const f = fmts.find(x => fmtOk(x, w.id) && !(used[w.id] || []).includes(x)) || fmts.find(x => fmtOk(x, w.id)) || 'en2es';
+        (used[w.id] = used[w.id] || []).push(f);
+        out.push({ id: wid(w.id), ex: f, words: true });
+      }
+    }
+    return out;
+  }
+  // v9.7 Word practice stone: 14 drills, ~65% this unit's words and ~35% earlier words (due today and weak ones first),
+  // mostly sentence level. No grammar-focus drills.
+  const WP_FMTS = ['build', 'cloze', 'listenS', 'speak', 'en2es', 'buildEn', 'listen', 'flip'];
+  const WP_N = 14;
+  function wordPracticeQueue(u, n) {
+    n = n || WP_N; const now = Date.now(), eod = endOfToday();
+    const cur = u.words.filter(w => !S.parked[w.id]);
+    const old = [];
+    unitsUpTo(u.id).slice(0, -1).forEach(x => x.words.forEach(w => { if (!S.parked[w.id] && S.items[wid(w.id)]) old.push(w); }));
+    const score = w => { const c = S.items[wid(w.id)]; return (c.due <= eod ? 0 : 2) + ((c.lapses || 0) > 0 || c.s < 7 ? 0 : 1) + SRS.currentR(c, now) * 0.5 + Math.random() * 0.4; };
+    old.sort((a, b) => score(a) - score(b));
+    const nOld = Math.min(old.length, n - Math.round(n * 0.65));
+    const a = wordDrills(cur, n - nOld, false), b = wordDrills(old.slice(0, nOld), nOld, false);
+    // spread the earlier words evenly through the run
+    const q = a.slice(), step = (q.length + 1) / (b.length + 1);
+    b.forEach((e, k) => q.splice(Math.round(step * (k + 1)) + k, 0, e));
     return q;
   }
   // ---------- v9.6 grammar focus: one pattern per practice / review session, about 8 drills on it ----------
@@ -1165,8 +1223,9 @@
   function chooseFocus(cands, first) {
     const eod = endOfToday(), last = (S.focusLog || [])[0];
     const due = pk => { const c = S.items[pid(pk)]; return c && c.due <= eod ? 0 : 1; };
-    const ranked = [...new Set(cands)].filter(pk => IDX.patterns[pk]).map(pk => ({ pk, t: first.includes(pk) ? 0 : 1, d: due(pk), w: patWeak(pk), r: Math.random() }))
-      .sort((a, b) => a.t - b.t || a.d - b.d || b.w - a.w || a.r - b.r);
+    const unseen = pk => S.items[pid(pk)] ? 1 : 0; // v9.7: a pattern not introduced yet goes first (within its tier)
+    const ranked = [...new Set(cands)].filter(pk => IDX.patterns[pk]).map(pk => ({ pk, t: first.includes(pk) ? 0 : 1, n: unseen(pk), d: due(pk), w: patWeak(pk), r: Math.random() }))
+      .sort((a, b) => a.t - b.t || a.n - b.n || a.d - b.d || b.w - a.w || a.r - b.r);
     if (!ranked.length) return null;
     let top = ranked[0];
     if (top.pk === last && ranked.length > 1) {
@@ -1206,10 +1265,14 @@
     n = n || 14; const now = Date.now();
     const units = unitsUpTo(u.id);
     const pool = [], pats = [];
-    units.forEach(x => { x.words.forEach(w => { if (!S.parked[w.id] && S.items[wid(w.id)]) pool.push(wid(w.id)); }); x.focus.forEach(p => { if (S.items[pid(p)] || u.focus.includes(p)) pats.push(p); }); });
+    // v9.7: grammar is introduced here now (not in New words), so every pattern of the units reached is a candidate
+    units.forEach(x => { x.words.forEach(w => { if (!S.parked[w.id] && S.items[wid(w.id)]) pool.push(wid(w.id)); }); x.focus.forEach(p => pats.push(p)); });
     const eod = endOfToday();
     const score = id => { const c = S.items[id]; const due = c.due <= eod ? 0 : 1; const weak = (c.lapses || 0) > 0 || c.s < 7 ? 0 : 1; return due * 2 + weak + SRS.currentR(c, now) * 0.5 + Math.random() * 0.4; };
-    const ranked = pool.sort((a, b) => score(a) - score(b));
+    const ranked0 = pool.sort((a, b) => score(a) - score(b));
+    // v9.7: the vocab half favours this unit's words (up to 4 of the ~6), then the most due / weak from anywhere
+    const mine = new Set(u.words.map(w => wid(w.id)));
+    const ranked = ranked0.filter(id => mine.has(id)).slice(0, 4); ranked0.forEach(id => { if (!ranked.includes(id)) ranked.push(id); });
     // fresh sentences: words lean on cloze / sentence listening; flip cards, repeat-after-me and the picker join the mix
     const vocab = id => ({ id, ex: withTiles(id.slice(2), pick(['cloze', 'listenS', 'en2es', 'cloze', 'flip', 'speak', 'cloze', 'pickEn'])) });
     const fk = chooseFocus(pats, u.focus);
@@ -1241,6 +1304,7 @@
     if (i === 1) return startStory(u);
     const meta = { uid, stone: i };
     if (i === 0) return startRun(introQueue(u), 'intro', meta);
+    if (i === 'w') return startRun(wordPracticeQueue(u), 'words', meta);
     if (i === 2) return startRun(practiceQueue(u), 'practice', meta);
     return startRun(testQueue(u), 'test', meta);
   }
@@ -1422,7 +1486,10 @@
   function reviewQueue() { // v9.6: words that are due, plus ~8 drills on ONE due grammar pattern (the other due patterns wait their turn)
     const due = dueIds(Date.now()), pats = due.filter(id => id.startsWith('p:')).map(id => id.slice(2)), words = due.filter(id => id.startsWith('w:'));
     const cur = currentPos(), first = cur ? C.units[IDX.unitIdx[cur.uid]].focus : [];
-    const fk = pats.length ? chooseFocus(pats, first) : null;
+    // v9.7: grammar is now introduced in Practice, one pattern per session. With no pattern due, review teaches a pattern
+    // still waiting from a unit whose Practice stone is already done (units with 2-3 patterns catch up this way).
+    const waiting = pats.length || !words.length ? [] : IDX.section.units.filter(uid => stones(uid)[2]).flatMap(uid => C.units[IDX.unitIdx[uid]].focus).filter(p => IDX.patterns[p] && !S.items[pid(p)]);
+    const fk = pats.length ? chooseFocus(pats, first) : waiting.length ? chooseFocus(waiting, first) : null;
     if (!fk) return words.slice(0, 60).map(id => ({ id }));
     return weave(focusDrills(fk), words.slice(0, 60 - FOCUS_N).map(id => ({ id })));
   }
@@ -1458,7 +1525,7 @@
     checkC2();
     const st = stats(), sec = IDX.section, cur = currentPos();
     const doneUnits = sec.units.filter(unitDone).length;
-    const offs = [0, 1, 0, -1];
+    const offs = [0, 1, 0, -1, 0];
     const sectionHtml = s => {
       if (s.placeholder === 'before') return `<div class="section-card skipped"><span class="cefr">${esc(s.cefr)}</span><div><b>${esc(s.title)}</b><div class="muted small">Skipped — below your level</div></div></div>`;
       if (s.placeholder === 'after') return `<div class="section-card locked"><span class="cefr">${esc(s.cefr)}</span><div><b>${esc(s.title)}</b><div class="muted small">Not written yet</div></div></div>`;
@@ -1466,8 +1533,8 @@
         ${s.units.map((uid, n) => {
           const u = C.units[IDX.unitIdx[uid]];
           return `<div class="unit ${unitDone(uid) ? 'udone' : ''}${u.ta ? ' ta' : ''}" id="unit-${uid}"><div class="unit-head"><div class="label">Unit ${n + 1}${u.ta ? ' · <span class="badge ta">Tres Aguas</span>' : ''}${S.path.testedOut[uid] ? ' · tested out' : ''}</div><div class="utitle">${esc(u.title)}</div><div class="muted small">${esc(u.titleEn)} · ${u.focus.map(p => esc(C.patterns[p].name.replace(/\s*\(.*\)\s*$/, ''))).join(' · ')}</div></div>
-            <div class="stones">${STONES.map((stn, i) => { const state = stoneState(uid, i); const jd = opts.justDone && opts.justDone.uid === uid && opts.justDone.stone === i;
-              return `<div class="stone-wrap" style="--off:${offs[i]}"><button class="stone ${state}${jd ? ' just-done' : ''}" data-u="${uid}" data-s="${i}" aria-label="${esc(stn.label)}">${state === 'done' ? '✓' : state === 'locked' ? '🔒' : stn.icon}</button><span class="stone-label">${esc(stn.label)}${i === 3 && S.path.tests[uid] ? ` · ${S.path.tests[uid].best}/${S.path.tests[uid].total || 15}` : ''}</span></div>`; }).join('')}</div></div>`;
+            <div class="stones">${STONES.map((stn, i) => { const state = stoneState(uid, stn.s); const jd = opts.justDone && opts.justDone.uid === uid && opts.justDone.stone === stn.s;
+              return `<div class="stone-wrap" style="--off:${offs[i]}"><button class="stone ${state}${jd ? ' just-done' : ''}" data-u="${uid}" data-s="${stn.s}" aria-label="${esc(stn.label)}">${state === 'done' ? '✓' : state === 'locked' ? '🔒' : stn.icon}</button><span class="stone-label">${esc(stn.label)}${stn.s === 3 && S.path.tests[uid] ? ` · ${S.path.tests[uid].best}/${S.path.tests[uid].total || 15}` : ''}</span></div>`; }).join('')}</div></div>`;
         }).join('')}`;
     };
     app.innerHTML = `<div class="home-head"><div class="topbar home-top"><div class="title">Español <span class="muted small">${APP_VERSION}</span></div><span class="row-inline">${lpHtml()}<button class="btn secondary slim" id="prog">Progress</button></span></div>${dayBarHtml()}</div>
@@ -1480,7 +1547,7 @@
     document.getElementById('prog').onclick = renderProgress; bindLp();
     document.getElementById('review').onclick = startReview;
     app.querySelectorAll('.stone').forEach(b => b.onclick = () => {
-      const uid = b.dataset.u, i = +b.dataset.s, state = stoneState(uid, i);
+      const uid = b.dataset.u, i = b.dataset.s === 'w' ? 'w' : +b.dataset.s, state = stoneState(uid, i);
       if (state === 'locked') return toast('Finish the stone before this one first.');
       openStone(uid, i);
     });
@@ -1497,8 +1564,8 @@
   function renderProgress() {
     const st = stats();
     const units = IDX.section.units.map(uid => {
-      const u = C.units[IDX.unitIdx[uid]]; const n = stones(uid).filter(Boolean).length;
-      return `<li class="col"><div class="rowline"><span>${esc(u.title)} <span class="muted">· ${esc(u.titleEn)}</span></span><span>${n}/4</span></div><div class="small">${u.words.map(w => `<span class="chip ${S.parked[w.id] ? 'parked' : S.items[wid(w.id)] ? 'learned' : ''}" data-w="${w.id}">${esc(w.es)}</span>`).join(' ')}</div></li>`;
+      const u = C.units[IDX.unitIdx[uid]]; const n = STONES.filter(t => stoneDone(uid, t.s)).length;
+      return `<li class="col"><div class="rowline"><span>${esc(u.title)} <span class="muted">· ${esc(u.titleEn)}</span></span><span>${n}/${STONES.length}</span></div><div class="small">${u.words.map(w => `<span class="chip ${S.parked[w.id] ? 'parked' : S.items[wid(w.id)] ? 'learned' : ''}" data-w="${w.id}">${esc(w.es)}</span>`).join(' ')}</div></li>`;
     }).join('');
     const patterns = Object.keys(C.patterns).map(p => {
       const c = S.items[pid(p)], ps = S.pstats[p];
@@ -1826,7 +1893,7 @@
   }
   window.__app = { version: APP_VERSION, counts: () => runCounts(), openWordMenu: (id, x, y, word) => openWordMenu(id, x, y, word), get state() { return S; }, get ex() { return run && run.ex; }, get entry() { return run && (run.ruleStep ? Object.assign({}, run.queue[run.i], { rule: true }) : run.queue[run.i]); }, get run() { return run; }, get story() { return story; },
     makeExercise: e => makeExercise(e), nextCard: () => nextCard(), openRule: p => openRule(p), get content() { return C; }, importBackup: (t) => importBackup(t, true), openStone: (u, i) => openStone(u, i), testQueue: u => testQueue(C.units[IDX.unitIdx[u]]), practiceQueue: u => practiceQueue(C.units[IDX.unitIdx[u]]), reviewQueue: () => reviewQueue(), chooseFocus: (c, f) => chooseFocus(c, f || []), patWeak: pk => patWeak(pk), startReview: () => startReview(), dueIds: () => dueIds(Date.now()), currentPos: () => currentPos(),
-    introQueue: u => introQueue(C.units[IDX.unitIdx[u]]), withTiles: (w, t) => withTiles(w, t), pickStoryTile: u => pickStoryTile(C.units[IDX.unitIdx[u]].story),
+    introQueue: u => introQueue(C.units[IDX.unitIdx[u]]), wordPracticeQueue: u => wordPracticeQueue(C.units[IDX.unitIdx[u]]), stoneDone: (u, i) => stoneDone(u, i), STONES: STONES, withTiles: (w, t) => withTiles(w, t), pickStoryTile: u => pickStoryTile(C.units[IDX.unitIdx[u]].story),
     forceEx: (type, sent) => { if (!run || run.answered) return; run.ruleStep = null; const e = run.queue[run.i] = Object.assign({}, run.queue[run.i], { ex: type }, sent ? { sent } : {}); run.ex = makeExercise(e); renderExercise(e, run.ex); },
     speakPaused: () => speakPaused(), speakOk: () => speakOk(), cantSpeak: () => { const b = document.getElementById('cantSpeak'); if (b) b.click(); }, get voice() { return voice; }, get voice2() { return voice2; }, storyVoice: s => { const v = storyVoice(s); return v && { voice: v.voice && v.voice.name, pitch: v.pitch }; }, pickVoice: () => pickVoice(), gloss: w => gloss(w), pickExercise: (id, rev) => pickExercise(IDX.words[id], rev), unblockSpeech: () => unblockSpeech(), get micFails() { return micFails; }, get recActive() { return !!rec; }, get speechBlocked() { return speechBlocked; }, normalize: raw => normalize(raw), keepFooterVisible: () => keepFooterVisible(), speakables: () => speakables(), speak: (t, slow, spk) => speak(t, slow, spk != null ? storyVoice(spk) : null), unitAudio: u => unitAudio(C.units[IDX.unitIdx[u]]), get recorded() { return useRecorded(); }, recStory: s => storyVoice(s) && storyVoice(s).rec, offlineAudio: () => offlineAudio(),
     tick: () => tick(), listenPaused: () => listenPaused(), cantListen: () => { const b = document.getElementById('cantListen'); if (b) b.click(); }, todayMinutes: () => Daily.minutesOn(S.daily, todayKey()), streakNow: () => Daily.current(S.streak, todayKey()) };

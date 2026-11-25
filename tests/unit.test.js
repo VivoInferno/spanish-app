@@ -157,9 +157,9 @@ t('B1 path has syllabus units 1-15 in order, Tres Aguas at every third stop', ()
   assert.equal(new Set(C.units.map(u => u.id)).size, C.units.length);
   ['u1', 'u2', 'u3', 'u4', 'u5', 'u6', 'u7', 'u8', 'u9'].forEach(id => assert.ok(C.units.some(u => u.id === id), 'existing unit id kept: ' + id));
 });
-t('every story: 9-12 lines, 4 questions, each answerable from the lines shown before it', () => {
+t('every story: 9-16 lines (v9.7: longer, to reuse the new words), 4 questions, each answerable from the lines shown before it', () => {
   for (const u of PATH) {
-    const st = u.story; assert.ok(st.lines.length >= 9 && st.lines.length <= 12, u.id + ' lines ' + st.lines.length); assert.equal(st.qs.length, 4, u.id);
+    const st = u.story; assert.ok(st.lines.length >= 9 && st.lines.length <= 16, u.id + ' lines ' + st.lines.length); assert.equal(st.qs.length, 4, u.id);
     for (const q of st.qs) {
       const seen = norm(st.lines.slice(0, q.after + 1).map(l => l.es).join(' '));
       assert.ok(new Set(q.o.map(norm)).size === q.o.length, u.id + ' duplicate options: ' + q.q);

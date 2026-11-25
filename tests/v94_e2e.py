@@ -23,7 +23,7 @@ async def main():
         pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto(URL); await pg.wait_for_selector('.stone'); await pg.wait_for_timeout(400)
         s = await pg.evaluate("__app.state")
-        check(await pg.evaluate("__app.version") == 'v9.6' and s['items'] == V9['items'] and s['path'] == V9['path'] and s['daily'] == V9['daily'] and s['streak'] == V9['streak']
+        check(await pg.evaluate("__app.version") == 'v9.7' and s['items'] == V9['items'] and s['path'] == V9['path'] and s['daily'] == V9['daily'] and s['streak'] == V9['streak']
               and s['rulesSeen'] == {} and s['pace'] == {}, 'v9.x data → v9.5 losslessly (no rule cards seen yet)')
         n_rules = await pg.evaluate("Object.values(__app.content.patterns).filter(p => p.rule).length")
         n_pat = await pg.evaluate("Object.keys(__app.content.patterns).length")

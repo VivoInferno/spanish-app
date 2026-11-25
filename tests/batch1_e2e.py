@@ -57,7 +57,7 @@ async def main():
                 await pg.goto(URL); await pg.wait_for_selector('.stone')
             else:
                 await pg.goto(URL); await pg.wait_for_selector('#go'); await pg.evaluate("s => __app.importBackup(s)", json.dumps(V5)); await pg.reload(); await pg.wait_for_selector('.stone')
-            check(await pg.evaluate("__app.version") == 'v9.6', f'[{mode}] app version is v9.5')
+            check(await pg.evaluate("__app.version") == 'v9.7', f'[{mode}] app version is v9.5')
             s = await pg.evaluate("__app.state"); stored = await pg.evaluate(f"JSON.parse(localStorage.getItem('{KEY}'))")
             keep = ['items', 'pstats', 'recent', 'parked', 'daily', 'streak', 'placementDone', 'placementSummary', 'sessions', 'created']
             check(all(s.get(k) == raw.get(k) for k in keep), f'[{mode}] SRS items ({len(raw["items"])}), stats, parked, daily history, streak unchanged')
@@ -66,7 +66,7 @@ async def main():
             cur = await pg.evaluate("__app.currentPos()")
             check(cur == {'uid': 'ta1', 'stone': 0}, f'[{mode}] next stop is the new unit 3 (Primer mensaje por WhatsApp): {cur}')
             u3 = await pg.evaluate("[...document.querySelectorAll('#unit-u3 .stone')].map(b => b.classList.contains('done'))")
-            check(u3 == [True] * 4, f'[{mode}] El trabajo (now unit 4) still shows all 4 stones done')
+            check(u3 == [True] * 5, f'[{mode}] El trabajo (now unit 4) still shows all 5 stones done (v9.7: Word practice marked done on upgrade)')
             if mode == 'localStorage':
                 ids = await pg.evaluate("[...document.querySelectorAll('.unit')].map(e => e.id.slice(5))")
                 check(ids == ORDER, f'path shows 15 units in syllabus order')

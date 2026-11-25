@@ -38,7 +38,7 @@ async def main():
         page = await ctx.new_page(); errors = []
         page.on('pageerror', lambda e: errors.append(str(e)))
         await page.goto(URL); await page.wait_for_selector('.stone')
-        check(await page.evaluate("__app.version") == 'v9.6', 'app version is v9.5')
+        check(await page.evaluate("__app.version") == 'v9.7', 'app version is v9.5')
 
         # ---- zoom off ----
         vp = await page.evaluate("document.querySelector('meta[name=viewport]').content")
@@ -65,8 +65,8 @@ async def main():
         check(stats['es'] > 0 and stats['en'] > 0 and stats['nosent'] == 0, 'both directions (ES tiles and EN tiles), none without a sentence')
         ex_en = await page.evaluate("(() => { for (let i = 0; i < 400; i++) { const ex = __app.makeExercise({id: 'w:' + __app.content.units[0].words[i % __app.content.units[0].words.length].id, ex: 'buildEn'}); if (ex.kind === 'build') return ex; } })()")
         check(ex_en and ex_en['opts']['lang'] == 'en' and len(ex_en['tiles']) > len(re.sub(PUNCT, '', ex_en['answers'][0]).split()), 'EN-tile drill has English target and distractor tiles')
-        iq = await page.evaluate(f"""(() => {{ let n = 0, t = 0; for (let r = 0; r < 40; r++) __app.introQueue('{uid}').forEach(e => {{ if (e.practice) {{ n++; if (e.ex === 'build' || e.ex === 'buildEn') t++; }} }}); return [n, t]; }})()""")
-        check(iq[1] > 0 and iq[1] / max(iq[0], 1) <= 0.35, f'intro practice items include tile drills ({iq[1]}/{iq[0]})')
+        iq = await page.evaluate(f"""(() => {{ let n = 0, t = 0; for (let r = 0; r < 40; r++) __app.introQueue('{uid}').forEach(e => {{ if (e.words) {{ n++; if (e.ex === 'build' || e.ex === 'buildEn') t++; }} }}); return [n, t]; }})()""")
+        check(iq[1] > 0 and iq[1] / max(iq[0], 1) <= 0.5, f'New words drills include tile drills ({iq[1]}/{iq[0]})')
         tq = await page.evaluate(f"__app.testQueue('{uid}')")
         nb = sum(1 for e in tq if e.get('ex') == 'build'); nv = sum(1 for e in tq if not e.get('theme') and e.get('ex') != 'build')
         check(nv == 12 and nb == 3, f'test stays 12 vocab + 3 builds ({nv}+{nb})')
