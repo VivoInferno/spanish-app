@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const APP_VERSION = 'v9.7'; // keep in sync with CACHE in sw.js (espanol-v9-7)
+  const APP_VERSION = 'v9.8'; // keep in sync with CACHE in sw.js (espanol-v9-8)
   const KEY = 'spanish-app-state-v1'; // unchanged since v1 — never rename
   const DAY = SRS.DAY;
   // v9.7: five stones per unit, in this order. `s` is the stone's storage slot: 0-3 are the original path.done[uid] booleans
@@ -174,7 +174,7 @@
     const toks = t => tokCores(t).forEach(add);
     C.units.forEach(u => {
       u.words.forEach(w => { add(w.es); toks(w.es); });
-      u.sentences.forEach(x => { add(x.es); toks(x.es); });
+      u.sentences.forEach(x => { add(x.es); toks(x.es); if (x.dict) { add(x.dict.es); toks(x.dict.es); } });
       u.story.lines.forEach(l => { story.push([u.id, l.s || '', l.es.trim()]); toks(l.es); });
     });
     Object.values(C.patterns).forEach(p => p.items.forEach(it => { const full = it.q.replace('___', it.o[0]); add(full); add(full.replace(/\s*\([^)]*\)\s*$/, '')); toks(it.q); toks(full);
@@ -403,7 +403,7 @@
     if (!Rec.man) return [];
     const out = new Set(), add = (t, v) => { const p = Rec.lookup(Rec.man, t, v); if (p) out.add(p); }, toks = t => tokCores(t).forEach(x => add(x));
     u.words.forEach(w => { add(w.es); toks(w.es); });
-    u.sentences.forEach(x => { add(x.es); toks(x.es); });
+    u.sentences.forEach(x => { add(x.es); toks(x.es); if (x.dict) { add(x.dict.es); toks(x.dict.es); } });
     u.story.lines.forEach(l => { add(l.es, Rec.castFor(Rec.man, u.id, l.s)); toks(l.es); });
     u.focus.forEach(p => C.patterns[p].items.forEach(it => { const full = it.q.replace('___', it.o[0]); add(full); add(full.replace(/\s*\([^)]*\)\s*$/, '')); toks(it.q); toks(full); }));
     return [...out];
@@ -516,7 +516,7 @@
     if (type === 'build' || type === 'buildEn') type = 'en2es';
     if (Listen.isAudio(type) && listenPaused()) type = Listen.substitute(type, sents.length > 0); // "Can't listen now" is on
     if ((type === 'cloze' || type === 'listenS') && !sents.length) type = 'en2es';
-    const sent = sents.length ? pick(sents) : null;
+    const sent = entry.sent || (sents.length ? pick(sents) : null);
     const esAns = [w.es].concat(w.esAlt || []);
     switch (type) {
       case 'es2en': return { kind: 'type', label: 'Translate to English', big: w.es, bubbleEs: w.es, bigW: w.id, speakNow: w.es, answers: w.accept, opts: { lang: 'en', typo: true }, placeholder: 'English', reveal: { es: w.es, en: w.en, note: w.note, ex: sent } };
@@ -529,8 +529,9 @@
       }
       default: {
         const useSentence = sent && (card && card.s >= 3 || type === 'listenS');
-        const text = useSentence ? sent.es : w.es;
-        return { kind: 'type', audio: true, label: useSentence ? 'Listen and type the sentence' : 'Listen and type the word', listen: text, answers: [text], opts: { lang: 'es', sentence: useSentence }, placeholder: 'Escribe lo que oyes', reveal: useSentence ? { es: sent.es, en: sent.en } : { es: w.es, en: w.en, note: w.note } };
+        // v9.8: dictation never plays more than 7 words: a long example sentence uses its short `dict` chunk (same target word)
+        const d = useSentence ? (sent.dict || sent) : null, text = useSentence ? d.es : w.es;
+        return { kind: 'type', audio: true, dict: true, label: useSentence ? 'Listen and type the sentence' : 'Listen and type the word', listen: text, answers: [text], opts: { lang: 'es', sentence: useSentence }, placeholder: 'Escribe lo que oyes', reveal: useSentence ? { es: d.es, en: d.en } : { es: w.es, en: w.en, note: w.note } };
       }
     }
   }
@@ -702,7 +703,7 @@
     show();
   }
   function finishRun() {
-    sessionDone();
+    stopRec(); sessionDone();
     if (run.mode === 'placement') return finishPlacement();
     if (run.mode === 'review') return finishReview();
     if (run.mode === 'test') return finishTest();
@@ -935,9 +936,25 @@
   const micTimes = () => window.__micTimes || [MIC_IDLE, MIC_CAP, MIC_STOP]; // tests may shorten these
   let rec = null, recT = [];
   const clearRecTimers = () => { recT.forEach(clearTimeout); recT = []; };
+  // v9.8 "sounds like a phone call after the mic" (iOS): an open recogniser switches the audio session to play-and-record
+  // (voice-call route, low quality) and it stays there while anything holds the mic. So: tell Safari's Audio Session API we
+  // are recording only while listening, and after every listen fully release the recogniser (stop + abort, refs dropped),
+  // put the session back to 'playback', and rebuild the <audio> element and the effects AudioContext on the next tap.
+  // No getUserMedia stream, level meter or persistent mic exists in the app (SpeechRecognition only).
+  let micOpen = false;
+  function audioSessionType(t) { try { const s = navigator.audioSession; if (s && s.type !== t) s.type = t; } catch (e) { /* ignore */ } }
+  function micBegin() { micOpen = true; audioSessionType('play-and-record'); }
+  function micEnd() {
+    if (!micOpen) return; micOpen = false;
+    (window.__micTracks || []).forEach(t => { try { t.stop(); } catch (e) { /* ignore */ } }); window.__micTracks = []; // defensive: no streams are opened
+    audioSessionType('playback');
+    if (Rec.afterMic) Rec.afterMic();
+    if (FX.afterMic) FX.afterMic();
+  }
   function stopRec() {
     clearRecTimers();
-    if (rec) { const r = rec; rec = null; r.onresult = r.onerror = r.onend = r.onnomatch = r.onspeechend = r.onaudiostart = null; try { r.abort(); } catch (e) { /* ignore */ } }
+    if (rec) { const r = rec; rec = null; r.onresult = r.onerror = r.onend = r.onnomatch = r.onspeechend = r.onaudiostart = r.onsoundstart = r.onspeechstart = null; try { r.stop(); } catch (e) { /* ignore */ } try { r.abort(); } catch (e) { /* ignore */ } }
+    micEnd();
     document.querySelectorAll('.vmic.on').forEach(b => { b.classList.remove('on'); b.setAttribute('aria-pressed', 'false'); const l = b.querySelector('.vmic-label'); if (l) l.textContent = 'Say it'; });
     document.querySelectorAll('.mic.on').forEach(b => { b.classList.remove('on'); b.setAttribute('aria-pressed', 'false'); const l = b.querySelector('.mic-label'); if (l) l.textContent = 'Tap to speak'; });
   }
@@ -992,7 +1009,8 @@
         setState(false, err === 'no-speech' ? AGAIN : 'Something went wrong with the mic. Tap it to try again, or use Skip.');
       };
       r.onend = () => { if (!live()) return; stopRec(); setState(false, got ? null : AGAIN); };
-      try { r.start(); } catch (e) { rec = null; return failed(null, 'start-failed'); }
+      micBegin();
+      try { r.start(); } catch (e) { rec = null; micEnd(); return failed(null, 'start-failed'); }
       setState(true, '');
       // watchdog: nothing within 8 s (no result / end / error) or 12 s in total → abort and give the card back
       let last = performance.now();
@@ -1058,7 +1076,8 @@
       };
       r.onend = () => { if (!live()) return; stopRec(); setOn(false); deliver(); };
       const failed = () => { if (!live()) return; stopRec(); setOn(false); micFails++; if (h.text) return deliver(); if (micFails >= 2) return off('timeout'); note('The mic didn’t respond. Tap 🎤 to try again, or type it.'); };
-      try { r.start(); } catch (err) { rec = null; micFails++; return micFails >= 2 ? off('start-failed') : note('The mic didn’t start. Tap 🎤 to try again, or type it.'); }
+      micBegin();
+      try { r.start(); } catch (err) { rec = null; micEnd(); micFails++; return micFails >= 2 ? off('start-failed') : note('The mic didn’t start. Tap 🎤 to try again, or type it.'); }
       setOn(true); note('<span class="vlisten">Listening… say the sentence, then tap Stop or just pause</span>');
       ['onaudiostart', 'onsoundstart', 'onspeechstart'].forEach(k => { try { r[k] = () => { last = performance.now(); }; } catch (err) { /* ignore */ } });
       const [tIdle, tCap] = micTimes();
@@ -1895,7 +1914,7 @@
     makeExercise: e => makeExercise(e), nextCard: () => nextCard(), openRule: p => openRule(p), get content() { return C; }, importBackup: (t) => importBackup(t, true), openStone: (u, i) => openStone(u, i), testQueue: u => testQueue(C.units[IDX.unitIdx[u]]), practiceQueue: u => practiceQueue(C.units[IDX.unitIdx[u]]), reviewQueue: () => reviewQueue(), chooseFocus: (c, f) => chooseFocus(c, f || []), patWeak: pk => patWeak(pk), startReview: () => startReview(), dueIds: () => dueIds(Date.now()), currentPos: () => currentPos(),
     introQueue: u => introQueue(C.units[IDX.unitIdx[u]]), wordPracticeQueue: u => wordPracticeQueue(C.units[IDX.unitIdx[u]]), stoneDone: (u, i) => stoneDone(u, i), STONES: STONES, withTiles: (w, t) => withTiles(w, t), pickStoryTile: u => pickStoryTile(C.units[IDX.unitIdx[u]].story),
     forceEx: (type, sent) => { if (!run || run.answered) return; run.ruleStep = null; const e = run.queue[run.i] = Object.assign({}, run.queue[run.i], { ex: type }, sent ? { sent } : {}); run.ex = makeExercise(e); renderExercise(e, run.ex); },
-    speakPaused: () => speakPaused(), speakOk: () => speakOk(), cantSpeak: () => { const b = document.getElementById('cantSpeak'); if (b) b.click(); }, get voice() { return voice; }, get voice2() { return voice2; }, storyVoice: s => { const v = storyVoice(s); return v && { voice: v.voice && v.voice.name, pitch: v.pitch }; }, pickVoice: () => pickVoice(), gloss: w => gloss(w), pickExercise: (id, rev) => pickExercise(IDX.words[id], rev), unblockSpeech: () => unblockSpeech(), get micFails() { return micFails; }, get recActive() { return !!rec; }, get speechBlocked() { return speechBlocked; }, normalize: raw => normalize(raw), keepFooterVisible: () => keepFooterVisible(), speakables: () => speakables(), speak: (t, slow, spk) => speak(t, slow, spk != null ? storyVoice(spk) : null), unitAudio: u => unitAudio(C.units[IDX.unitIdx[u]]), get recorded() { return useRecorded(); }, recStory: s => storyVoice(s) && storyVoice(s).rec, offlineAudio: () => offlineAudio(),
+    speakPaused: () => speakPaused(), speakOk: () => speakOk(), cantSpeak: () => { const b = document.getElementById('cantSpeak'); if (b) b.click(); }, get voice() { return voice; }, get voice2() { return voice2; }, storyVoice: s => { const v = storyVoice(s); return v && { voice: v.voice && v.voice.name, pitch: v.pitch }; }, pickVoice: () => pickVoice(), gloss: w => gloss(w), pickExercise: (id, rev) => pickExercise(IDX.words[id], rev), unblockSpeech: () => unblockSpeech(), get micFails() { return micFails; }, get recActive() { return !!rec; }, get micOpen() { return micOpen; }, get speechBlocked() { return speechBlocked; }, normalize: raw => normalize(raw), keepFooterVisible: () => keepFooterVisible(), speakables: () => speakables(), speak: (t, slow, spk) => speak(t, slow, spk != null ? storyVoice(spk) : null), unitAudio: u => unitAudio(C.units[IDX.unitIdx[u]]), get recorded() { return useRecorded(); }, recStory: s => storyVoice(s) && storyVoice(s).rec, offlineAudio: () => offlineAudio(),
     tick: () => tick(), listenPaused: () => listenPaused(), cantListen: () => { const b = document.getElementById('cantListen'); if (b) b.click(); }, todayMinutes: () => Daily.minutesOn(S.daily, todayKey()), streakNow: () => Daily.current(S.streak, todayKey()) };
   boot();
 })();

@@ -2982,25 +2982,41 @@
      "es": "Tengo una cita en el banco a las diez.",
      "en": "I have an appointment at the bank at ten.",
      "k": "cita",
-     "f": "cita"
+     "f": "cita",
+     "dict": {
+      "es": "Tengo una cita en el banco.",
+      "en": "I have an appointment at the bank."
+     }
     },
     {
      "es": "Para abrir la cuenta, me pidieron un comprobante de domicilio.",
      "en": "To open the account, they asked me for proof of address.",
      "k": "comprobante",
-     "f": "comprobante de domicilio"
+     "f": "comprobante de domicilio",
+     "dict": {
+      "es": "Me pidieron un comprobante de domicilio.",
+      "en": "They asked me for proof of address."
+     }
     },
     {
      "es": "Si necesitas el recibo, te lo mando por correo.",
      "en": "If you need the receipt, I'll send it to you by email.",
      "k": "recibo",
-     "f": "recibo"
+     "f": "recibo",
+     "dict": {
+      "es": "Si necesitas el recibo, te lo mando.",
+      "en": "If you need the receipt, I'll send it to you."
+     }
     },
     {
      "es": "Tengo que entregar los documentos antes del viernes.",
      "en": "I have to hand in the documents before Friday.",
      "k": "entregar",
-     "f": "entregar"
+     "f": "entregar",
+     "dict": {
+      "es": "Tengo que entregar los documentos.",
+      "en": "I have to hand in the documents."
+     }
     },
     {
      "es": "Este trámite tarda casi un mes.",
@@ -3016,7 +3032,11 @@
      "h": "entregar, preterite yo",
      "alts": [
       "¿El comprobante de domicilio? Ayer se lo entregué a la licenciada."
-     ]
+     ],
+     "dict": {
+      "es": "Se lo entregué a la licenciada.",
+      "en": "I gave it to the lawyer."
+     }
     },
     {
      "es": "Cuando tengas el recibo, dámelo y yo hago el trámite.",
@@ -3026,7 +3046,11 @@
      "alts": [
       "Cuando tengas el recibo, dámelo y hago el trámite.",
       "Cuando tengas el recibo, dámelo y hago yo el trámite."
-     ]
+     ],
+     "dict": {
+      "es": "Dámelo y yo hago el trámite.",
+      "en": "Give it to me and I'll do the paperwork."
+     }
     }
    ],
    "story": {
@@ -3264,7 +3288,11 @@
        "w": "fontanero",
        "for": "plomero"
       }
-     ]
+     ],
+     "dict": {
+      "es": "La llave del baño tenía una fuga.",
+      "en": "The bathroom faucet had a leak."
+     }
     },
     {
      "es": "Cuando llegué, el refri estaba descompuesto.",
@@ -3314,7 +3342,11 @@
       "El plomero ayer vino, pero no pudo arreglar la fuga.",
       "Vino el plomero ayer, pero no pudo arreglar la fuga.",
       "Ayer vino el plomero, pero no pudo arreglar la fuga."
-     ]
+     ],
+     "dict": {
+      "es": "No pudo arreglar la fuga.",
+      "en": "He couldn't fix the leak."
+     }
     },
     {
      "es": "Se me olvidó entregarle el recibo al plomero.",
@@ -3332,7 +3364,11 @@
        "w": "fontanero",
        "for": "plomero"
       }
-     ]
+     ],
+     "dict": {
+      "es": "Le entregué el recibo al plomero.",
+      "en": "I gave the plumber the receipt."
+     }
     },
     {
      "es": "Mientras arreglaba la llave, se le cayó una pieza.",
@@ -3344,7 +3380,11 @@
        "w": "reparaba",
        "for": "arreglaba"
       }
-     ]
+     ],
+     "dict": {
+      "es": "Estaba arreglando la llave del baño.",
+      "en": "He was fixing the bathroom faucet."
+     }
     },
     {
      "es": "Hice una cita con el plomero para el lunes.",
@@ -3362,7 +3402,11 @@
        "w": "fontanero",
        "for": "plomero"
       }
-     ]
+     ],
+     "dict": {
+      "es": "Hice una cita con el plomero.",
+      "en": "I made an appointment with the plumber."
+     }
     },
     {
      "es": "El elevador estuvo descompuesto toda la semana.",
@@ -3622,7 +3666,11 @@
        "w": "reunión",
        "for": "junta"
       }
-     ]
+     ],
+     "dict": {
+      "es": "La junta es a las nueve.",
+      "en": "The meeting is at nine."
+     }
     },
     {
      "es": "Necesito que me mandes el presupuesto antes de la junta.",
@@ -3634,7 +3682,11 @@
        "w": "reunión",
        "for": "junta"
       }
-     ]
+     ],
+     "dict": {
+      "es": "Mándame el presupuesto antes de la junta.",
+      "en": "Send me the budget before the meeting."
+     }
     },
     {
      "es": "Ojalá que aprueben la propuesta esta semana.",
@@ -3647,7 +3699,11 @@
      "es": "El plazo para entregar la propuesta es el viernes.",
      "en": "The deadline to hand in the proposal is Friday.",
      "k": "plazo",
-     "f": "plazo"
+     "f": "plazo",
+     "dict": {
+      "es": "El plazo es el viernes.",
+      "en": "The deadline is Friday."
+     }
     },
     {
      "es": "Le pedí al plomero un presupuesto para arreglar la fuga.",
@@ -3663,14 +3719,22 @@
        "w": "fontanero",
        "for": "plomero"
       }
-     ]
+     ],
+     "dict": {
+      "es": "Le pedí un presupuesto al plomero.",
+      "en": "I asked the plumber for an estimate."
+     }
     },
     {
      "es": "Es importante que el cliente apruebe el presupuesto pronto.",
      "en": "It's important that the client approve the budget soon.",
      "k": "aprobar",
      "f": "apruebe",
-     "h": "aprobar, subjunctive él"
+     "h": "aprobar, subjunctive él",
+     "dict": {
+      "es": "Ojalá que el cliente apruebe el presupuesto.",
+      "en": "Hopefully the client approves the budget."
+     }
     },
     {
      "es": "Mi jefe está en una junta; te llama cuando termine.",
@@ -3688,7 +3752,11 @@
        "w": "reunión",
        "for": "junta"
       }
-     ]
+     ],
+     "dict": {
+      "es": "Mi jefe está en una junta.",
+      "en": "My boss is in a meeting."
+     }
     },
     {
      "es": "Mandé la propuesta, pero todavía no me contestan.",
@@ -3697,7 +3765,11 @@
      "f": "propuesta",
      "alts": [
       "Mandé la propuesta, pero no me contestan todavía."
-     ]
+     ],
+     "dict": {
+      "es": "Mandé la propuesta ayer.",
+      "en": "I sent the proposal yesterday."
+     }
     }
    ],
    "story": {
@@ -3978,7 +4050,11 @@
        "w": "alquiláramos",
        "for": "rentáramos"
       }
-     ]
+     ],
+     "dict": {
+      "es": "Si rentáramos un carro, sería más fácil.",
+      "en": "If we rented a car, it would be easier."
+     }
     },
     {
      "es": "¿Me podría dar el recibo del boleto, por favor?",
@@ -3996,7 +4072,11 @@
        "w": "pasaje",
        "for": "boleto"
       }
-     ]
+     ],
+     "dict": {
+      "es": "¿Me podría dar el recibo del boleto?",
+      "en": "Could you give me the receipt for the ticket?"
+     }
     },
     {
      "es": "Si no hubiera retraso, llegaríamos a tiempo a la junta.",
@@ -4018,7 +4098,11 @@
        "w": "atraso",
        "for": "retraso"
       }
-     ]
+     ],
+     "dict": {
+      "es": "El vuelo tiene una hora de retraso.",
+      "en": "The flight is an hour late."
+     }
     },
     {
      "es": "Antes de la caseta hay una gasolinera.",
@@ -4253,7 +4337,11 @@
        "w": "píldoras",
        "for": "pastillas"
       }
-     ]
+     ],
+     "dict": {
+      "es": "El doctor me recetó unas pastillas.",
+      "en": "The doctor prescribed me some pills."
+     }
     },
     {
      "es": "Tómese una pastilla cada ocho horas.",
@@ -4289,19 +4377,31 @@
      "es": "No se le olvide traer la receta a la cita.",
      "en": "Don't forget to bring the prescription to the appointment.",
      "k": "receta",
-     "f": "receta"
+     "f": "receta",
+     "dict": {
+      "es": "No se le olvide la receta.",
+      "en": "Don't forget the prescription."
+     }
     },
     {
      "es": "Si sigues mareado, ve al doctor; no esperes.",
      "en": "If you're still dizzy, go to the doctor; don't wait.",
      "k": "mareado",
-     "f": "mareado"
+     "f": "mareado",
+     "dict": {
+      "es": "Si sigues mareado, ve al doctor.",
+      "en": "If you're still dizzy, go to the doctor."
+     }
     },
     {
      "es": "La farmacia no me quiso vender la medicina sin receta.",
      "en": "The pharmacy wouldn't sell me the medicine without a prescription.",
      "k": "receta",
-     "f": "receta"
+     "f": "receta",
+     "dict": {
+      "es": "No me la vendieron sin receta.",
+      "en": "They wouldn't sell it to me without a prescription."
+     }
     },
     {
      "es": "Llegué al consultorio y el doctor iba con una hora de retraso.",
@@ -4313,7 +4413,11 @@
        "w": "atraso",
        "for": "retraso"
       }
-     ]
+     ],
+     "dict": {
+      "es": "Llegué temprano al consultorio.",
+      "en": "I got to the doctor's office early."
+     }
     }
    ],
    "story": {
@@ -4509,7 +4613,11 @@
      "es": "Compro las verduras en el puesto de doña Lupe.",
      "en": "I buy vegetables at doña Lupe's stall.",
      "k": "puesto",
-     "f": "puesto"
+     "f": "puesto",
+     "dict": {
+      "es": "Compro las verduras en el puesto.",
+      "en": "I buy vegetables at the stall."
+     }
     },
     {
      "es": "Estos aguacates todavía no están maduros.",
@@ -4538,33 +4646,53 @@
      "es": "Disculpe, no tengo cambio; solo traigo un billete de quinientos.",
      "en": "Sorry, I don't have change; I only have a 500 bill.",
      "k": "cambio",
-     "f": "cambio"
+     "f": "cambio",
+     "dict": {
+      "es": "Disculpe, no tengo cambio.",
+      "en": "Sorry, I don't have change."
+     }
     },
     {
      "es": "En el mercado se puede regatear un poco, pero en el súper no.",
      "en": "At the market you can haggle a little, but not at the supermarket.",
      "k": "regatear",
-     "f": "regatear"
+     "f": "regatear",
+     "dict": {
+      "es": "En el mercado se puede regatear.",
+      "en": "At the market you can haggle."
+     }
     },
     {
      "es": "Me faltaron diez pesos, pero el señor del puesto me lo dejó en noventa.",
      "en": "I was ten pesos short, but the man at the stall let me have it for ninety.",
      "k": "puesto",
-     "f": "puesto"
+     "f": "puesto",
+     "dict": {
+      "es": "El señor del puesto me hizo descuento.",
+      "en": "The man at the stall gave me a discount."
+     }
     },
     {
      "es": "Escoge los mangos más maduros para el agua fresca.",
      "en": "Pick the ripest mangos for the agua fresca.",
      "k": "maduro",
      "f": "maduros",
-     "h": "plural"
+     "h": "plural",
+     "dict": {
+      "es": "Escoge los mangos más maduros.",
+      "en": "Pick the ripest mangos."
+     }
     },
     {
      "es": "El señor pesó las naranjas y me cobró cuarenta pesos.",
      "en": "The man weighed the oranges and charged me forty pesos.",
      "k": "pesar",
      "f": "pesó",
-     "h": "pesar, preterite él"
+     "h": "pesar, preterite él",
+     "dict": {
+      "es": "El señor pesó las naranjas.",
+      "en": "The man weighed the oranges."
+     }
     }
    ],
    "story": {
@@ -4769,7 +4897,11 @@
      "es": "El cajero no me dio el dinero, pero sí me lo descontó.",
      "en": "The ATM didn't give me the money, but it did take it out of my account.",
      "k": "cajero",
-     "f": "cajero"
+     "f": "cajero",
+     "dict": {
+      "es": "El cajero no me dio el dinero.",
+      "en": "The ATM didn't give me the money."
+     }
     },
     {
      "es": "Ya te hice la transferencia; revisa tu cuenta.",
@@ -4784,13 +4916,21 @@
      ],
      "alts": [
       "Te hice la transferencia ya; revisa tu cuenta."
-     ]
+     ],
+     "dict": {
+      "es": "Ya te hice la transferencia.",
+      "en": "I already sent you the transfer."
+     }
     },
     {
      "es": "En el estado de cuenta aparece un cargo que no reconozco.",
      "en": "There's a charge on the statement that I don't recognize.",
      "k": "estadocuenta",
-     "f": "estado de cuenta"
+     "f": "estado de cuenta",
+     "dict": {
+      "es": "Revisé mi estado de cuenta.",
+      "en": "I checked my statement."
+     }
     },
     {
      "es": "¿Cuánto cobra el banco por cada retiro?",
@@ -4803,7 +4943,11 @@
      "es": "Ese cajero cobra una comisión de treinta pesos.",
      "en": "That ATM charges a thirty-peso fee.",
      "k": "comision",
-     "f": "comisión"
+     "f": "comisión",
+     "dict": {
+      "es": "Ese cajero cobra una comisión.",
+      "en": "That ATM charges a fee."
+     }
     },
     {
      "es": "Todavía no me ha llegado la transferencia del cliente.",
@@ -4812,7 +4956,11 @@
      "f": "transferencia",
      "alts": [
       "No me ha llegado la transferencia del cliente todavía."
-     ]
+     ],
+     "dict": {
+      "es": "Todavía no me llega la transferencia.",
+      "en": "The transfer still hasn't reached me."
+     }
     },
     {
      "es": "Cuando revisé el estado de cuenta, ya me habían cobrado la comisión.",
@@ -4827,7 +4975,11 @@
      ],
      "alts": [
       "Cuando revisé el estado de cuenta, me habían cobrado la comisión ya."
-     ]
+     ],
+     "dict": {
+      "es": "Ya me habían cobrado la comisión.",
+      "en": "They had already charged me the fee."
+     }
     },
     {
      "es": "El plomero me cobró ochocientos pesos por arreglar la fuga.",
@@ -4844,7 +4996,11 @@
        "w": "fontanero",
        "for": "plomero"
       }
-     ]
+     ],
+     "dict": {
+      "es": "El plomero me cobró ochocientos pesos.",
+      "en": "The plumber charged me 800 pesos."
+     }
     }
    ],
    "story": {
@@ -5046,19 +5202,31 @@
      "es": "El vecino de al lado tiene tres perros que ladran toda la noche.",
      "en": "The next-door neighbor has three dogs that bark all night.",
      "k": "vecino",
-     "f": "vecino"
+     "f": "vecino",
+     "dict": {
+      "es": "El vecino de al lado tiene perros.",
+      "en": "The next-door neighbor has dogs."
+     }
     },
     {
      "es": "El camión de la basura pasa los martes y los viernes.",
      "en": "The garbage truck comes on Tuesdays and Fridays.",
      "k": "basura",
-     "f": "basura"
+     "f": "basura",
+     "dict": {
+      "es": "La basura pasa los martes.",
+      "en": "The garbage truck comes on Tuesdays."
+     }
     },
     {
      "es": "No pude dormir por el ruido de la fiesta.",
      "en": "I couldn't sleep because of the noise from the party.",
      "k": "ruido",
-     "f": "ruido"
+     "f": "ruido",
+     "dict": {
+      "es": "No pude dormir por el ruido.",
+      "en": "I couldn't sleep because of the noise."
+     }
     },
     {
      "es": "Si el ruido sigue, me voy a quejar con el administrador.",
@@ -5068,7 +5236,11 @@
      "h": "quejarse, infinitive after me voy a",
      "alts": [
       "Si sigue el ruido, me voy a quejar con el administrador."
-     ]
+     ],
+     "dict": {
+      "es": "Me voy a quejar con el administrador.",
+      "en": "I'm going to complain to the building manager."
+     }
     },
     {
      "es": "Alguien dejó el portón abierto otra vez.",
@@ -5090,7 +5262,11 @@
        "w": "averiado",
        "for": "descompuesto"
       }
-     ]
+     ],
+     "dict": {
+      "es": "El portón está descompuesto.",
+      "en": "The gate is broken."
+     }
     },
     {
      "es": "Lo que más me molesta es que dejen la basura en la banqueta.",
@@ -5102,7 +5278,11 @@
        "w": "acera",
        "for": "banqueta"
       }
-     ]
+     ],
+     "dict": {
+      "es": "Dejan la basura en la banqueta.",
+      "en": "They leave the trash on the sidewalk."
+     }
     },
     {
      "es": "Los vecinos se quejaron del ruido en la junta de condóminos.",
@@ -5115,7 +5295,11 @@
        "w": "reunión",
        "for": "junta"
       }
-     ]
+     ],
+     "dict": {
+      "es": "Los vecinos se quejaron del ruido.",
+      "en": "The neighbors complained about the noise."
+     }
     }
    ],
    "story": {
@@ -5343,7 +5527,11 @@
      ],
      "alts": [
       "El lunes dejé el carro en el taller."
-     ]
+     ],
+     "dict": {
+      "es": "Dejé el carro en el taller.",
+      "en": "I left the car at the shop."
+     }
     },
     {
      "es": "Se me ponchó una llanta en la carretera.",
@@ -5355,7 +5543,11 @@
        "w": "pinchó",
        "for": "ponchó"
       }
-     ]
+     ],
+     "dict": {
+      "es": "Se me ponchó una llanta.",
+      "en": "I got a flat tire."
+     }
     },
     {
      "es": "La llanta está ponchada; hay que cambiarla.",
@@ -5398,7 +5590,11 @@
      "es": "Hay que cambiarle el aceite cada cinco mil kilómetros.",
      "en": "You have to change the oil every five thousand kilometers.",
      "k": "aceite",
-     "f": "aceite"
+     "f": "aceite",
+     "dict": {
+      "es": "Hay que cambiarle el aceite.",
+      "en": "You have to change the oil."
+     }
     },
     {
      "es": "Quiero que el mecánico revise los frenos antes del viaje.",
@@ -5417,13 +5613,21 @@
        "w": "cheque",
        "for": "revise"
       }
-     ]
+     ],
+     "dict": {
+      "es": "Quiero que revise los frenos.",
+      "en": "I want him to check the brakes."
+     }
     },
     {
      "es": "El taller que me recomendaste me cobró muy poco.",
      "en": "The shop you recommended charged me very little.",
      "k": "taller",
-     "f": "taller"
+     "f": "taller",
+     "dict": {
+      "es": "Ese taller me cobró muy poco.",
+      "en": "That shop charged me very little."
+     }
     },
     {
      "es": "Si se te poncha una llanta, llámame y te ayudo.",
@@ -5435,7 +5639,11 @@
        "w": "pincha",
        "for": "poncha"
       }
-     ]
+     ],
+     "dict": {
+      "es": "Si se te poncha una llanta, llámame.",
+      "en": "If you get a flat tire, call me."
+     }
     },
     {
      "es": "El carro está tirando aceite; llévalo al taller.",
@@ -5447,7 +5655,11 @@
        "w": "coche",
        "for": "carro"
       }
-     ]
+     ],
+     "dict": {
+      "es": "El carro está tirando aceite.",
+      "en": "The car is leaking oil."
+     }
     }
    ],
    "story": {
@@ -5670,32 +5882,52 @@
      "f": "prospecto",
      "alts": [
       "Me escribió un prospecto de Oaxaca por WhatsApp ayer."
-     ]
+     ],
+     "dict": {
+      "es": "Ayer me escribió un prospecto.",
+      "en": "Yesterday a lead wrote to me."
+     }
     },
     {
      "es": "Cada prospecto nuevo quiere saber el precio primero.",
      "en": "Every new lead wants to know the price first.",
      "k": "prospecto",
-     "f": "prospecto"
+     "f": "prospecto",
+     "dict": {
+      "es": "Cada prospecto quiere saber el precio.",
+      "en": "Every lead wants to know the price."
+     }
     },
     {
      "es": "La señora está muy interesada en conocer el terreno.",
      "en": "The woman is very interested in seeing the land.",
      "k": "interesado",
      "f": "interesada",
-     "h": "feminine"
+     "h": "feminine",
+     "dict": {
+      "es": "La señora está muy interesada.",
+      "en": "The woman is very interested."
+     }
     },
     {
      "es": "Si sigue interesado, agendamos una cita para que conozca el terreno.",
      "en": "If you’re still interested, we’ll set up an appointment so you can see the land.",
      "k": "interesado",
-     "f": "interesado"
+     "f": "interesado",
+     "dict": {
+      "es": "Si sigue interesado, agendamos una cita.",
+      "en": "If you're still interested, we'll set up an appointment."
+     }
     },
     {
      "es": "Le envié la cotización y todavía no me contesta.",
      "en": "I sent him the quote and he still hasn’t answered me.",
      "k": "cotizacion",
-     "f": "cotización"
+     "f": "cotización",
+     "dict": {
+      "es": "Le envié la cotización ayer.",
+      "en": "I sent him the quote yesterday."
+     }
     },
     {
      "es": "¿Me puede mandar la cotización por correo también?",
@@ -5704,7 +5936,11 @@
      "f": "cotización",
      "alts": [
       "¿También me puede mandar la cotización por correo?"
-     ]
+     ],
+     "dict": {
+      "es": "¿Me puede mandar la cotización?",
+      "en": "Can you send me the quote?"
+     }
     },
     {
      "es": "¿Le comparto la información por aquí?",
@@ -5718,7 +5954,11 @@
      "en": "If you’re interested in the information, I’ll share it with you right now.",
      "k": "compartir",
      "f": "comparto",
-     "h": "compartir, yo"
+     "h": "compartir, yo",
+     "dict": {
+      "es": "Se la comparto ahora mismo.",
+      "en": "I'll share it with you right now."
+     }
     },
     {
      "es": "Con gusto se la mando hoy en la tarde.",
@@ -5728,13 +5968,21 @@
      "alts": [
       "Hoy en la tarde con gusto se la mando.",
       "Con gusto hoy en la tarde se la mando."
-     ]
+     ],
+     "dict": {
+      "es": "Con gusto se la mando hoy.",
+      "en": "I'll gladly send it to you today."
+     }
     },
     {
      "es": "Con gusto le entrego el recibo en la oficina.",
      "en": "I’ll gladly give you the receipt at the office.",
      "k": "congusto",
-     "f": "Con gusto"
+     "f": "Con gusto",
+     "dict": {
+      "es": "Con gusto le entrego el recibo.",
+      "en": "I'll gladly give you the receipt."
+     }
     }
    ],
    "story": {
@@ -5963,49 +6211,81 @@
      "es": "Tres Aguas es un fraccionamiento cerca de Puerto Escondido.",
      "en": "Tres Aguas is a development near Puerto Escondido.",
      "k": "fraccionamiento",
-     "f": "fraccionamiento"
+     "f": "fraccionamiento",
+     "dict": {
+      "es": "Tres Aguas es un fraccionamiento.",
+      "en": "Tres Aguas is a development."
+     }
     },
     {
      "es": "La playa que está frente al fraccionamiento se llama Agua Dulce.",
      "en": "The beach in front of the development is called Agua Dulce.",
      "k": "fraccionamiento",
-     "f": "fraccionamiento"
+     "f": "fraccionamiento",
+     "dict": {
+      "es": "Frente al fraccionamiento está Agua Dulce.",
+      "en": "Agua Dulce is in front of the development."
+     }
     },
     {
      "es": "Los lotes de la primera fila están frente al mar.",
      "en": "The front-row lots are oceanfront.",
      "k": "frentealmar",
-     "f": "frente al mar"
+     "f": "frente al mar",
+     "dict": {
+      "es": "Esos lotes están frente al mar.",
+      "en": "Those lots are oceanfront."
+     }
     },
     {
      "es": "El cliente que vino ayer quiere un lote frente al mar.",
      "en": "The client who came yesterday wants an oceanfront lot.",
      "k": "frentealmar",
-     "f": "frente al mar"
+     "f": "frente al mar",
+     "dict": {
+      "es": "Quiere un lote frente al mar.",
+      "en": "He wants an oceanfront lot."
+     }
     },
     {
      "es": "El plano de la lotificación está en la oficina.",
      "en": "The lot layout map is at the office.",
      "k": "lotificacion",
-     "f": "lotificación"
+     "f": "lotificación",
+     "dict": {
+      "es": "Aquí está el plano de la lotificación.",
+      "en": "Here's the lot layout map."
+     }
     },
     {
      "es": "En la lotificación, cada lote tiene acceso a una calle interna.",
      "en": "In the lot layout, every lot has access to an internal street.",
      "k": "lotificacion",
-     "f": "lotificación"
+     "f": "lotificación",
+     "dict": {
+      "es": "Revisamos la lotificación con el cliente.",
+      "en": "We went over the lot layout with the client."
+     }
     },
     {
      "es": "En el plan maestro se ven las calles, los lotes y las áreas comunes.",
      "en": "The master plan shows the streets, the lots and the common areas.",
      "k": "planmaestro",
-     "f": "plan maestro"
+     "f": "plan maestro",
+     "dict": {
+      "es": "Le muestro el plan maestro.",
+      "en": "Let me show you the master plan."
+     }
     },
     {
      "es": "Le comparto el plan maestro para que vea dónde queda cada lote.",
      "en": "I’ll share the master plan with you so you can see where each lot is.",
      "k": "planmaestro",
-     "f": "plan maestro"
+     "f": "plan maestro",
+     "dict": {
+      "es": "Le comparto el plan maestro.",
+      "en": "I'll share the master plan with you."
+     }
     },
     {
      "es": "Ahorita estamos vendiendo la etapa Gold Plus.",
@@ -6025,7 +6305,11 @@
       "Todavía la segunda etapa no tiene fecha de entrega.",
       "La segunda etapa no tiene fecha de entrega todavía.",
       "Todavía no tiene fecha de entrega la segunda etapa."
-     ]
+     ],
+     "dict": {
+      "es": "La segunda etapa no tiene fecha.",
+      "en": "The second phase doesn't have a date."
+     }
     }
    ],
    "story": {
@@ -6255,7 +6539,11 @@
      "es": "Tres Aguas queda por la carretera costera, rumbo a Acapulco.",
      "en": "Tres Aguas is off the coastal highway, heading toward Acapulco.",
      "k": "carreteracostera",
-     "f": "carretera costera"
+     "f": "carretera costera",
+     "dict": {
+      "es": "Queda por la carretera costera.",
+      "en": "It's off the coastal highway."
+     }
     },
     {
      "es": "La carretera costera es muy bonita, pero de noche hay que manejar con cuidado.",
@@ -6267,19 +6555,31 @@
        "w": "conducir",
        "for": "manejar"
       }
-     ]
+     ],
+     "dict": {
+      "es": "La carretera costera es muy bonita.",
+      "en": "The coastal highway is very pretty."
+     }
     },
     {
      "es": "La laguna de Manialtepec queda muy cerca del fraccionamiento.",
      "en": "Manialtepec Lagoon is very close to the development.",
      "k": "laguna",
-     "f": "laguna"
+     "f": "laguna",
+     "dict": {
+      "es": "La laguna queda muy cerca.",
+      "en": "The lagoon is very close."
+     }
     },
     {
      "es": "Pasamos por la laguna para llegar a la playa.",
      "en": "We go past the lagoon to get to the beach.",
      "k": "laguna",
-     "f": "laguna"
+     "f": "laguna",
+     "dict": {
+      "es": "Pasamos por la laguna.",
+      "en": "We go past the lagoon."
+     }
     },
     {
      "es": "El aeropuerto queda cerca, a quince minutos en carro.",
@@ -6291,37 +6591,61 @@
        "w": "coche",
        "for": "carro"
       }
-     ]
+     ],
+     "dict": {
+      "es": "El aeropuerto queda cerca.",
+      "en": "The airport is close."
+     }
     },
     {
      "es": "¿El centro queda cerca? Sí, a unos dieciocho minutos.",
      "en": "Is downtown close? Yes, about eighteen minutes.",
      "k": "quedarcerca",
-     "f": "queda cerca"
+     "f": "queda cerca",
+     "dict": {
+      "es": "¿El centro queda cerca?",
+      "en": "Is downtown close?"
+     }
     },
     {
      "es": "Después de Bajos de Chila, busque la desviación a la playa Agua Dulce.",
      "en": "After Bajos de Chila, look for the turnoff to Agua Dulce beach.",
      "k": "desviacion",
-     "f": "desviación"
+     "f": "desviación",
+     "dict": {
+      "es": "Busque la desviación a Agua Dulce.",
+      "en": "Look for the turnoff to Agua Dulce."
+     }
     },
     {
      "es": "La desviación está a la derecha, justo después del puente.",
      "en": "The turnoff is on the right, just after the bridge.",
      "k": "desviacion",
-     "f": "desviación"
+     "f": "desviación",
+     "dict": {
+      "es": "La desviación está a la derecha.",
+      "en": "The turnoff is on the right."
+     }
     },
     {
      "es": "En el entronque hay una tienda; ahí dé vuelta a la izquierda.",
      "en": "There’s a store at the junction; turn left there.",
      "k": "entronque",
-     "f": "entronque"
+     "f": "entronque",
+     "dict": {
+      "es": "En el entronque hay una tienda.",
+      "en": "There's a store at the junction."
+     }
     },
     {
      "es": "Le comparto la ubicación del entronque por WhatsApp.",
      "en": "I’ll share the location of the junction with you on WhatsApp.",
      "k": "entronque",
-     "f": "entronque"
+     "f": "entronque",
+     "dict": {
+      "es": "Le comparto la ubicación del entronque.",
+      "en": "I'll share the location of the junction with you."
+     }
     }
    ],
    "story": {
@@ -6587,7 +6911,11 @@
        "w": "reservado",
        "for": "apartado"
       }
-     ]
+     ],
+     "dict": {
+      "es": "El lote de la esquina está apartado.",
+      "en": "The corner lot is on hold."
+     }
     },
     {
      "es": "Se lo apartamos hoy si nos manda el comprobante de pago.",
@@ -6597,7 +6925,11 @@
      "h": "apartar, nosotros",
      "alts": [
       "Hoy se lo apartamos si nos manda el comprobante de pago."
-     ]
+     ],
+     "dict": {
+      "es": "Se lo apartamos hoy.",
+      "en": "We'll hold it for you today."
+     }
     },
     {
      "es": "Lo siento, ese lote ya está vendido.",
@@ -6618,31 +6950,51 @@
      "alts": [
       "Ya los tres lotes de esa fila están vendidos.",
       "Los tres lotes de esa fila están vendidos ya."
-     ]
+     ],
+     "dict": {
+      "es": "Esos lotes ya están vendidos.",
+      "en": "Those lots are already sold."
+     }
     },
     {
      "es": "¿Me da la clave del lote para buscarlo en el plano?",
      "en": "Can you give me the lot ID so I can find it on the map?",
      "k": "clavedellote",
-     "f": "clave del lote"
+     "f": "clave del lote",
+     "dict": {
+      "es": "¿Me da la clave del lote?",
+      "en": "Can you give me the lot ID?"
+     }
     },
     {
      "es": "La clave del lote que le interesa es L-689.",
      "en": "The ID of the lot you’re interested in is L-689.",
      "k": "clavedellote",
-     "f": "clave del lote"
+     "f": "clave del lote",
+     "dict": {
+      "es": "Anote la clave del lote, por favor.",
+      "en": "Write down the lot ID, please."
+     }
     },
     {
      "es": "Solo quedan dos lotes con vista al mar.",
      "en": "There are only two lots with an ocean view left.",
      "k": "quedan",
-     "f": "quedan"
+     "f": "quedan",
+     "dict": {
+      "es": "Solo quedan dos lotes.",
+      "en": "There are only two lots left."
+     }
     },
     {
      "es": "¿Cuántos lotes quedan en la etapa Gold Plus?",
      "en": "How many lots are left in the Gold Plus phase?",
      "k": "quedan",
-     "f": "quedan"
+     "f": "quedan",
+     "dict": {
+      "es": "¿Cuántos lotes quedan en esta etapa?",
+      "en": "How many lots are left in this phase?"
+     }
     }
    ],
    "story": {
@@ -6876,34 +7228,54 @@
        "w": "reunión",
        "for": "junta"
       }
-     ]
+     ],
+     "dict": {
+      "es": "Nos quedamos de sobremesa hasta las seis.",
+      "en": "We stayed at the table talking until six."
+     }
     },
     {
      "es": "Los domingos solemos comer en casa de mis suegros.",
      "en": "On Sundays we usually eat at my in-laws’ house.",
      "k": "soler",
      "f": "solemos",
-     "h": "soler, nosotros"
+     "h": "soler, nosotros",
+     "dict": {
+      "es": "Los domingos solemos comer en casa.",
+      "en": "On Sundays we usually eat at home."
+     }
     },
     {
      "es": "Cuando vivía en Texas, solía cenar a las seis.",
      "en": "When I lived in Texas, I used to have dinner at six.",
      "k": "soler",
      "f": "solía",
-     "h": "soler, yo, past habit"
+     "h": "soler, yo, past habit",
+     "dict": {
+      "es": "Solía cenar a las seis.",
+      "en": "I used to have dinner at six."
+     }
     },
     {
      "es": "Todavía no me acostumbro a comer tan tarde.",
      "en": "I still haven’t gotten used to eating so late.",
      "k": "acostumbrarse",
      "f": "acostumbro",
-     "h": "acostumbrarse, yo"
+     "h": "acostumbrarse, yo",
+     "dict": {
+      "es": "Todavía no me acostumbro.",
+      "en": "I still haven't gotten used to it."
+     }
     },
     {
      "es": "Al principio me costó acostumbrarme a la comida picante.",
      "en": "At first it was hard for me to get used to spicy food.",
      "k": "acostumbrarse",
-     "f": "acostumbrarme"
+     "f": "acostumbrarme",
+     "dict": {
+      "es": "Me costó acostumbrarme a la comida picante.",
+      "en": "It was hard for me to get used to spicy food."
+     }
     },
     {
      "es": "Aquí se acostumbra brindar antes de comer.",
@@ -6919,20 +7291,32 @@
      "en": "We toasted the bride and groom and the whole family.",
      "k": "brindar",
      "f": "Brindamos",
-     "h": "brindar, nosotros"
+     "h": "brindar, nosotros",
+     "dict": {
+      "es": "Brindamos por los novios.",
+      "en": "We toasted the bride and groom."
+     }
     },
     {
      "es": "La anfitriona nos recibió con un mole delicioso.",
      "en": "The hostess welcomed us with a delicious mole.",
      "k": "anfitrion",
      "f": "anfitriona",
-     "h": "feminine"
+     "h": "feminine",
+     "dict": {
+      "es": "La anfitriona nos recibió con mole.",
+      "en": "The hostess welcomed us with mole."
+     }
     },
     {
      "es": "Se me olvidó el regalo para el anfitrión.",
      "en": "I forgot the gift for the host.",
      "k": "anfitrion",
-     "f": "anfitrión"
+     "f": "anfitrión",
+     "dict": {
+      "es": "Se me olvidó el regalo del anfitrión.",
+      "en": "I forgot the host's gift."
+     }
     }
    ],
    "story": {
@@ -7170,13 +7554,21 @@
      "es": "El lote tiene una superficie de cuatrocientos metros cuadrados.",
      "en": "The lot has an area of four hundred square meters.",
      "k": "superficie",
-     "f": "superficie"
+     "f": "superficie",
+     "dict": {
+      "es": "¿Cuál es la superficie del lote?",
+      "en": "What is the lot's area?"
+     }
     },
     {
      "es": "¿Me confirma la superficie exacta? Necesito que me la mande por escrito.",
      "en": "Can you confirm the exact area? I need you to send it to me in writing.",
      "k": "superficie",
-     "f": "superficie"
+     "f": "superficie",
+     "dict": {
+      "es": "¿Me confirma la superficie exacta?",
+      "en": "Can you confirm the exact area?"
+     }
     },
     {
      "es": "Mide veinte metros de frente.",
@@ -7188,13 +7580,21 @@
      "es": "El L-702 es más grande que el L-689, pero tiene menos frente.",
      "en": "L-702 is bigger than L-689, but it has less frontage.",
      "k": "frente",
-     "f": "frente"
+     "f": "frente",
+     "dict": {
+      "es": "Ese lote tiene menos frente.",
+      "en": "That lot has less frontage."
+     }
     },
     {
      "es": "Tiene veinte de frente por treinta de fondo.",
      "en": "It’s twenty wide by thirty deep.",
      "k": "fondo",
-     "f": "fondo"
+     "f": "fondo",
+     "dict": {
+      "es": "Tiene treinta metros de fondo.",
+      "en": "It's thirty meters deep."
+     }
     },
     {
      "es": "Al fondo del terreno hay unas palmeras.",
@@ -7206,25 +7606,41 @@
      "es": "En el plano vienen todas las colindancias del lote.",
      "en": "The map shows all of the lot’s boundaries.",
      "k": "colindancias",
-     "f": "colindancias"
+     "f": "colindancias",
+     "dict": {
+      "es": "En el plano vienen las colindancias.",
+      "en": "The map shows the boundaries."
+     }
     },
     {
      "es": "Las colindancias del lote son una calle y dos lotes vendidos.",
      "en": "The lot borders a street and two sold lots.",
      "k": "colindancias",
-     "f": "colindancias"
+     "f": "colindancias",
+     "dict": {
+      "es": "Revise las colindancias del lote.",
+      "en": "Check the lot's boundaries."
+     }
     },
     {
      "es": "Este lote tiene menos pendiente que el de al lado.",
      "en": "This lot has less slope than the one next to it.",
      "k": "pendiente",
-     "f": "pendiente"
+     "f": "pendiente",
+     "dict": {
+      "es": "Este lote tiene menos pendiente.",
+      "en": "This lot has less slope."
+     }
     },
     {
      "es": "Con esa pendiente, la vista al mar es mejor.",
      "en": "With that slope, the ocean view is better.",
      "k": "pendiente",
-     "f": "pendiente"
+     "f": "pendiente",
+     "dict": {
+      "es": "Con esa pendiente, la vista es mejor.",
+      "en": "With that slope, the view is better."
+     }
     }
    ],
    "story": {
@@ -8388,7 +8804,18 @@
   "hablar": "to speak",
   "exacto": "exactly",
   "espacio": "space",
-  "jardín": "garden"
+  "jardín": "garden",
+  "arreglando": "fixing (arreglar)",
+  "mándame": "send me (mandar + me)",
+  "sería": "would be (ser)",
+  "vendieron": "they sold (vender)",
+  "hizo": "did / made (hacer)",
+  "descuento": "discount",
+  "dejan": "they leave (dejar)",
+  "revisamos": "we went over / we check (revisar)",
+  "muestro": "I show (mostrar)",
+  "anote": "write down (anotar, usted)",
+  "cuál": "which / what"
  },
  "synonyms": [
   {

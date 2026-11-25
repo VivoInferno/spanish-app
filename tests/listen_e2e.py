@@ -25,7 +25,7 @@ async def answer(page):
     if ex['kind'] == 'mc':
         opts = await page.query_selector_all('.opt'); texts = [await o.inner_text() for o in opts]; await opts[texts.index(ex['answer'])].click()
     elif ex['kind'] == 'build':
-        want = re.sub(r'[¿?¡!.,;:]', '', ex['answers'][0]).split(); used = set()
+        want = re.sub(r'[¿?¡!.,;:“”"]', '', ex['answers'][0]).split(); used = set()
         for wt in want:
             for k, t in enumerate(ex['tiles']):
                 if k not in used and t == wt: used.add(k); await page.click(f'#tiles .tile[data-k="{k}"]'); break
@@ -60,7 +60,7 @@ async def main():
         page.on('pageerror', lambda e: errors.append(str(e)))
         await page.clock.install(time=T0); await page.clock.pause_at(T0)
         await page.goto(URL); await page.wait_for_selector('.stone')
-        check(await page.evaluate("__app.version") == 'v9.7', 'app version is v9.5')
+        check(await page.evaluate("__app.version") == 'v9.8', 'app version is v9.5')
         s = await page.evaluate("__app.state")
         check(s['listenPauseUntil'] == 0 and s['items'] == raw['items'] and s['streak'] == raw['streak'] and s['daily'] == raw['daily'] and s['schema'] == 5 and s['speakPauseUntil'] == 0, 'v6 data loads losslessly, listening on by default')
         flags = await page.evaluate("['es2en','en2es','cloze','listen','listenS','build'].map(t => [t, !!__app.makeExercise({id: 'w:fuga', ex: t}).audio])")

@@ -38,7 +38,7 @@ async def main():
         V81 = dict(V7, settings=dict(V7['settings'], voice='', voice2='', anim=False)); V81['schema'] = 5; V81['speakPauseUntil'] = 0
         ctx, pg, errs = await ctx9(b, p, V81)
         s = await pg.evaluate("__app.state")
-        check(await pg.evaluate("__app.version") == 'v9.7' and s['items'] == V81['items'] and s['daily'] == V81['daily'] and s['streak'] == V81['streak'] and s['path'] == V81['path']
+        check(await pg.evaluate("__app.version") == 'v9.8' and s['items'] == V81['items'] and s['daily'] == V81['daily'] and s['streak'] == V81['streak'] and s['path'] == V81['path']
               and s['settings']['voiceMode'] == 'recorded' and s['settings']['anim'] is False and s['settings']['voice2'] == '' and s['schema'] == 5,
               'v8.1 data → v9 losslessly (items, path, daily, streak, settings kept; voiceMode = recorded)')
         man = await pg.evaluate("Rec.man && { main: Rec.man.main, voices: Rec.man.voices, n: Object.values(Rec.man.files).reduce((a, m) => a + Object.keys(m).length, 0) }")
@@ -123,7 +123,7 @@ async def main():
         short = await pg.evaluate("__app.content.units.find(u => u.id === 'u9').sentences.find(s => s.k === 'llanta' && s.es.split(' ').length <= 9)")
         await fresh_entry(pg, 'llanta', 'speak', f", sent: {json.dumps(short)}"); await pg.wait_for_selector('#mic')
         a = await last(pg); check(a and a['src'] == await path_for(pg, short['es']), 'repeat-after-me plays the recorded sentence')
-        await pg.evaluate(f"__sr.say = {json.dumps(re.sub(r'[¿?¡!.,;:]', '', short['es']).lower())}"); await pg.click('#mic'); await pg.wait_for_selector('#fb .feedback')
+        await pg.evaluate(f"__sr.say = {json.dumps(re.sub(r'[¿?¡!.,;:“”"]', '', short['es']).lower())}"); await pg.click('#mic'); await pg.wait_for_selector('#fb .feedback')
         check(await pg.query_selector('.feedback.good') is not None, 'speaking it is still graded correct')
         await pg.click('#quit'); await pg.wait_for_selector('.stone')
 

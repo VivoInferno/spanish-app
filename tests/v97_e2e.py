@@ -20,7 +20,7 @@ async def answer(pg, right=True):
     elif ex['kind'] == 'build':
         if right:
             used = set()
-            for wtok in re.sub(r'[¿?¡!.,;:]', '', ex['answers'][0]).split():
+            for wtok in re.sub(r'[¿?¡!.,;:“”"]', '', ex['answers'][0]).split():
                 for k, t in enumerate(ex['tiles']):
                     if k not in used and t == wtok: used.add(k); await pg.click(f'#tiles .tile[data-k="{k}"]'); break
             await pg.click('#check')
@@ -46,7 +46,7 @@ async def main():
 
         # ---------- 1. migration ----------
         s = await pg.evaluate("__app.state")
-        check(await pg.evaluate("__app.version") == 'v9.7' and s['items'] == V96['items'] and s['path'] == V96['path'] and s['daily'] == V96['daily']
+        check(await pg.evaluate("__app.version") == 'v9.8' and s['items'] == V96['items'] and s['path'] == V96['path'] and s['daily'] == V96['daily']
               and s['streak'] == V96['streak'] and s['parked'] == V96['parked'] and s['hidden'] == V96['hidden'] and s['focusLog'] == ['ser_estar'],
               'v9.6 data → v9.7 losslessly (items, path, tests, daily, streak, parks, hidden, focusLog untouched)')
         check(sorted(s['wordPractice'].keys()) == ['ta1', 'u1', 'u2', 'u3', 'u4'] and s['wpMigrated'] == 1,

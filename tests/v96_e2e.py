@@ -20,7 +20,7 @@ async def answer(pg, right=True):
     elif ex['kind'] == 'build':
         if right:
             used = set()
-            for wtok in re.sub(r'[¿?¡!.,;:]', '', ex['answers'][0]).split():
+            for wtok in re.sub(r'[¿?¡!.,;:“”"]', '', ex['answers'][0]).split():
                 for k, t in enumerate(ex['tiles']):
                     if k not in used and t == wtok: used.add(k); await pg.click(f'#tiles .tile[data-k="{k}"]'); break
             await pg.click('#check')
@@ -43,7 +43,7 @@ async def main():
         pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto(URL); await pg.wait_for_selector('.stone'); await pg.wait_for_timeout(400)
         s = await pg.evaluate("__app.state")
-        check(await pg.evaluate("__app.version") == 'v9.7' and s['items'] == V95['items'] and s['path'] == V95['path'] and s['daily'] == V95['daily']
+        check(await pg.evaluate("__app.version") == 'v9.8' and s['items'] == V95['items'] and s['path'] == V95['path'] and s['daily'] == V95['daily']
               and s['streak'] == V95['streak'] and s['parked'] == V95['parked'] and s['hidden'] == V95['hidden'] and s['focusLog'] == [],
               'v9.5 data → v9.6 losslessly (items, path, daily, streak, parks, hidden; focusLog = [])')
 

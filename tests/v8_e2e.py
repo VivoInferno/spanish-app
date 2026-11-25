@@ -83,7 +83,7 @@ async def main():
         V7 = strip_meta(json.load(open(FIX + 'v7-export.json')))
         ctx = await new_ctx(b, p, V7); page = await ctx.new_page(); page.on('pageerror', lambda e: errors.append(str(e)))
         await page.goto(URL); await page.wait_for_selector('.stone')
-        check(await page.evaluate("__app.version") == 'v9.7', 'app version is v9.5')
+        check(await page.evaluate("__app.version") == 'v9.8', 'app version is v9.5')
         await page.wait_for_timeout(700)
 
         # ---- voice choice ----
@@ -194,7 +194,7 @@ async def main():
         check(await page.evaluate("__app.ex.kind") == 'speak' and await page.is_visible('#cantSpeak') and short['es'] in (await page.inner_text('.bubble')).replace('🔊', '').strip(), 'speaking drill: sentence in a bubble, big mic, Can\'t speak now')
         await page.screenshot(path=shot('v8-speaking'))
         prev = await page.evaluate("__app.state.items['w:llanta'] || null")
-        await page.evaluate(f"__sr.say = {json.dumps(re.sub(r'[¿?¡!.,;:]', '', short['es']).lower())}"); await page.click('#mic'); await page.wait_for_selector('#fb .feedback')
+        await page.evaluate(f"__sr.say = {json.dumps(re.sub(r'[¿?¡!.,;:“”"]', '', short['es']).lower())}"); await page.click('#mic'); await page.wait_for_selector('#fb .feedback')
         cur = await page.evaluate("__app.state.items['w:llanta']")
         check(await page.query_selector('.feedback.good') is not None and await page.evaluate("__sr.lang") == 'es-MX', 'saying the line (no punctuation, lower case) is graded correct; recogniser set to es-MX')
         check(cur and (prev is None or cur['reps'] == prev['reps'] + 1), 'speaking result goes to FSRS')

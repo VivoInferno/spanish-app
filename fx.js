@@ -6,8 +6,10 @@
   const animOn = () => getSettings().anim !== false && !reduced();
   const speaking = () => root.speechSynthesis && root.speechSynthesis.speaking;
 
+  let stale = false;
   function unlock() { // iOS: create/resume the AudioContext inside a user gesture
     try {
+      if (stale) { stale = false; try { if (ctx) ctx.close(); } catch (e) { /* ignore */ } ctx = null; master = null; unlocked = false; } // v9.8: rebuilt after the mic
       if (!ctx) {
         const AC = root.AudioContext || root.webkitAudioContext; if (!AC) return;
         ctx = new AC(); master = ctx.createGain(); master.gain.value = 0.22; master.connect(ctx.destination);
@@ -107,6 +109,9 @@
       const bar = el.querySelector('.mbar') || el, r = bar.getBoundingClientRect(); sparkle(r.left + r.width / 2, r.top + r.height / 2);
     },
     pause(el) { sounds.pause(); vibrate(8); retrigger(el, 'fx-pop'); retrigger(document.querySelector('main.card'), 'fx-dim'); },
+    // v9.8: the mic put iOS on the call route; the context is closed and rebuilt on the next tap (playback route)
+    afterMic() { stale = true; if (ctx) try { ctx.close(); } catch (e) { /* ignore */ } ctx = null; master = null; unlocked = false; },
+    get ctx() { return ctx; },
     sounds
   };
   root.FX = FX;

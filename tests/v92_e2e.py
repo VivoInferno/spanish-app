@@ -46,7 +46,7 @@ async def main():
         pg = await ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto(URL); await pg.wait_for_selector('.stone'); await pg.wait_for_timeout(500)
         s = await pg.evaluate("__app.state")
-        check(await pg.evaluate("__app.version") == 'v9.7' and s['items'] == V91['items'] and s['path'] == V91['path'] and s['daily'] == V91['daily'] and s['streak'] == V91['streak'] and s['settings']['voiceMode'] == 'recorded',
+        check(await pg.evaluate("__app.version") == 'v9.8' and s['items'] == V91['items'] and s['path'] == V91['path'] and s['daily'] == V91['daily'] and s['streak'] == V91['streak'] and s['settings']['voiceMode'] == 'recorded',
               'v9.1 data → v9.5 losslessly')
         LONG = await pg.evaluate("__app.content.units.flatMap(u => u.sentences).sort((a, b) => b.es.length - a.es.length)[0]")
         print('   longest sentence:', LONG['es'])
@@ -72,7 +72,7 @@ async def main():
         await fresh(pg, LONG['k'], 'listenS', LONG); await pg.wait_for_selector('#ans')
         await pg.fill('#ans', 'uno\ndos\r\ntres'); v = await pg.evaluate("document.getElementById('ans').value")
         check(v == 'uno dos tres', f'pasted line breaks become spaces ({v!r})')
-        await pg.fill('#ans', ' '.join([typed] * 6)); await pg.wait_for_timeout(50)
+        await pg.fill('#ans', ' '.join([typed] * 14)); await pg.wait_for_timeout(50)
         big = await pg.evaluate("(() => { const a = document.getElementById('ans'), cs = getComputedStyle(a); return { h: a.getBoundingClientRect().height, lh: parseFloat(cs.lineHeight), oy: cs.overflowY, sw: a.scrollWidth, cw: a.clientWidth }; })()")
         check(big['h'] <= 6 * big['lh'] + 40 and big['oy'] == 'auto' and big['sw'] <= big['cw'] + 1, f'caps at ~6 lines then scrolls ({big["h"]:.0f}px, overflow-y {big["oy"]})')
         await pg.fill('#ans', 'zzzz qqqq'); await pg.click('#check'); await pg.wait_for_selector('#fb .feedback')

@@ -57,7 +57,7 @@ async def main():
                 await pg.goto(URL); await pg.wait_for_selector('.stone')
             else:
                 await pg.goto(URL); await pg.wait_for_selector('#go'); await pg.evaluate("s => __app.importBackup(s)", json.dumps(V5)); await pg.reload(); await pg.wait_for_selector('.stone')
-            check(await pg.evaluate("__app.version") == 'v9.7', f'[{mode}] app version is v9.5')
+            check(await pg.evaluate("__app.version") == 'v9.8', f'[{mode}] app version is v9.5')
             s = await pg.evaluate("__app.state"); stored = await pg.evaluate(f"JSON.parse(localStorage.getItem('{KEY}'))")
             keep = ['items', 'pstats', 'recent', 'parked', 'daily', 'streak', 'placementDone', 'placementSummary', 'sessions', 'created']
             check(all(s.get(k) == raw.get(k) for k in keep), f'[{mode}] SRS items ({len(raw["items"])}), stats, parked, daily history, streak unchanged')
@@ -107,7 +107,7 @@ async def main():
                     if ex['kind'] == 'mc':
                         opts = await pg.query_selector_all('.opt'); texts = [await o.inner_text() for o in opts]; await opts[texts.index(ex['answer'])].click()
                     elif ex['kind'] == 'build':
-                        want = re.sub(r'[¿?¡!.,;:]', '', ex['answers'][0]).split(); used = set()
+                        want = re.sub(r'[¿?¡!.,;:“”"]', '', ex['answers'][0]).split(); used = set()
                         for wt in want:
                             for k, t in enumerate(ex['tiles']):
                                 if k not in used and t == wt: used.add(k); await pg.click(f'#tiles .tile[data-k="{k}"]'); break

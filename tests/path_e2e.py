@@ -25,7 +25,7 @@ async def answer(page, right=True):
     elif ex['kind'] == 'build':
         if right:
             import re
-            want = re.sub(r'[¿?¡!.,;:]', '', ex['answers'][0]).split()
+            want = re.sub(r'[¿?¡!.,;:“”"]', '', ex['answers'][0]).split()
             used = set()
             for wtok in want:
                 for k, t in enumerate(ex['tiles']):
@@ -56,7 +56,7 @@ async def main():
         page.on('console', lambda m: errors.append(m.text) if m.type == 'error' else None)
         page.on('pageerror', lambda e: errors.append(str(e)))
         await page.goto(URL); await page.wait_for_selector('#go')
-        check(await page.evaluate("__app.version") == 'v9.7', 'app version is v9.7')
+        check(await page.evaluate("__app.version") == 'v9.8', 'app version is v9.8')
         # --- placement
         await page.click('#go'); k = 0
         while not await page.query_selector('h1:has-text("Placement results")'):

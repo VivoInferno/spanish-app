@@ -290,7 +290,7 @@ t('v8 glosses: every Spanish word in sentences, stories and grammar items has a 
   C.units.forEach(u => u.sentences.forEach(s => { const k = strip(s.f); if (!k.includes(' ')) forms.add(k); }));
   const G = new Set(Object.keys(C.glosses).map(strip)); const miss = new Set();
   const scan = txt => txt.replace(/\([^)]*\)/g, ' ').split(/\s+/).forEach(tok => { const c = tok.replace(/^[¿¡“"(«—]+|[.,;:!?”"»)…—]+$/g, ''); if (!c || !/\p{L}/u.test(c)) return; const k = strip(c); if (!forms.has(k) && !G.has(k)) miss.add(c); });
-  C.units.forEach(u => { u.sentences.forEach(s => scan(s.es)); u.story.lines.forEach(l => scan(l.es)); });
+  C.units.forEach(u => { u.sentences.forEach(s => { scan(s.es); if (s.dict) scan(s.dict.es); }); u.story.lines.forEach(l => scan(l.es)); });
   Object.values(C.patterns).forEach(p => p.items.forEach(i => scan(i.q.replace('___', i.o[0]))));
   assert.deepEqual([...miss], []);
   Object.entries(C.glosses).forEach(([k, v]) => assert.ok(v && v.trim(), k));
@@ -620,4 +620,20 @@ t('v9.6 every pattern has at least 2 easy items for the opening contrasts and 6+
   });
   t('v9.6 no generated order breaks the content rules', () => all.forEach(([es, list]) => (list || []).forEach(x => assert.ok(!/palmarito|cocodril|garantiz/i.test(x), x))));
 }
+
+// ---- v9.8 dictation length: "type what you hear" never plays more than 7 words ----
+t('v9.8 every dictation item (sentence or its short dict chunk, and every word) is 7 words or fewer, keeps the target form, and is recorded', () => {
+  const fs = require('fs'), path = require('path'), Rec = require('../audio.js');
+  const man = JSON.parse(fs.readFileSync(path.join(__dirname, '../audio/manifest.json'), 'utf8'));
+  const n = t => t.replace(/[¿?¡!.,;:“”"]/g, '').split(/\s+/).filter(Boolean).length;
+  let short = 0;
+  C.units.forEach(u => {
+    u.sentences.forEach(s => {
+      const d = s.dict || s; assert.ok(n(d.es) <= 7, u.id + ': ' + d.es);
+      if (s.dict) { short++; assert.ok(n(s.dict.es) >= 4, 'too short: ' + s.dict.es); assert.ok(n(s.es) > 7, 'dict only on long sentences: ' + s.es); assert.ok(s.dict.es.toLowerCase().includes(s.f.toLowerCase()), s.dict.es + ' lacks ' + s.f); assert.ok(s.dict.en, s.dict.es); assert.ok(Rec.lookup(man, s.dict.es), 'recorded: ' + s.dict.es); }
+    });
+    u.words.forEach(w => assert.ok(n(w.es) <= 7, w.es));
+  });
+  assert.ok(short >= 100, short + ' short variants');
+});
 console.log(`\n${n} tests passed`);

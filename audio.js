@@ -18,10 +18,11 @@
   if (typeof module !== 'undefined') { module.exports = Rec; return; }
 
   const SILENT = 'data:audio/mpeg;base64,SUQzBAAAAAAAIlRTU0UAAAAOAAADTGF2ZjYxLjcuMTAzAAAAAAAAAAAAAAD/84TAAAAAAAAAAAAASW5mbwAAAA8AAAAFAAACoABtbW1tbW1tbW1tbW1tbW1tbW1tkpKSkpKSkpKSkpKSkpKSkpKSkpK2tra2tra2tra2tra2tra2tra2ttvb29vb29vb29vb29vb29vb29vb//////////////////////////8AAAAATGF2YzYxLjE5AAAAAAAAAAAAAAAAJARQAAAAAAAAAqC9P8vrAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/80TEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy7/80TEUwAAA0gAAAAAMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy7/80TEpgAAA0gAAAAAMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/80TErAAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/80TErAAAA0gAAAAAVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU=';
-  let el = null, unlocked = false, seq = 0;
+  let el = null, unlocked = false, seq = 0, stale = false;
   const blobs = new Map(); // path → blob URL (small LRU)
   const media = () => el || (el = new Audio());
   Rec.unlock = () => {
+    if (stale) { stale = false; if (el) try { el.pause(); el.removeAttribute('src'); el.load(); } catch (e) { /* ignore */ } el = null; unlocked = false; } // v9.8: fresh element after the mic
     if (unlocked) return; unlocked = true;
     try { const a = media(); a.muted = true; a.src = SILENT; const p = a.play(); if (p && p.then) p.then(() => { a.pause(); a.muted = false; }, () => { a.muted = false; unlocked = false; }); else a.muted = false; } catch (e) { unlocked = false; }
   };
@@ -36,6 +37,7 @@
   Rec.stop = () => { seq++; if (el) try { el.pause(); } catch (e) { /* ignore */ } };
   // resolves true when playback started; rejects on a missing file / blocked play so the caller can fall back
   Rec.play = (path, rate) => {
+    if (stale) { stale = false; if (el) try { el.pause(); el.removeAttribute('src'); el.load(); } catch (e) { /* ignore */ } el = null; unlocked = false; } // never reuse the call-route element
     const my = ++seq; if (el) try { el.pause(); } catch (e) { /* ignore */ }
     if (root.__audioLog) root.__audioLog.push({ src: path, rate });
     return blobUrl(path).then(u => {
@@ -47,6 +49,10 @@
   };
   // v9.1: hand the audio session back before the microphone starts (iOS): stop, drop the clip and reset the element
   Rec.release = () => { seq++; if (!el) return; try { el.pause(); el.removeAttribute('src'); el.load(); } catch (e) { /* ignore */ } };
+  // v9.8: after the microphone (iOS keeps the element on the phone-call route): drop the clip now and swap in a brand-new
+  // element on the next tap, unlocked inside that gesture, so playback picks up the normal speaker route again
+  Rec.afterMic = () => { Rec.release(); if (el) { try { el.pause(); el.removeAttribute('src'); el.load(); } catch (e) { /* ignore */ } el = null; } unlocked = false; stale = true; };
+  Rec.fresh = () => !stale;
   Rec.playing = () => !!(el && !el.paused && !el.ended);
   // fill the offline audio cache with the given files (only missing ones), a few at a time
   Rec.prefetch = async (paths, onProgress) => {
